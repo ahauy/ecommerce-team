@@ -278,19 +278,18 @@ schema-version: "1.3"
   - **Priority:** Must-Have (P0)
   - **Depends-on:** `US-PRD-002`, `US-AUTH-001`
   - **Blocks:** `US-ORD-001`
-  - **Mô tả:** Guest quản lý giỏ hàng trên trình duyệt (localStorage). Khi đăng nhập, giỏ hàng tự động merge vào DB. Customer xem/sửa giỏ hàng từ DB.
+  - **Mô tả:** Người mua đã đăng nhập quản lý giỏ hàng lưu trong DB. Guest (chưa đăng nhập) chỉ xem sản phẩm — không có giỏ hàng, không có localStorage cart, không merge. Admin không mua nên không có giỏ.
   - **Acceptance Criteria (AC):**
-    - [ ] Guest: Thêm SP vào giỏ → lưu localStorage; refresh trang không mất dữ liệu.
-    - [ ] Guest: Số lượng trong giỏ không vượt quá stock hiện tại — nếu vượt → báo lỗi client-side.
+    - [ ] Chưa đăng nhập bấm "Thêm giỏ" → FE chuyển sang trang đăng nhập; mọi endpoint `/api/v1/cart/*` yêu cầu JWT (thiếu token → 401).
+    - [ ] Admin gọi `POST /api/v1/cart/items` → 403 (Admin chỉ kiểm duyệt, không mua).
     - [ ] Customer: `GET /api/v1/cart` → trả về giỏ hàng từ DB, **nhóm theo người bán** (`groups[].seller`, `subtotal`) + `totalAmount`.
     - [ ] Customer: `POST /api/v1/cart/items` → thêm item, validate stock; **SP của chính mình → 400**.
     - [ ] Customer: `PATCH /api/v1/cart/items/:productId` → cập nhật quantity.
     - [ ] Customer: `DELETE /api/v1/cart/items/:productId` → xóa item.
-    - [ ] Customer: `POST /api/v1/cart/merge` (ngay sau đăng nhập) → merge localStorage items vào DB cart, quantity không vượt stock; **tự lọc bỏ SP của chính mình**.
     - [ ] Item có `stock = 0` hoặc SP ẩn/bị block bị loại khỏi giỏ khi tải lại.
     - [ ] FE: Trang giỏ hàng (CartPage) hiển thị items **theo từng shop** (subtotal mỗi shop), tổng tiền VNĐ, nút checkout.
   - **Tasks:**
-    - [ ] **Backend:** `Cart schema (userId unique, items[])` · `Cart CRUD service + group by sellerId khi GET` · `Merge logic (cộng quantity, cap ở stock, lọc SP của mình)` · `Guard: JwtAuthGuard`
+    - [ ] **Backend:** `Cart schema (userId unique, items[])` · `Cart CRUD service + group by sellerId khi GET` · `Guard: JwtAuthGuard (Admin → 403)`
     - [ ] **Frontend:** `cartStore (localStorage cho Guest, API cho Customer)` · `CartPage, CartItem components` · `Merge cart on login action`
   - **Deliverables khi [x]:**
     - `.specify/features/cart-management/baseline.md` (SIGNED-OFF)
@@ -311,20 +310,20 @@ schema-version: "1.3"
   - **Priority:** Must-Have (P0)
   - **Depends-on:** `US-CART-001`
   - **Blocks:** `US-PAY-001`, `US-ORD-002`, `US-SELL-002`
-  - **Mô tả:** Guest và Customer tạo đơn từ giỏ hàng. Hệ thống nhóm item theo người bán, tạo **1 Checkout + N Order** (mỗi shop 1 Order), thanh toán một lần qua VNPay.
+  - **Mô tả:** Người mua đã đăng nhập (Customer; Admin không mua) tạo đơn từ giỏ hàng. Hệ thống nhóm item theo người bán, tạo **1 Checkout + N Order** (mỗi shop 1 Order), thanh toán một lần qua VNPay.
   - **Acceptance Criteria (AC):**
-    - [ ] `POST /api/v1/orders` (⚪ Optional auth — Guest + Customer dùng chung) → tạo Checkout + các Order, trừ stock ngay.
+    - [ ] `POST /api/v1/orders` (🔒 yêu cầu đăng nhập — không có Guest checkout; Admin → 403) → tạo Checkout + các Order, trừ stock ngay.
     - [ ] Giỏ có SP của 2 shop → tạo đúng 2 Order, mỗi Order có `sellerId` và `totalAmount` riêng; `Checkout.totalAmount` = tổng.
     - [ ] Giá và tên SP lấy từ DB, bỏ qua `price` do client gửi.
-    - [ ] Guest: bắt buộc cung cấp `recipient` (fullName, phone, email, address).
-    - [ ] Customer: auto-fill từ profile, cho phép override address.
-    - [ ] Có bất kỳ SP nào `stock < quantity` (hoặc SP ẩn/block) → 400 kèm danh sách SP thiếu hàng, **không tạo Checkout/Order nào và stock đã trừ được hoàn lại**.
+    - [ ] `recipient` tự lấy từ profile, cho phép override address; profile thiếu `phone`/`address` mà body không bổ sung → 400 (BR-CHK-008).
+    - [ ] Có bất kỳ SP nào `stock < quantity` (hoặc SP ẩn/block) → 400 kèm danh sách SP thiếu hàng, **transaction abort: không tạo Checkout/Order nào, stock không đổi**.
     - [ ] Customer mua SP của chính mình → 400.
     - [ ] Trừ stock nguyên tử (`stock >= qty`); 2 người mua SP cuối cùng cùng lúc → chỉ 1 người thành công.
+    - [ ] Tạo Checkout (trừ stock + Checkout + N Order) chạy trong **1 MongoDB transaction** (`session.withTransaction`, BR-CHK-010); lỗi giữa chừng → không còn stock bị giữ mà không có Order.
     - [ ] Response trả `checkoutId`, `checkoutCode`, `totalAmount`, `expiresAt`, `orders[]`, `vnpayUrl`. Mọi Order mặc định `pending`.
     - [ ] FE: Trang Checkout (form recipient) → "Thanh toán" → redirect VNPay; trang kết quả `/checkout/result` liệt kê các đơn.
   - **Tasks:**
-    - [ ] **Backend:** `Checkout schema + Order schema (checkoutId, sellerId, sellerShopName, userId nullable, recipient, items snapshot, totalAmount, status, paymentStatus)` · `POST /orders: group by seller, atomic decrement, all-or-nothing rollback, generate VNPay URL` · `orderCode/checkoutCode generator` · `restockAndCancel() dùng chung`
+    - [ ] **Backend:** `Checkout schema + Order schema (checkoutId, sellerId, sellerShopName, userId, recipient, items snapshot, totalAmount, status, paymentStatus)` · `POST /orders: group by seller, atomic decrement, session.withTransaction (all-or-nothing), generate VNPay URL` · `orderCode/checkoutCode generator` · `restockAndCancel() dùng chung`
     - [ ] **Frontend:** `CheckoutPage (Guest form / Customer prefill)` · `CheckoutResultPage (success/fail)`
   - **Deliverables khi [x]:**
     - `.specify/features/order-checkout/baseline.md` (SIGNED-OFF)
