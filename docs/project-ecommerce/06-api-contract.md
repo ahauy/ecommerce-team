@@ -245,9 +245,10 @@ Authorization: Bearer <access_token>
 | POST   | `/products`            | ✅ Login              | Đăng bán SP mới (yêu cầu đã thiết lập gian hàng) — `sellerId` = mình    |
 | PATCH  | `/products/:id`        | ✅ Login + Owner      | Cập nhật SP (gồm `price`, `stock`, `isActive`)                          |
 | DELETE | `/products/:id`        | ✅ Login + Owner      | Ẩn sản phẩm (soft delete, `isActive = false`)                           |
-| POST   | `/products/:id/images` | ✅ Login + Owner      | Upload ảnh (Cloudinary) và gắn vào SP                                   |
 
 > Route `/products/my` phải khai báo **trước** `/products/:id` trong controller NestJS.
+>
+> Upload ảnh: gọi `POST /upload/image` (✅ Login) lấy URL Cloudinary, rồi gửi mảng URL trong `images[]` của `POST/PATCH /products` (không có endpoint upload riêng theo SP). Server chỉ nhận URL thuộc cloud của app (BR-PRD-012).
 
 #### GET `/products` — Query Params
 
@@ -260,6 +261,7 @@ Authorization: Bearer <access_token>
 &maxPrice=5000000        // lọc giá tối đa
 &sortBy=price            // price | createdAt | name
 &order=asc               // asc | desc
+                         // limit tối đa 100 (mặc định 20)
 ```
 
 > Chỉ trả SP có `isActive = true` **và** `isBlocked = false`.
@@ -371,6 +373,7 @@ Authorization: Bearer <access_token>
 | GET    | `/orders`                 | ✅ Admin                   | Tất cả đơn hàng (lọc `status`, `sellerId`, `userId`)       |
 | GET    | `/orders/:id`             | ✅ Admin                   | Chi tiết đơn bất kỳ                                        |
 | PATCH  | `/orders/:id/status`      | ✅ Login + Owner (Seller của đơn) hoặc Admin | Cập nhật trạng thái đơn        |
+| GET    | `/checkouts/:checkoutCode` | ✅ Login + Owner (chủ Checkout) | Trạng thái 1 lần thanh toán + các đơn con — cho trang `/checkout/result` |
 
 > `/orders/my` và `/orders/selling` phải khai báo **trước** `/orders/:id` trong controller NestJS.
 
@@ -397,19 +400,19 @@ Authorization: Bearer <access_token>
   "success": true,
   "data": {
     "checkoutId": "...",
-    "checkoutCode": "CHK-20261002-ABCD",
+    "checkoutCode": "CHK-20261002-7F3K9QX2AB",
     "totalAmount": 59980000,
     "expiresAt": "2026-10-02T10:30:00.000Z",
     "orders": [
       {
         "orderId": "...",
-        "orderCode": "ORD-20261002-AAAA",
+        "orderCode": "ORD-20261002-4M8TQ2ZP6C",
         "seller": { "id": "...", "shopName": "Shop A" },
         "totalAmount": 29990000
       },
       {
         "orderId": "...",
-        "orderCode": "ORD-20261002-BBBB",
+        "orderCode": "ORD-20261002-9H2WD5LR7E",
         "seller": { "id": "...", "shopName": "Shop B" },
         "totalAmount": 29990000
       }
@@ -433,13 +436,31 @@ Lỗi thường gặp:
 { "success": false, "message": "Bạn không thể mua sản phẩm của chính mình" }
 ```
 
+#### GET `/checkouts/:checkoutCode` — trang kết quả thanh toán
+
+```json
+// Response 200 — thông tin tối thiểu, KHÔNG trả recipient / items
+{
+  "success": true,
+  "data": {
+    "checkoutCode": "CHK-20261002-7F3K9QX2AB",
+    "status": "paid",              // pending | paid | failed | expired
+    "totalAmount": 59980000,
+    "orders": [
+      { "orderCode": "ORD-20261002-4M8TQ2ZP6C", "shopName": "Shop A", "totalAmount": 29990000, "status": "confirmed" }
+    ]
+  }
+}
+// 404 nếu không tồn tại hoặc không phải checkout của mình. FE dùng endpoint này thay vì tin query ?status=... trên URL redirect.
+```
+
 #### GET `/orders/my` — mỗi phần tử
 
 ```json
 {
   "id": "...",
-  "orderCode": "ORD-20261002-AAAA",
-  "checkoutCode": "CHK-20261002-ABCD",
+  "orderCode": "ORD-20261002-4M8TQ2ZP6C",
+  "checkoutCode": "CHK-20261002-7F3K9QX2AB",
   "seller": { "id": "...", "shopName": "Shop A" },
   "items": [ { "name": "...", "imageUrl": "...", "price": 100000, "quantity": 2 } ],
   "totalAmount": 200000,
@@ -481,6 +502,9 @@ Lỗi thường gặp:
 > `vnpay/return` và `vnpay/ipn` đều: verify checksum HMAC-SHA512 → gọi **chung** hàm xử lý idempotent (BR-PAY-006) → khác nhau ở phần response:
 > - `return`: redirect trình duyệt về FE `FRONTEND_URL/checkout/result?checkoutCode=...&status=success|failed`.
 > - `ipn`: trả JSON cho VNPay.
+> - FE **không tin** `status` trên URL redirect — gọi `GET /checkouts/:checkoutCode` để lấy trạng thái thật.
+> - Tạo URL VNPay kèm `vnp_ExpireDate = expiresAt` (BR-PAY-010).
+> - Khi deploy (Render): Return URL và IPN URL trỏ về backend public → IPN gọi được thật; vẫn giữ Return URL cập nhật đơn như dự phòng (xem `10-deployment.md`).
 >
 > Lý do dùng chung: khi chạy `localhost`, VNPay **không gọi được IPN** (trừ khi dùng ngrok/cloudflared), nên Return URL phải đủ sức cập nhật đơn.
 

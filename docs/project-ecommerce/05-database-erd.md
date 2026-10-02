@@ -31,7 +31,7 @@ payments       (raw log callback VNPay)
   address: String,        // optional — dùng cho checkout nhanh
   role: String,           // enum: ['customer', 'admin'], default: 'customer'
   isActive: Boolean,      // default: true — false khi bị ban
-  refreshToken: String,   // lưu refresh token hiện tại (hash hoặc raw)
+  refreshToken: String,   // SHA-256 hash của refresh token hiện tại (không lưu raw) — 1 token / user
 
   // ── Gian hàng (null cho tới khi user thiết lập để đăng bán) ──
   shopName: String,       // optional, 3–50 ký tự — bắt buộc có mới được đăng SP
@@ -66,7 +66,7 @@ payments       (raw log callback VNPay)
   _id: ObjectId,
   sellerId: ObjectId,     // ref: 'users', required, BẤT BIẾN — chủ sở hữu SP
   name: String,           // required, max 120 ký tự
-  slug: String,           // unique, tạo tự động từ name
+  slug: String,           // unique, slugify(name) + hậu tố ngẫu nhiên (BR-PRD-011) — nhiều seller có thể trùng tên SP
   description: String,    // required
   price: Number,          // VNĐ, integer, > 0
   stock: Number,          // integer, >= 0
@@ -113,8 +113,8 @@ payments       (raw log callback VNPay)
 ```js
 {
   _id: ObjectId,
-  checkoutCode: String,    // unique, tự generate (e.g. "CHK-20261002-ABCD") — dùng làm vnp_TxnRef
-  userId: ObjectId,        // ref: 'users' — null nếu là Guest
+  checkoutCode: String,    // unique, tự generate (e.g. "CHK-20261002-7F3K9QX2AB", đuôi ≥10 ký tự ngẫu nhiên) — dùng làm vnp_TxnRef
+  userId: ObjectId,        // ref: 'users', required — người mua (không có Guest checkout)
 
   recipient: {             // snapshot người nhận, dùng chung cho mọi order con
     fullName: String,
@@ -143,9 +143,9 @@ payments       (raw log callback VNPay)
 ```js
 {
   _id: ObjectId,
-  orderCode: String,       // unique, tự generate (e.g. "ORD-20261002-XXXX")
+  orderCode: String,       // unique, tự generate (e.g. "ORD-20261002-4M8TQ2ZP6C", đuôi ≥10 ký tự ngẫu nhiên)
   checkoutId: ObjectId,    // ref: 'checkouts', required
-  userId: ObjectId,        // ref: 'users' — người mua; null nếu là Guest
+  userId: ObjectId,        // ref: 'users', required — người mua
   sellerId: ObjectId,      // ref: 'users', required — người bán của đơn này
 
   // Thông tin người nhận (snapshot tại thời điểm đặt hàng, copy từ checkout)
@@ -264,6 +264,8 @@ orders.userId: index                  // lịch sử mua
 orders.sellerId: index                // đơn bán của seller
 orders.status: index
 orders.createdAt: index               // sort by date
+orders.{sellerId, createdAt}: compound index   // đơn bán, sort mới nhất
+orders.{userId, createdAt}: compound index     // đơn mua, sort mới nhất
 ```
 
 ---
@@ -283,3 +285,56 @@ Order.findOneAndUpdate(
   { status: 'cancelled', ... },
 ); // có kết quả trả về → mới $inc stock lại cho từng item
 ```
+
+### Chuyển trạng thái Checkout — cũng phải nguyên tử
+
+```js
+// Dùng chung cho IPN, Return URL và cron hết hạn (BR-PAY-011) — chạy trong cùng transaction với cập nhật Order con (BR-CHK-010)
+const checkout = await Checkout.findOneAndUpdate(
+  { _id, status: 'pending' },
+  { status: 'paid', paidAt: new Date(), vnpayTransactionId },
+  { new: true, session },
+); // null → đã có bên khác xử lý (hoặc đã expired) → KHÔNG cập nhật Order / hoàn stock lần nữa
+```
+
+### Ban seller — không ghi đè block có sẵn (BR-SELL-004)
+
+```js
+Product.updateMany(
+  { sellerId, isBlocked: false },
+  { isBlocked: true, blockReason: 'seller_banned' },
+);
+// Unban: chỉ mở lại SP có blockReason === 'seller_banned'
+```
+
+### Transaction — `createCheckout` / `restockAndCancel` (BR-CHK-010)
+
+> Cần MongoDB replica set (Atlas free tier có sẵn; local: single-node replica set — xem 09). Không dùng cờ `reserved` hay rollback thủ công.
+
+```js
+// createCheckout: trừ stock + tạo Checkout + N Order = 1 transaction
+const session = await this.connection.startSession();
+let checkout;
+try {
+  await session.withTransaction(async () => {
+    for (const item of items) {
+      const p = await Product.findOneAndUpdate(
+        { _id: item.productId, isActive: true, isBlocked: false, stock: { $gte: item.quantity } },
+        { $inc: { stock: -item.quantity } },
+        { new: true, session },
+      );
+      if (!p) throw new BadRequestException('Sản phẩm hết hàng hoặc không còn bán'); // abort → stock tự quay lại
+    }
+    [checkout] = await Checkout.create([{ /* ... */ }], { session });
+    await Order.create(orders.map((o) => ({ ...o, checkoutId: checkout._id })), { session });
+  });
+} finally {
+  await session.endSession();
+}
+// Tạo URL VNPay SAU khi transaction commit
+```
+
+- Mọi thao tác DB trong transaction đều truyền `{ session }`.
+- Callback của `withTransaction` có thể bị chạy lại khi gặp lỗi tạm thời → chỉ chứa thao tác DB, **không** gọi VNPay / Cloudinary / gửi mail bên trong.
+- `restockAndCancel`: `Order.findOneAndUpdate({ _id, status: <trạng thái hợp lệ> }, { status: 'cancelled' }, { session })` + `$inc` stock từng item trong **cùng** transaction → hoặc cả hai cùng xảy ra, hoặc không gì thay đổi.
+- IPN / Return: cập nhật Checkout có điều kiện (BR-PAY-011) + Order → `confirmed` + xóa item giỏ (BR-CHK-007) trong cùng 1 transaction.

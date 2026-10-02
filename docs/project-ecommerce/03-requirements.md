@@ -22,10 +22,15 @@
 | BR-AUTH-001 | Email là định danh duy nhất — không được trùng khi đăng ký                                |
 | BR-AUTH-002 | Password phải hash bằng bcrypt trước khi lưu DB                                           |
 | BR-AUTH-003 | Access Token hết hạn sau 15 phút; Refresh Token hết hạn sau 7 ngày                        |
-| BR-AUTH-004 | Chỉ Admin mới có thể gán role `admin` cho user khác                                       |
+| BR-AUTH-004 | Không có API gán role `admin`. Tài khoản Admin đầu tiên được tạo bằng **seed script** (đọc `ADMIN_EMAIL` / `ADMIN_PASSWORD` từ `.env`); đăng ký công khai luôn ra `role = customer` |
 | BR-AUTH-005 | Guest không có token — truy cập public endpoint bình thường                               |
 | BR-AUTH-006 | Một tài khoản vừa mua vừa bán được; không có role `seller` riêng (role chỉ `customer`/`admin`) |
 | BR-AUTH-007 | User bị ban (`isActive = false`) không đăng nhập được (403) và không refresh được token   |
+| BR-AUTH-008 | Password tối thiểu 8 ký tự (khớp ví dụ lỗi validation ở API Contract) |
+| BR-AUTH-009 | Ban có hiệu lực **ngay**: `JwtStrategy.validate` đọc `isActive` từ DB mỗi request — access token còn hạn của user bị ban bị từ chối (403) |
+| BR-AUTH-010 | `users.refreshToken` lưu **hash** (SHA-256), không lưu raw; mỗi user 1 refresh token (đăng nhập thiết bị mới vô hiệu hóa token cũ) |
+| BR-AUTH-011 | Admin **chỉ kiểm duyệt**: block/unblock SP, ban/unban user, xem đơn, hủy / hoàn tiền đơn đã thanh toán. Admin **không mua** (thêm giỏ, `POST /orders` → 403) và **không đăng bán** (không có gian hàng, `POST /products` → 403) |
+| BR-AUTH-012 | Guest (chưa đăng nhập) **chỉ xem**. Mọi thao tác giỏ hàng / checkout / đơn hàng yêu cầu đăng nhập — **không có Guest checkout, không có giỏ localStorage, không merge cart** |
 
 ### User & Shop (gian hàng)
 
@@ -60,15 +65,18 @@
 | BR-PRD-008 | SP hiển thị công khai khi và chỉ khi `isActive = true` **và** `isBlocked = false`                                        |
 | BR-PRD-009 | Tên sản phẩm tối đa 120 ký tự                                                                                            |
 | BR-PRD-010 | `sellerId` bất biến — không đổi chủ sau khi tạo                                                                          |
+| BR-PRD-011 | `slug` unique **toàn sàn** nhưng nhiều người bán có thể đặt trùng tên → slug = `slugify(name)` + hậu tố ngẫu nhiên ngắn (vd `iphone-15-pro-k3f9`); API tra cứu SP dùng `:id`, slug chỉ để hiển thị URL |
+| BR-PRD-012 | Mỗi URL trong `images[]` phải bắt đầu bằng `https://res.cloudinary.com/<CLOUDINARY_CLOUD_NAME>/` — từ chối URL ngoài (400) |
+| BR-PRD-013 | `PATCH /products/:id` dùng DTO whitelist: **không** nhận `sellerId`, `isBlocked`, `blockReason`, `slug` từ body của Seller (chống mass assignment) |
 
 ### Seller (đăng bán & sở hữu)
 
 | ID          | Rule                                                                                                                                      |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | BR-SELL-001 | Seller chỉ sửa / ẩn / xóa mềm / cập nhật stock **sản phẩm của mình**. Admin thao tác được trên mọi SP. Sai chủ → 403                      |
-| BR-SELL-002 | Seller **không được mua sản phẩm của chính mình** — chặn ở thêm giỏ, merge cart và tạo Order                                              |
+| BR-SELL-002 | Seller **không được mua sản phẩm của chính mình** — chặn ở thêm giỏ và tạo Order |
 | BR-SELL-003 | Seller chỉ xem và xử lý các Order có `order.sellerId` = mình                                                                              |
-| BR-SELL-004 | Seller bị ban → toàn bộ SP của họ bị block (`isBlocked = true`, `blockReason = "seller_banned"`); unban → chỉ mở lại SP có reason này     |
+| BR-SELL-004 | Seller bị ban → block các SP **đang `isBlocked = false`** (`isBlocked = true`, `blockReason = "seller_banned"`); **không ghi đè** `blockReason` của SP đã bị Admin block trước đó. Unban → chỉ mở lại SP có `blockReason = "seller_banned"` |
 | BR-SELL-005 | Admin có thể block SP vi phạm (bắt buộc nhập lý do). Seller không tự mở lại được; vẫn thấy SP bị block kèm lý do                          |
 | BR-SELL-006 | Ẩn / xóa mềm / block SP không ảnh hưởng Order đã tạo (Order lưu snapshot)                                                                 |
 | BR-SELL-007 | Không duyệt trước — đăng là hiển thị ngay (Admin kiểm duyệt sau bằng block)                                                               |
@@ -94,6 +102,10 @@
 | BR-CHK-004 | 1 Checkout = **1 giao dịch VNPay** duy nhất; `totalAmount` của Checkout = tổng `totalAmount` các Order con                          |
 | BR-CHK-005 | Checkout hết hạn sau **30 phút** kể từ lúc tạo (`expiresAt`) nếu chưa thanh toán                                                    |
 | BR-CHK-006 | Thông tin người nhận (`recipient`) dùng chung cho mọi Order con của cùng Checkout                                                   |
+| BR-CHK-007 | Khi Checkout chuyển `paid`: xóa các item đã mua khỏi cart DB của người mua. Checkout `failed`/`expired`: **giữ nguyên** giỏ |
+| BR-CHK-008 | Customer bỏ trống `recipient` → lấy từ profile; nếu profile thiếu `phone`/`address` → 400 yêu cầu bổ sung (email lấy từ tài khoản) |
+| BR-CHK-009 | `checkoutCode` / `orderCode` có đuôi ≥ 10 ký tự ngẫu nhiên (crypto). `GET /checkouts/:checkoutCode` yêu cầu đăng nhập và chỉ **chủ Checkout** (`userId`) xem được — người khác → 404 |
+| BR-CHK-010 | Tạo Checkout (trừ stock từng item + tạo Checkout + N Order) chạy trong **1 MongoDB multi-document transaction** (`session.withTransaction`): lỗi/hết hàng ở bất kỳ bước nào → abort toàn bộ, không có rollback thủ công, không rò rỉ stock. `restockAndCancel` (hủy Order + hoàn stock) cũng là 1 transaction. Không gọi dịch vụ ngoài (VNPay, Cloudinary) bên trong transaction — tạo URL VNPay **sau khi** commit. Yêu cầu MongoDB replica set (Atlas có sẵn) |
 
 ### Order
 
@@ -130,7 +142,7 @@
     ▼
 [delivered]
 
-[pending]   ──→ [cancelled]  (thanh toán thất bại / hết hạn: hệ thống · hoặc Admin)
+[pending]   ──→ [cancelled]  (thanh toán thất bại / hết hạn: CHỈ hệ thống)
 [confirmed] ──→ [cancelled]  (Seller của đơn / Admin — trước khi giao)
 [cancelled] ──→ [refunded]   (chỉ Admin, chỉ khi đơn đã thanh toán — hoàn tiền thủ công)
 ```
@@ -138,7 +150,7 @@
 | Chuyển trạng thái       | Ai được thực hiện              | Điều kiện                                   |
 | ----------------------- | ------------------------------ | ------------------------------------------- |
 | `pending → confirmed`   | **Hệ thống** (VNPay thành công) | Không ai chuyển tay                        |
-| `pending → cancelled`   | Hệ thống · Admin               | Thanh toán lỗi / hết hạn / Admin hủy        |
+| `pending → cancelled`   | **Hệ thống** (không ai hủy tay) | Thanh toán lỗi / Checkout hết hạn           |
 | `confirmed → shipping`  | **Seller của đơn** · Admin     |                                             |
 | `shipping → delivered`  | **Seller của đơn** · Admin     |                                             |
 | `confirmed → cancelled` | **Seller của đơn** · Admin     | Có `cancelReason`; hoàn stock               |
@@ -152,6 +164,7 @@
 | BR-STT-004 | Chuyển `cancelled → refunded`: chỉ Admin, và chỉ khi `paymentStatus = paid`                   |
 | BR-STT-005 | `delivered` và `refunded` là trạng thái cuối — không chuyển tiếp                              |
 | BR-STT-006 | Chuyển sai chiều → 400; user không có quyền với đơn đó → 403                                  |
+| BR-STT-007 | Order `pending` **không** bị Admin/Seller hủy tay: nếu hủy trong lúc Checkout còn `pending` thì người mua vẫn có thể thanh toán đủ `totalAmount` cho cả Checkout → lệch tiền. Chỉ hệ thống hủy khi Checkout `failed`/`expired` |
 
 ### Payment — VNPay
 
@@ -166,6 +179,8 @@
 | BR-PAY-007 | `vnp_TxnRef` = `checkoutCode`; `vnp_Amount` = `totalAmount × 100`                                                                              |
 | BR-PAY-008 | Mọi callback (hợp lệ hay không) đều lưu raw data vào `payments` để audit                                                                       |
 | BR-PAY-009 | Job định kỳ (mỗi phút) tìm Checkout `pending` quá `expiresAt` → `expired`, hủy các Order `pending` con + hoàn stock                            |
+| BR-PAY-010 | Truyền `vnp_ExpireDate = expiresAt` (định dạng `yyyyMMddHHmmss`, GMT+7) khi tạo URL VNPay để VNPay tự từ chối thanh toán sau hạn — giảm tình huống thanh toán muộn |
+| BR-PAY-011 | Chuyển trạng thái Checkout bằng **cập nhật có điều kiện** (`findOneAndUpdate({ _id, status: "pending" }, ...)`) — dùng chung cho IPN, Return và cron hết hạn; bên nào cập nhật được bản ghi trước thì xử lý tiếp (cập nhật Order, hoàn stock), bên sau bỏ qua. Cập nhật Checkout + Order con (+ hoàn stock nếu hủy) nằm trong **cùng 1 transaction** (BR-CHK-010) |
 
 ### Admin
 

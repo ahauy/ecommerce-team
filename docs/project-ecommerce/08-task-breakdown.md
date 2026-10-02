@@ -54,6 +54,7 @@ Danh sách dưới đây là gợi ý — team tự phân công feature cụ th�
 | 1.7 | UI: Form Đăng ký / Đăng nhập                                        | FE   | 🟡 High     |
 | 1.8 | FE: Lưu token, axios interceptor tự refresh                         | FE   | 🟡 High     |
 | 1.9 | UI: Trang Profile                                                   | FE   | 🟢 Normal   |
+| 1.10 | Seed script: Admin (từ `ADMIN_EMAIL`/`ADMIN_PASSWORD`, không có gian hàng), vài category, 2 seller + SP demo, 1 buyer (dùng cho demo & test) | BE   | 🟡 High     |
 
 ---
 
@@ -126,9 +127,11 @@ Danh sách dưới đây là gợi ý — team tự phân công feature cụ th�
 | 5.4 | Service `restockAndCancel(order)` dùng chung (cập nhật có điều kiện, hoàn stock đúng 1 lần)           | BE   | 🔴 Critical |
 | 5.5 | `GET /orders/my` + `GET /orders/my/:id`                                                               | BE   | 🟡 High     |
 | 5.6 | `GET /orders` + `GET /orders/:id` (Admin)                                                             | BE   | 🟡 High     |
-| 5.7 | FE: Trang Checkout (Guest form + Customer prefill từ `/users/me`)                                     | FE   | 🔴 Critical |
+| 5.7 | FE: Trang Checkout (form người nhận, prefill từ `/users/me`; yêu cầu đăng nhập)                       | FE   | 🔴 Critical |
 | 5.8 | FE: Trang kết quả `/checkout/result` (liệt kê các đơn của checkout, success/fail)                     | FE   | 🔴 Critical |
 | 5.9 | FE: Customer — Lịch sử đơn mua (hiện shop, trạng thái từng đơn)                                       | FE   | 🟡 High     |
+| 5.10 | `GET /checkouts/:checkoutCode` (Login + Owner, thông tin tối thiểu) — nguồn dữ liệu cho trang kết quả                                | BE   | 🔴 Critical |
+| 5.11 | Transaction (BR-CHK-010): `createCheckout` và `restockAndCancel` chạy trong `session.withTransaction()`; unit test: 1 item hết hàng → toàn bộ abort, stock không đổi | BE   | 🔴 Critical |
 
 ---
 
@@ -148,6 +151,9 @@ Danh sách dưới đây là gợi ý — team tự phân công feature cụ th�
 | 6.6 | `@Cron` mỗi phút: Checkout `pending` quá `expiresAt` → `expired` + hủy Order + hoàn stock      | BE   | 🟡 High     |
 | 6.7 | Payment schema (lưu raw VNPay data, kể cả callback sai chữ ký / thanh toán muộn)               | BE   | 🟢 Normal   |
 | 6.8 | FE: Trang redirect sau VNPay (success/fail UI)                                                 | FE   | 🟡 High     |
+| 6.9 | Khi Checkout `paid`: xóa item đã mua khỏi cart DB (BR-CHK-007); Checkout `failed`/`expired` giữ giỏ                             | BE   | 🟡 High     |
+| 6.10 | Deploy BE lên Render (làm sớm, ~cuối Ngày 4, để IPN VNPay gọi được URL public) — theo `10-deployment.md` | BE   | 🟡 High     |
+| 6.11 | Deploy FE lên Vercel (+ `vercel.json` rewrite SPA), cập nhật `FRONTEND_URL` / Return URL / IPN URL, smoke test luồng mua trên URL thật | FE   | 🟡 High     |
 
 ---
 
@@ -187,13 +193,18 @@ Danh sách dưới đây là gợi ý — team tự phân công feature cụ th�
 
 | Ngày       | Mục tiêu                                                                                        |
 | ---------- | ----------------------------------------------------------------------------------------------- |
+| **Ngày 0** | (trước khi code) Đăng ký VNPay sandbox (có thể chờ email), Cloudinary, MongoDB Atlas · chốt phân công 2 người · tạo `main`/`dev` + bảo vệ branch · cả hai pair 2–3 giờ dựng nền: global pipes/filters/interceptor, **toàn bộ Mongoose schema**, guards |
 | **Ngày 1** | Setup project · Module 1 BE hoàn tất (gồm `/users/me`, shop setup) · Module 2 & 3 BE bắt đầu     |
 | **Ngày 2** | Module 2 & 3 BE hoàn tất (ownership) · Module 4 BE · FE Auth xong                               |
 | **Ngày 3** | Module 4 & 5 BE (tách đơn theo seller) · FE Product + Seller form + Cart                        |
 | **Ngày 4** | Module 6 (VNPay theo Checkout) · Module 8 BE · FE Checkout                                      |
 | **Ngày 5** | Module 7 Admin · Module 8 FE · FE Order history · Integration test                              |
-| **Ngày 6** | Bug fix · Polish UI · Test E2E luồng chính (mua nhiều shop + bán + xử lý đơn)                    |
+| **Ngày 6** | Bug fix · Polish UI · Test E2E luồng chính (mua nhiều shop + bán + xử lý đơn) trên bản đã deploy (Vercel + Render) |
 | **Ngày 7** | Buffer — fix critical bugs · Demo chuẩn bị                                                      |
+
+> **Điểm quyết định cuối Ngày 3:** nếu `POST /orders` (5.2) + `restockAndCancel` (5.4) chưa chạy ổn → cắt ngay các mục trong "Đường cắt" bên dưới, đừng chờ tới Ngày 5. VNPay (Module 6) là rủi ro lớn nhất (phụ thuộc bên ngoài) — nên làm spike URL + verify chữ ký từ Ngày 2.
+
+> **Deploy (đã chốt: chỉ cần Vercel + Render, đơn giản):** deploy BE sớm (~cuối Ngày 4) rồi dùng URL đó để test IPN VNPay và CORS; không cần CI/CD, Docker, domain riêng. Chi tiết: `10-deployment.md`.
 
 ### ✂️ Đường cắt (nếu trễ tiến độ — cắt từ dưới lên)
 

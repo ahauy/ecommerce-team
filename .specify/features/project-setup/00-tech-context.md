@@ -21,6 +21,7 @@
 | **Package Manager** | pnpm (FE) / npm (BE)                 |                                              |
 | **Port FE**         | 5173 (Vite default)                  |                                              |
 | **Port BE**         | 3000                                 |                                              |
+| **Repo layout**     | `backend/` + `frontend/` ở root      | Không có `apps/`, không có pnpm workspace    |
 
 ## API Contract
 
@@ -46,6 +47,6 @@
 
 | Role     | Key permissions       |
 | -------- | --------------------- |
-| Guest    | Public endpoints only |
-| customer | Own cart, own orders  |
-| admin    | All resources         |
+| Guest    | Chỉ xem (public endpoints): SP, shop, category. Mua hàng phải đăng nhập — không có Guest checkout |
+| customer | Own cart, own orders (mua) · own products, own selling orders (bán — xác định bằng ownership `sellerId`, KHÔNG phải role) |
+| admin    | Chỉ **kiểm duyệt**: block SP, ban/unban user, xem tất cả đơn, hủy / hoàn tiền đơn đã thanh toán. **KHÔNG mua, KHÔNG đăng bán** (không giỏ, không Order, không gian hàng) |

@@ -71,7 +71,7 @@ schema-version: "1.3"
 ## 🗺️ Lộ Trình Phát Hành (Release Roadmap)
 
 ```text
-[ Sprint 0 - Setup & Architecture ] ──► [ COMPLETED ✅ ]
+[ Sprint 0 - Setup & Architecture ] ──► [ IN PROGRESS 🔧 ]
   ├── SETUP-001: Khởi tạo repo, cấu hình NestJS project + Mongoose
   ├── SETUP-002: Cấu hình global pipes, filters, interceptors (response wrapper)
   └── SETUP-003: Viết .env.example + hướng dẫn setup Cloudinary / MongoDB / VNPay
@@ -396,7 +396,7 @@ schema-version: "1.3"
     - [ ] `GET /api/v1/orders/selling/:id` → chi tiết; đơn của shop khác → 404.`
     - [ ] `PATCH /api/v1/orders/:id/status` bởi Seller của đơn: `confirmed→shipping`, `shipping→delivered`, `confirmed→cancelled` (kèm `reason` bắt buộc) → 200.`
     - [ ] Seller không phải chủ đơn → 403; Seller đặt `refunded` → 403.`
-    - [ ] Admin: ngoài các chuyển trên còn `pending→cancelled` và `cancelled→refunded` (chỉ khi `paymentStatus = paid`).`
+    - [ ] Admin: ngoài các chuyển trên còn `cancelled→refunded` (chỉ khi `paymentStatus = paid`).`
     - [ ] Không ai đặt tay `confirmed` / `pending` qua API → 400 (`confirmed` chỉ do VNPay).`
     - [ ] Chuyển sai chiều (vd `delivered→shipping`) → 400 với thông báo rõ ràng.`
     - [ ] Hủy đơn → hoàn stock đúng 1 lần; gọi hủy 2 lần không hoàn trùng.`
@@ -461,7 +461,7 @@ Một User Story chỉ được chuyển từ `[/]` sang `[x]` khi:
    - Backend: Unit test cho Service logic (stock validation, tách đơn theo seller, state machine + phân quyền, ownership check).
    - Frontend: Không có console.error, form validation hoạt động đúng.
 3. **Code Quality:**
-   - File < 800 dòng, Function < 50 dòng.
+   - File < 300 dòng, Function < 50 dòng (khớp `07-tech-conventions.md`).
    - Không có `any` type trong TypeScript.
    - DTO đầy đủ `class-validator`.
 4. **Zero Critical Bugs:** Không có lỗi Blocker/Critical.

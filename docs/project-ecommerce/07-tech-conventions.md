@@ -3,12 +3,11 @@
 ## Monorepo Structure
 
 ```
-ecommerce/                    ← root repo (monorepo)
-├── apps/
-│   ├── backend/              ← NestJS API
-│   └── frontend/             ← React 18 + Vite (clone từ react-boider-plate-ts)
-├── package.json              ← workspace root (pnpm workspaces)
-└── pnpm-workspace.yaml
+ecommerce-team/              ← root repo (2 project độc lập, KHÔNG có pnpm workspace / apps/)
+├── backend/                 ← NestJS API (npm)
+├── frontend/                ← React 18 + Vite, clone từ react-boider-plate-ts (pnpm)
+├── docs/  adr/  .specify/   ← tài liệu & đặc tả
+└── CONTEXT.md  README.md
 ```
 
 ## Frontend Stack (Template: react-boider-plate-ts)
@@ -29,8 +28,10 @@ ecommerce/                    ← root repo (monorepo)
 
 ## Frontend Folder Structure
 
+> Cây dưới đây là **đích đến**. Template hiện có `HOCs/`, `consts/`, `helpers/`, `interfaces/`, `i18n/`, `providers/`, `layouts/` và `stores/useStores.ts`. **Giữ nguyên cấu trúc template**, chỉ thêm thư mục/file mới (`pages/seller`, `pages/admin`, `services/*.service.ts`...) — không refactor template trong 1 tuần.
+
 ```
-apps/frontend/
+frontend/
 ├── src/
 │   ├── main.tsx
 │   ├── App.tsx                   # Router setup
@@ -336,3 +337,17 @@ Ví dụ:
 - **No `any` type** — luôn có type rõ ràng
 - **DTOs phải có validation** — dùng `class-validator`
 - **Service không import trực tiếp Schema của module khác** — dùng qua Service của module đó
+
+---
+
+## Bảo mật tối thiểu (bắt buộc, chi phí thấp)
+
+- `ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true })` toàn cục — chặn mass assignment (`role`, `isActive`, `sellerId`, `isBlocked`... không bao giờ nhận từ body).
+- `helmet()` + `@nestjs/throttler` cho nhóm `/auth/*` (vd 10 req/phút/IP) để chống dò mật khẩu.
+- Không log password / token / `vnp_SecureHash` / secret; `.env` không commit.
+- Mọi endpoint `/orders/selling*`, `/products/my`, `PATCH /orders/:id/status`, `PATCH|DELETE /products/:id` phải có test **sai chủ → 403/404** (đã nằm trong DoD).
+- Phân trang: `limit` tối đa 100 ở mọi endpoint danh sách.
+
+## Dependencies backend cần cài (scaffold hiện chỉ có NestJS starter)
+
+`@nestjs/config @nestjs/mongoose mongoose @nestjs/jwt @nestjs/passport passport passport-jwt bcrypt class-validator class-transformer @nestjs/schedule cloudinary multer helmet @nestjs/throttler` (+ `@types/bcrypt @types/multer @types/passport-jwt` ở dev).

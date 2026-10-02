@@ -184,7 +184,6 @@
   ├── [Quản lý Order]
   │     - Xem tất cả đơn hàng, lọc theo trạng thái / shop / người mua
   │     - Cập nhật trạng thái (như Seller, cộng thêm):
-  │         pending → cancelled
   │         cancelled → refunded   (chỉ đơn đã thanh toán — hoàn tiền thủ công)
   │
   └── [Quản lý User]
@@ -216,3 +215,9 @@
 | Seller cố mở lại SP đã bị Admin block                              | Cập nhật `isActive` được nhưng SP vẫn không hiển thị (vì `isBlocked`); thấy lý do block |
 | Seller A cố sửa SP / đơn của Seller B                              | 403 (ghi) hoặc 404 (đọc theo "của tôi")                                                |
 | Seller đặt trạng thái `refunded`                                   | 403 — chỉ Admin                                                                        |
+| Thanh toán thành công — xử lý giỏ hàng                             | Xóa item đã mua khỏi cart DB (BR-CHK-007)                                                   |
+| User sửa query `/checkout/result?status=success`                   | FE **không tin** query; gọi `GET /checkouts/:checkoutCode` lấy trạng thái thật             |
+| Admin muốn hủy Order `pending`                                     | Không cho phép (BR-STT-007) — chờ hệ thống hủy khi thanh toán lỗi / hết hạn                |
+| User đóng trang kết quả sau khi thanh toán                         | Xem lại ở "Lịch sử đơn mua", hoặc mở lại `/checkout/result?checkoutCode=...` (API yêu cầu đăng nhập + đúng chủ) |
+| Guest bấm "Thêm giỏ" / "Đặt hàng"                                  | FE chuyển sang trang đăng nhập (BR-AUTH-012); không có giỏ localStorage                     |
+| Admin gọi thêm giỏ / `POST /orders` / `POST /products`             | 403 (BR-AUTH-011)                                                                           |

@@ -6,7 +6,8 @@
 | ------- | ----------------- | ------------------------------- |
 | Node.js | >= 20.x           | Dùng LTS                        |
 | npm     | >= 10.x           | Đi kèm Node                     |
-| MongoDB | >= 7.x            | Hoặc dùng MongoDB Atlas (cloud) |
+| pnpm    | >= 8.x            | Chỉ cho `frontend/` (`corepack enable`) |
+| MongoDB | >= 7.x (replica set) | **Bắt buộc replica set** để dùng transaction: dùng MongoDB Atlas (khuyến nghị) hoặc single-node replica set ở local |
 | Git     | >= 2.x            |                                 |
 
 ---
@@ -67,6 +68,14 @@ VNPAY_IPN_URL=http://localhost:3000/api/v1/payments/vnpay/ipn
 
 # ── Checkout ─────────────────────────────────────
 CHECKOUT_EXPIRE_MINUTES=30
+
+# ── Seed (tài khoản Admin đầu tiên — BR-AUTH-004) ─
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=change_me_please
+
+# Khi deploy (Vercel + Render) — xem 10-deployment.md:
+#   FRONTEND_URL = URL Vercel của frontend (không có dấu / ở cuối)
+#   Return URL và VNPAY_IPN_URL = URL public của backend trên Render
 
 # ── Frontend URL (CORS + redirect sau thanh toán) ─
 # Return URL redirect về: ${FRONTEND_URL}/checkout/result?checkoutCode=...&status=success|failed
