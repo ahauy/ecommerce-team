@@ -5,7 +5,7 @@
 | Mục           | Nội dung                                                                                                                                      |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Tên dự án** | Ecommerce Team Project                                                                                                                        |
-| **Mục tiêu**  | Xây dựng hệ thống thương mại điện tử bán sản phẩm vật lý với đầy đủ luồng: xem SP → giỏ hàng → checkout → thanh toán VNPay → quản lý đơn hàng |
+| **Mục tiêu**  | Xây dựng **sàn thương mại điện tử nhiều người bán** (kiểu Shopee thu gọn): user vừa **đăng bán** vừa **mua** sản phẩm vật lý. Luồng: đăng bán SP → xem SP → giỏ hàng → checkout (tách đơn theo người bán) → thanh toán VNPay → người bán xử lý đơn |
 | **Deadline**  | 1 tuần                                                                                                                                        |
 | **Team**      | 2 người — phân công theo feature (mỗi người làm FE→BE của feature mình)                                                                       |
 | **Ngôn ngữ**  | Tiếng Việt                                                                                                                                    |
@@ -33,8 +33,9 @@
               │ REST /api/v1/
 ┌─────────────▼───────────────────┐
 │       NestJS Backend            │
-│  Auth · Category · Product      │
-│  Cart · Order · Payment · Admin │
+│  Auth · User/Shop · Category    │
+│  Product · Cart · Order         │
+│  Checkout · Payment · Admin     │
 └─────────────┬───────────────────┘
               │ Mongoose
 ┌─────────────▼───────────────────┐
@@ -53,3 +54,13 @@
 3. **Branch strategy** — `main` (stable) · `dev` (integration) · `feature/<tên>` (cá nhân)
 4. **Commit convention** — Conventional Commits (xem phần Tech Conventions)
 5. **Zero silent assumption** — mọi câu hỏi về logic đều hỏi nhau trước khi code
+6. **Một tài khoản, hai vai** — không có role `seller`; quyền bán xác định bằng quyền sở hữu (`sellerId`)
+
+## Mô hình vai trò
+
+| Vai trò      | Mô tả                                                                          |
+| ------------ | ------------------------------------------------------------------------------ |
+| **Guest**    | Chưa đăng nhập: xem SP, mua hàng (giỏ localStorage, nhập thông tin giao hàng)  |
+| **Customer** | User đã đăng nhập: mua hàng, và **bán hàng** sau khi thiết lập gian hàng        |
+| **Seller**   | Không phải role — là Customer khi thao tác trên SP/đơn mà mình sở hữu          |
+| **Admin**    | Quản trị sàn: Category, kiểm duyệt SP (block), User, mọi Order                 |

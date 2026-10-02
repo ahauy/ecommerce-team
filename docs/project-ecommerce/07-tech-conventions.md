@@ -50,7 +50,9 @@ apps/frontend/
 │   │   ├── auth.service.ts
 │   │   ├── product.service.ts
 │   │   ├── cart.service.ts
-│   │   └── order.service.ts
+│   │   ├── order.service.ts
+│   │   ├── user.service.ts           # /users/me, /users/me/shop
+│   │   └── shop.service.ts           # /shops/:sellerId
 │   │
 │   ├── pages/                    # Route-level components
 │   │   ├── auth/
@@ -66,10 +68,19 @@ apps/frontend/
 │   │   │   ├── OrderSuccessPage.tsx
 │   │   │   └── OrderFailPage.tsx
 │   │   ├── orders/
-│   │   │   └── OrderHistoryPage.tsx
+│   │   │   └── OrderHistoryPage.tsx  # đơn đã mua
+│   │   ├── shop/
+│   │   │   └── ShopPage.tsx          # trang công khai của 1 gian hàng
+│   │   ├── profile/
+│   │   │   └── ProfilePage.tsx
+│   │   ├── seller/                   # "Kênh người bán" (PrivateRoute)
+│   │   │   ├── ShopSetupPage.tsx     # thiết lập shopName, pickupAddress
+│   │   │   ├── MyProductsPage.tsx    # Sản phẩm của tôi
+│   │   │   ├── ProductFormPage.tsx   # Thêm / sửa SP + upload ảnh
+│   │   │   └── SellerOrdersPage.tsx  # Đơn bán + nút Giao hàng / Đã giao / Hủy
 │   │   └── admin/
 │   │       ├── AdminDashboard.tsx
-│   │       ├── AdminProducts.tsx
+│   │       ├── AdminProducts.tsx     # xem mọi SP, block / unblock
 │   │       ├── AdminCategories.tsx
 │   │       ├── AdminOrders.tsx
 │   │       └── AdminUsers.tsx
@@ -82,7 +93,8 @@ apps/frontend/
 │   ├── types/                    # Shared TypeScript types
 │   │   ├── auth.types.ts
 │   │   ├── product.types.ts
-│   │   └── order.types.ts
+│   │   ├── shop.types.ts
+│   │   └── order.types.ts            # Order, Checkout
 │   │
 │   └── locales/                  # i18n
 │       ├── vi.json
@@ -103,7 +115,8 @@ backend/
 │   │
 │   ├── common/                    # Shared utilities
 │   │   ├── decorators/            # @CurrentUser, @Roles, etc.
-│   │   ├── guards/                # JwtAuthGuard, RolesGuard
+│   │   │                          # Ownership check dùng helper assertOwnerOrAdmin() ở service
+│   │   ├── guards/                # JwtAuthGuard, OptionalJwtAuthGuard, RolesGuard
 │   │   ├── filters/               # GlobalExceptionFilter
 │   │   ├── interceptors/          # ResponseInterceptor (wrap format)
 │   │   ├── pipes/                 # ValidationPipe
@@ -124,9 +137,15 @@ backend/
 │   │   │
 │   │   ├── users/
 │   │   │   ├── users.module.ts
+│   │   │   ├── users.controller.ts # /users/me, /users/me/shop
 │   │   │   ├── users.service.ts
 │   │   │   ├── schemas/           # user.schema.ts
-│   │   │   └── dto/
+│   │   │   └── dto/               # update-profile.dto.ts, setup-shop.dto.ts
+│   │   │
+│   │   ├── shops/
+│   │   │   ├── shops.module.ts
+│   │   │   ├── shops.controller.ts # GET /shops/:sellerId
+│   │   │   └── shops.service.ts    # dùng UsersService + ProductsService
 │   │   │
 │   │   ├── categories/
 │   │   │   ├── categories.module.ts
@@ -151,9 +170,10 @@ backend/
 │   │   │
 │   │   ├── orders/
 │   │   │   ├── orders.module.ts
-│   │   │   ├── orders.controller.ts
-│   │   │   ├── orders.service.ts
-│   │   │   ├── schemas/           # order.schema.ts
+│   │   │   ├── orders.controller.ts   # /orders, /orders/my, /orders/selling, PATCH status
+│   │   │   ├── orders.service.ts      # tạo checkout, nhóm theo seller, state machine
+│   │   │   ├── checkout-expiry.task.ts # @Cron mỗi phút: hủy checkout quá hạn + hoàn stock
+│   │   │   ├── schemas/           # order.schema.ts, checkout.schema.ts
 │   │   │   └── dto/
 │   │   │
 │   │   ├── payments/
@@ -225,14 +245,32 @@ export enum OrderStatus {
   REFUNDED = "refunded",
 }
 
-// Payment Status
+// Payment Status (cấp Order)
 export enum PaymentStatus {
   UNPAID = "unpaid",
   PAID = "paid",
   REFUNDED = "refunded",
 }
 
-// User Role
+// Checkout Status (cấp Checkout — 1 giao dịch VNPay)
+export enum CheckoutStatus {
+  PENDING = "pending",
+  PAID = "paid",
+  FAILED = "failed",
+  EXPIRED = "expired",
+}
+
+// Ai hủy đơn
+export enum CancelledBy {
+  SYSTEM = "system",
+  SELLER = "seller",
+  ADMIN = "admin",
+}
+
+// Lý do block mặc định khi ban seller
+export const BLOCK_REASON_SELLER_BANNED = "seller_banned";
+
+// User Role — KHÔNG có "seller": bán hàng xác định bằng quyền sở hữu (sellerId)
 export enum UserRole {
   CUSTOMER = "customer",
   ADMIN = "admin",
@@ -250,6 +288,7 @@ main          ← production-ready (chỉ merge từ dev sau review)
   └── dev     ← integration branch (merge feature branches vào đây)
         ├── feature/auth
         ├── feature/category-product
+        ├── feature/seller-shop
         ├── feature/cart
         ├── feature/order-checkout
         ├── feature/payment-vnpay
@@ -269,11 +308,12 @@ type:
   test     — thêm/sửa test
   chore    — cấu hình, package, CI
 
-scope: auth | category | product | cart | order | payment | admin | upload
+scope: auth | user | shop | category | product | cart | order | checkout | payment | admin | upload
 
 Ví dụ:
   feat(product): add text search by product name
   fix(order): rollback stock when payment fails
+  feat(product): restrict update/delete to owner or admin
   docs(api): update order status endpoint docs
   refactor(auth): extract token validation to helper
 ```
