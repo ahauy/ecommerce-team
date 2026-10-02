@@ -129,13 +129,13 @@ schema-version: "1.3"
   - **Blocks:** `US-AUTH-002`, `US-SELL-001`, `US-CAT-001`, `US-PRD-001`, `US-CART-001`, `US-ORD-001`, `US-ADM-001`
   - **Mô tả:** Người dùng có thể tạo tài khoản mới bằng email & mật khẩu, và đăng nhập để nhận JWT token.
   - **Acceptance Criteria (AC):**
-    - [ ] `POST /api/v1/auth/register` với email/password/fullName hợp lệ → trả về 201 và thông tin user (không có password).`
-    - [ ] `POST /api/v1/auth/register` với email đã tồn tại → trả về 409 Conflict.`
-    - [ ] `POST /api/v1/auth/login` với đúng credentials → trả về `accessToken` + `refreshToken` + thông tin user.`
-    - [ ] `POST /api/v1/auth/login` với sai password → trả về 401 Unauthorized.`
-    - [ ] `POST /api/v1/auth/login` với tài khoản `isActive = false` → trả về 403 "Tài khoản đã bị khóa".`
-    - [ ] Password được lưu dưới dạng bcrypt hash, không bao giờ trả về plain text.`
-    - [ ] FE: Form đăng ký / đăng nhập hiển thị đúng validation errors (email format, password min length).`
+    - [ ] `POST /api/v1/auth/register` với email/password/fullName hợp lệ → trả về 201 và thông tin user (không có password).
+    - [ ] `POST /api/v1/auth/register` với email đã tồn tại → trả về 409 Conflict.
+    - [ ] `POST /api/v1/auth/login` với đúng credentials → trả về `accessToken` + `refreshToken` + thông tin user.
+    - [ ] `POST /api/v1/auth/login` với sai password → trả về 401 Unauthorized.
+    - [ ] `POST /api/v1/auth/login` với tài khoản `isActive = false` → trả về 403 "Tài khoản đã bị khóa".
+    - [ ] Password được lưu dưới dạng bcrypt hash, không bao giờ trả về plain text.
+    - [ ] FE: Form đăng ký / đăng nhập hiển thị đúng validation errors (email format, password min length).
   - **Tasks:**
     - [ ] **Backend:** `User schema (email unique, password bcrypt, role enum, isActive, refreshToken)` · `POST /auth/register DTO + Service` · `POST /auth/login + JwtStrategy (access 15m)`
     - [ ] **Frontend:** `Trang /register + /login` · `Axios instance với Authorization header` · `Lưu token vào localStorage/cookie`
@@ -154,11 +154,11 @@ schema-version: "1.3"
   - **Blocks:** _(none)_
   - **Mô tả:** Access Token hết hạn sau 15 phút; hệ thống tự động làm mới bằng Refresh Token mà không cần người dùng đăng nhập lại.
   - **Acceptance Criteria (AC):**
-    - [ ] `POST /api/v1/auth/refresh` với Refresh Token hợp lệ → trả về `accessToken` mới.`
-    - [ ] `POST /api/v1/auth/refresh` với Refresh Token hết hạn / không hợp lệ → trả về 401.`
-    - [ ] `POST /api/v1/auth/logout` → xóa refreshToken trong DB; token cũ không dùng được nữa.`
-    - [ ] FE: Axios interceptor tự động gọi `/auth/refresh` khi nhận 401, retry request gốc.`
-    - [ ] FE: Nếu refresh thất bại → redirect về trang đăng nhập.`
+    - [ ] `POST /api/v1/auth/refresh` với Refresh Token hợp lệ → trả về `accessToken` mới.
+    - [ ] `POST /api/v1/auth/refresh` với Refresh Token hết hạn / không hợp lệ → trả về 401.
+    - [ ] `POST /api/v1/auth/logout` → xóa refreshToken trong DB; token cũ không dùng được nữa.
+    - [ ] FE: Axios interceptor tự động gọi `/auth/refresh` khi nhận 401, retry request gốc.
+    - [ ] FE: Nếu refresh thất bại → redirect về trang đăng nhập.
   - **Tasks:**
     - [ ] **Backend:** `JwtRefreshStrategy` · `POST /auth/refresh` · `POST /auth/logout (xóa refreshToken field)`
     - [ ] **Frontend:** `Axios response interceptor retry logic` · `Auth store (Zustand/Pinia/Redux) quản lý token state`
@@ -177,11 +177,11 @@ schema-version: "1.3"
   - **Blocks:** `US-PRD-001`
   - **Mô tả:** Mọi user đã đăng nhập có profile (dùng prefill checkout) và có thể thiết lập gian hàng (`shopName`, `pickupAddress`) để đủ điều kiện đăng bán. Không có role seller riêng, không KYC, không duyệt.
   - **Acceptance Criteria (AC):**
-    - [ ] `GET /api/v1/users/me` → trả profile + `shopName`/`pickupAddress` (null nếu chưa có).`
-    - [ ] `PATCH /api/v1/users/me` → cập nhật `fullName`, `phone`, `address`.`
-    - [ ] `PATCH /api/v1/users/me/shop` với `shopName` (3–50 ký tự) + `pickupAddress` hợp lệ → 200; thiếu hoặc sai độ dài → 400.`
-    - [ ] `GET /api/v1/shops/:sellerId` (public) → `shopName`, `joinedAt`, `productCount`; 404 nếu user chưa có shop hoặc đang bị ban.`
-    - [ ] FE: `ProfilePage`, `ShopSetupPage`; nút "Đăng bán" dẫn tới ShopSetup nếu `shopName = null`.`
+    - [ ] `GET /api/v1/users/me` → trả profile + `shopName`/`pickupAddress` (null nếu chưa có).
+    - [ ] `PATCH /api/v1/users/me` → cập nhật `fullName`, `phone`, `address`.
+    - [ ] `PATCH /api/v1/users/me/shop` với `shopName` (3–50 ký tự) + `pickupAddress` hợp lệ → 200; thiếu hoặc sai độ dài → 400.
+    - [ ] `GET /api/v1/shops/:sellerId` (public) → `shopName`, `joinedAt`, `productCount`; 404 nếu user chưa có shop hoặc đang bị ban.
+    - [ ] FE: `ProfilePage`, `ShopSetupPage`; nút "Đăng bán" dẫn tới ShopSetup nếu `shopName = null`.
   - **Tasks:**
     - [ ] **Backend:** `UsersController (/users/me, /users/me/shop)` · `DTO validate` · `ShopsController GET /shops/:sellerId`
     - [ ] **Frontend:** `ProfilePage` · `ShopSetupPage` · `user.service.ts`, `shop.service.ts`
@@ -200,13 +200,13 @@ schema-version: "1.3"
   - **Blocks:** `US-PRD-001`
   - **Mô tả:** Admin có thể tạo, sửa, xóa danh mục sản phẩm (danh mục dùng chung toàn sàn — người bán chỉ chọn). Người dùng có thể xem danh sách danh mục để lọc sản phẩm.
   - **Acceptance Criteria (AC):**
-    - [ ] `GET /api/v1/categories` (public) → trả về danh sách category đang active.`
-    - [ ] `POST /api/v1/categories` (Admin) → tạo category mới, `slug` tự động từ `name`.`
-    - [ ] `POST /api/v1/categories` với tên trùng → trả về 409 Conflict.`
-    - [ ] `PATCH /api/v1/categories/:id` (Admin) → cập nhật tên/mô tả/ảnh.`
-    - [ ] `DELETE /api/v1/categories/:id` khi còn sản phẩm (của bất kỳ shop nào) đang dùng → trả về 400 với thông báo rõ ràng.`
-    - [ ] FE Admin: Màn hình danh sách category, form tạo/sửa, nút xóa với confirm.`
-    - [ ] FE Public: Danh mục hiển thị trên sidebar/nav để lọc sản phẩm.`
+    - [ ] `GET /api/v1/categories` (public) → trả về danh sách category đang active.
+    - [ ] `POST /api/v1/categories` (Admin) → tạo category mới, `slug` tự động từ `name`.
+    - [ ] `POST /api/v1/categories` với tên trùng → trả về 409 Conflict.
+    - [ ] `PATCH /api/v1/categories/:id` (Admin) → cập nhật tên/mô tả/ảnh.
+    - [ ] `DELETE /api/v1/categories/:id` khi còn sản phẩm (của bất kỳ shop nào) đang dùng → trả về 400 với thông báo rõ ràng.
+    - [ ] FE Admin: Màn hình danh sách category, form tạo/sửa, nút xóa với confirm.
+    - [ ] FE Public: Danh mục hiển thị trên sidebar/nav để lọc sản phẩm.
   - **Tasks:**
     - [ ] **Backend:** `Category schema (name unique, slug, description, imageUrl, isActive)` · `CRUD endpoints` · `Validate no-delete khi có product` · `RolesGuard`
     - [ ] **Frontend:** `Admin: CategoryList, CategoryForm components` · `Public: CategoryNav/Sidebar`
@@ -225,16 +225,16 @@ schema-version: "1.3"
   - **Blocks:** `US-PRD-002`, `US-CART-001`
   - **Mô tả:** User đã thiết lập gian hàng đăng bán sản phẩm (giá, stock, ảnh Cloudinary, category) và chỉ quản lý được SP **của mình**. Admin thao tác được trên mọi SP.
   - **Acceptance Criteria (AC):**
-    - [ ] `POST /api/v1/products` (✅ Login) → tạo SP; `sellerId` gán từ token (bỏ qua `sellerId` trong body).`
-    - [ ] `POST /products` khi chưa thiết lập gian hàng → 403 "Vui lòng thiết lập thông tin gian hàng trước khi đăng bán".`
-    - [ ] `name` tối đa 120 ký tự; tối đa 5 ảnh / SP — vượt quá → 400.`
-    - [ ] `POST /api/v1/upload/image` (✅ Login) → upload Cloudinary, trả URL; chỉ jpg/png/webp, ≤5MB.`
-    - [ ] `GET /api/v1/products/my` → danh sách SP của mình, gồm cả ẩn / bị block (kèm `blockReason`).`
-    - [ ] `PATCH /api/v1/products/:id` bởi chủ SP → 200; bởi user khác → 403; bởi Admin → 200.`
-    - [ ] `DELETE /api/v1/products/:id` → soft delete (`isActive = false`), cùng quy tắc quyền như PATCH.`
-    - [ ] Seller tắt `isActive` thì SP biến khỏi danh sách công khai; bật lại được **trừ khi** `isBlocked = true`.`
-    - [ ] `stock` không thể lưu giá trị âm — validation ở DTO level; `sellerId` không đổi được sau khi tạo.`
-    - [ ] FE Seller: `MyProductsPage`, `ProductFormPage` với preview ảnh, chọn category từ dropdown, nút "Lưu & Hiển thị".`
+    - [ ] `POST /api/v1/products` (✅ Login) → tạo SP; `sellerId` gán từ token (bỏ qua `sellerId` trong body).
+    - [ ] `POST /products` khi chưa thiết lập gian hàng → 403 "Vui lòng thiết lập thông tin gian hàng trước khi đăng bán".
+    - [ ] `name` tối đa 120 ký tự; tối đa 5 ảnh / SP — vượt quá → 400.
+    - [ ] `POST /api/v1/upload/image` (✅ Login) → upload Cloudinary, trả URL; chỉ jpg/png/webp, ≤5MB.
+    - [ ] `GET /api/v1/products/my` → danh sách SP của mình, gồm cả ẩn / bị block (kèm `blockReason`).
+    - [ ] `PATCH /api/v1/products/:id` bởi chủ SP → 200; bởi user khác → 403; bởi Admin → 200.
+    - [ ] `DELETE /api/v1/products/:id` → soft delete (`isActive = false`), cùng quy tắc quyền như PATCH.
+    - [ ] Seller tắt `isActive` thì SP biến khỏi danh sách công khai; bật lại được **trừ khi** `isBlocked = true`.
+    - [ ] `stock` không thể lưu giá trị âm — validation ở DTO level; `sellerId` không đổi được sau khi tạo.
+    - [ ] FE Seller: `MyProductsPage`, `ProductFormPage` với preview ảnh, chọn category từ dropdown, nút "Lưu & Hiển thị".
   - **Tasks:**
     - [ ] **Backend:** `Product schema (sellerId, name, slug, description, price, stock, images[], categoryId, isActive, isBlocked, blockReason)` · `Indexes (text, sellerId, categoryId, price)` · `Upload service (Cloudinary SDK)` · `CRUD endpoints + assertOwnerOrAdmin`
     - [ ] **Frontend:** `Seller: MyProductsPage, ProductFormPage (image uploader)` · `Cloudinary upload helper`
@@ -253,15 +253,15 @@ schema-version: "1.3"
   - **Blocks:** `US-CART-001`
   - **Mô tả:** Người dùng (Guest & Customer) có thể xem danh sách sản phẩm, tìm kiếm theo tên, lọc theo danh mục và khoảng giá.
   - **Acceptance Criteria (AC):**
-    - [ ] `GET /api/v1/products` → danh sách phân trang (page, limit) chỉ hiện sản phẩm `isActive = true` **và** `isBlocked = false`.`
-    - [ ] Query param `?search=iphone` → lọc theo tên (text search MongoDB).`
-    - [ ] Query param `?categoryId=xxx` → lọc theo danh mục.`
-    - [ ] Query param `?sellerId=xxx` → lọc theo người bán (trang shop).`
-    - [ ] Query param `?minPrice=100000&maxPrice=5000000` → lọc theo khoảng giá.`
-    - [ ] Query param `?sortBy=price&order=asc` → sắp xếp đúng.`
-    - [ ] Sản phẩm `stock = 0` hiển thị badge "Hết hàng" — không thể thêm vào giỏ.`
-    - [ ] `GET /api/v1/products/:id` → chi tiết sản phẩm (ảnh, giá, mô tả, stock, category name, `seller.shopName`); SP ẩn/bị block → 404 trừ Owner/Admin.`
-    - [ ] FE: Trang danh sách SP (ProductGrid) + trang chi tiết SP (ProductDetail).`
+    - [ ] `GET /api/v1/products` → danh sách phân trang (page, limit) chỉ hiện sản phẩm `isActive = true` **và** `isBlocked = false`.
+    - [ ] Query param `?search=iphone` → lọc theo tên (text search MongoDB).
+    - [ ] Query param `?categoryId=xxx` → lọc theo danh mục.
+    - [ ] Query param `?sellerId=xxx` → lọc theo người bán (trang shop).
+    - [ ] Query param `?minPrice=100000&maxPrice=5000000` → lọc theo khoảng giá.
+    - [ ] Query param `?sortBy=price&order=asc` → sắp xếp đúng.
+    - [ ] Sản phẩm `stock = 0` hiển thị badge "Hết hàng" — không thể thêm vào giỏ.
+    - [ ] `GET /api/v1/products/:id` → chi tiết sản phẩm (ảnh, giá, mô tả, stock, category name, `seller.shopName`); SP ẩn/bị block → 404 trừ Owner/Admin.
+    - [ ] FE: Trang danh sách SP (ProductGrid) + trang chi tiết SP (ProductDetail).
   - **Tasks:**
     - [ ] **Backend:** `GET /products với query builder (search, filter, sort, paginate, sellerId)` · `GET /products/:id populate category + seller (OptionalJwtAuthGuard)`
     - [ ] **Frontend:** `ProductGrid, ProductCard, ProductDetail components` · `FilterSidebar, SearchBar` · `Pagination component`
@@ -280,15 +280,15 @@ schema-version: "1.3"
   - **Blocks:** `US-ORD-001`
   - **Mô tả:** Guest quản lý giỏ hàng trên trình duyệt (localStorage). Khi đăng nhập, giỏ hàng tự động merge vào DB. Customer xem/sửa giỏ hàng từ DB.
   - **Acceptance Criteria (AC):**
-    - [ ] Guest: Thêm SP vào giỏ → lưu localStorage; refresh trang không mất dữ liệu.`
-    - [ ] Guest: Số lượng trong giỏ không vượt quá stock hiện tại — nếu vượt → báo lỗi client-side.`
-    - [ ] Customer: `GET /api/v1/cart` → trả về giỏ hàng từ DB, **nhóm theo người bán** (`groups[].seller`, `subtotal`) + `totalAmount`.`
-    - [ ] Customer: `POST /api/v1/cart/items` → thêm item, validate stock; **SP của chính mình → 400**.`
-    - [ ] Customer: `PATCH /api/v1/cart/items/:productId` → cập nhật quantity.`
-    - [ ] Customer: `DELETE /api/v1/cart/items/:productId` → xóa item.`
-    - [ ] Customer: `POST /api/v1/cart/merge` (ngay sau đăng nhập) → merge localStorage items vào DB cart, quantity không vượt stock; **tự lọc bỏ SP của chính mình**.`
-    - [ ] Item có `stock = 0` hoặc SP ẩn/bị block bị loại khỏi giỏ khi tải lại.`
-    - [ ] FE: Trang giỏ hàng (CartPage) hiển thị items **theo từng shop** (subtotal mỗi shop), tổng tiền VNĐ, nút checkout.`
+    - [ ] Guest: Thêm SP vào giỏ → lưu localStorage; refresh trang không mất dữ liệu.
+    - [ ] Guest: Số lượng trong giỏ không vượt quá stock hiện tại — nếu vượt → báo lỗi client-side.
+    - [ ] Customer: `GET /api/v1/cart` → trả về giỏ hàng từ DB, **nhóm theo người bán** (`groups[].seller`, `subtotal`) + `totalAmount`.
+    - [ ] Customer: `POST /api/v1/cart/items` → thêm item, validate stock; **SP của chính mình → 400**.
+    - [ ] Customer: `PATCH /api/v1/cart/items/:productId` → cập nhật quantity.
+    - [ ] Customer: `DELETE /api/v1/cart/items/:productId` → xóa item.
+    - [ ] Customer: `POST /api/v1/cart/merge` (ngay sau đăng nhập) → merge localStorage items vào DB cart, quantity không vượt stock; **tự lọc bỏ SP của chính mình**.
+    - [ ] Item có `stock = 0` hoặc SP ẩn/bị block bị loại khỏi giỏ khi tải lại.
+    - [ ] FE: Trang giỏ hàng (CartPage) hiển thị items **theo từng shop** (subtotal mỗi shop), tổng tiền VNĐ, nút checkout.
   - **Tasks:**
     - [ ] **Backend:** `Cart schema (userId unique, items[])` · `Cart CRUD service + group by sellerId khi GET` · `Merge logic (cộng quantity, cap ở stock, lọc SP của mình)` · `Guard: JwtAuthGuard`
     - [ ] **Frontend:** `cartStore (localStorage cho Guest, API cho Customer)` · `CartPage, CartItem components` · `Merge cart on login action`
@@ -313,16 +313,16 @@ schema-version: "1.3"
   - **Blocks:** `US-PAY-001`, `US-ORD-002`, `US-SELL-002`
   - **Mô tả:** Guest và Customer tạo đơn từ giỏ hàng. Hệ thống nhóm item theo người bán, tạo **1 Checkout + N Order** (mỗi shop 1 Order), thanh toán một lần qua VNPay.
   - **Acceptance Criteria (AC):**
-    - [ ] `POST /api/v1/orders` (⚪ Optional auth — Guest + Customer dùng chung) → tạo Checkout + các Order, trừ stock ngay.`
-    - [ ] Giỏ có SP của 2 shop → tạo đúng 2 Order, mỗi Order có `sellerId` và `totalAmount` riêng; `Checkout.totalAmount` = tổng.`
-    - [ ] Giá và tên SP lấy từ DB, bỏ qua `price` do client gửi.`
-    - [ ] Guest: bắt buộc cung cấp `recipient` (fullName, phone, email, address).`
-    - [ ] Customer: auto-fill từ profile, cho phép override address.`
-    - [ ] Có bất kỳ SP nào `stock < quantity` (hoặc SP ẩn/block) → 400 kèm danh sách SP thiếu hàng, **không tạo Checkout/Order nào và stock đã trừ được hoàn lại**.`
-    - [ ] Customer mua SP của chính mình → 400.`
-    - [ ] Trừ stock nguyên tử (`stock >= qty`); 2 người mua SP cuối cùng cùng lúc → chỉ 1 người thành công.`
-    - [ ] Response trả `checkoutId`, `checkoutCode`, `totalAmount`, `expiresAt`, `orders[]`, `vnpayUrl`. Mọi Order mặc định `pending`.`
-    - [ ] FE: Trang Checkout (form recipient) → "Thanh toán" → redirect VNPay; trang kết quả `/checkout/result` liệt kê các đơn.`
+    - [ ] `POST /api/v1/orders` (⚪ Optional auth — Guest + Customer dùng chung) → tạo Checkout + các Order, trừ stock ngay.
+    - [ ] Giỏ có SP của 2 shop → tạo đúng 2 Order, mỗi Order có `sellerId` và `totalAmount` riêng; `Checkout.totalAmount` = tổng.
+    - [ ] Giá và tên SP lấy từ DB, bỏ qua `price` do client gửi.
+    - [ ] Guest: bắt buộc cung cấp `recipient` (fullName, phone, email, address).
+    - [ ] Customer: auto-fill từ profile, cho phép override address.
+    - [ ] Có bất kỳ SP nào `stock < quantity` (hoặc SP ẩn/block) → 400 kèm danh sách SP thiếu hàng, **không tạo Checkout/Order nào và stock đã trừ được hoàn lại**.
+    - [ ] Customer mua SP của chính mình → 400.
+    - [ ] Trừ stock nguyên tử (`stock >= qty`); 2 người mua SP cuối cùng cùng lúc → chỉ 1 người thành công.
+    - [ ] Response trả `checkoutId`, `checkoutCode`, `totalAmount`, `expiresAt`, `orders[]`, `vnpayUrl`. Mọi Order mặc định `pending`.
+    - [ ] FE: Trang Checkout (form recipient) → "Thanh toán" → redirect VNPay; trang kết quả `/checkout/result` liệt kê các đơn.
   - **Tasks:**
     - [ ] **Backend:** `Checkout schema + Order schema (checkoutId, sellerId, sellerShopName, userId nullable, recipient, items snapshot, totalAmount, status, paymentStatus)` · `POST /orders: group by seller, atomic decrement, all-or-nothing rollback, generate VNPay URL` · `orderCode/checkoutCode generator` · `restockAndCancel() dùng chung`
     - [ ] **Frontend:** `CheckoutPage (Guest form / Customer prefill)` · `CheckoutResultPage (success/fail)`
@@ -341,15 +341,15 @@ schema-version: "1.3"
   - **Blocks:** `US-ORD-002`, `US-SELL-002`
   - **Mô tả:** Một giao dịch VNPay cho cả Checkout. Thành công → mọi Order con `confirmed`; thất bại / hết hạn → mọi Order con `cancelled` và rollback stock.
   - **Acceptance Criteria (AC):**
-    - [ ] `vnp_TxnRef = checkoutCode`, `vnp_Amount = totalAmount × 100`.`
-    - [ ] `GET /api/v1/payments/vnpay/ipn` (VNPay gọi bằng GET) → verify HMAC-SHA512 + số tiền, trả `RspCode`/`Message` đúng (00, 01, 02, 04, 97, 99).`
-    - [ ] Thanh toán thành công → Checkout `paid`; **tất cả** Order con `pending → confirmed`, `paymentStatus = paid`.`
-    - [ ] Thanh toán thất bại → Checkout `failed`; **tất cả** Order con `cancelled` (`cancelledBy = system`), rollback stock từng item.`
-    - [ ] `GET /api/v1/payments/vnpay/return` → verify, gọi **cùng hàm xử lý idempotent** với IPN, rồi redirect FE `/checkout/result?checkoutCode=...&status=...`.`
-    - [ ] IPN/Return đến trùng hoặc cùng lúc → chỉ xử lý 1 lần (idempotency theo trạng thái Checkout).`
-    - [ ] Mọi callback (kể cả sai chữ ký) lưu vào collection `payments`.`
-    - [ ] `@Cron` mỗi phút: Checkout `pending` quá `expiresAt` (30 phút) → `expired`, hủy Order `pending`, rollback stock.`
-    - [ ] Thanh toán thành công đến **sau** khi Checkout `expired` → ghi `payments.note = late_success_after_expiry`, trả `02`.`
+    - [ ] `vnp_TxnRef = checkoutCode`, `vnp_Amount = totalAmount × 100`.
+    - [ ] `GET /api/v1/payments/vnpay/ipn` (VNPay gọi bằng GET) → verify HMAC-SHA512 + số tiền, trả `RspCode`/`Message` đúng (00, 01, 02, 04, 97, 99).
+    - [ ] Thanh toán thành công → Checkout `paid`; **tất cả** Order con `pending → confirmed`, `paymentStatus = paid`.
+    - [ ] Thanh toán thất bại → Checkout `failed`; **tất cả** Order con `cancelled` (`cancelledBy = system`), rollback stock từng item.
+    - [ ] `GET /api/v1/payments/vnpay/return` → verify, gọi **cùng hàm xử lý idempotent** với IPN, rồi redirect FE `/checkout/result?checkoutCode=...&status=...`.
+    - [ ] IPN/Return đến trùng hoặc cùng lúc → chỉ xử lý 1 lần (idempotency theo trạng thái Checkout).
+    - [ ] Mọi callback (kể cả sai chữ ký) lưu vào collection `payments`.
+    - [ ] `@Cron` mỗi phút: Checkout `pending` quá `expiresAt` (30 phút) → `expired`, hủy Order `pending`, rollback stock.
+    - [ ] Thanh toán thành công đến **sau** khi Checkout `expired` → ghi `payments.note = late_success_after_expiry`, trả `02`.
   - **Tasks:**
     - [ ] **Backend:** `VNPay service (tạo URL, verify checksum)` · `processPaymentResult() idempotent` · `GET /payments/vnpay/ipn` · `GET /payments/vnpay/return` · `Payment schema` · `Scheduled job (@Cron) checkout expiry`
     - [ ] **Frontend:** `CheckoutResultPage (đọc checkoutCode từ query param)`
@@ -368,12 +368,12 @@ schema-version: "1.3"
   - **Blocks:** `US-ADM-001`
   - **Mô tả:** Người mua xem lịch sử đơn **đã mua** của mình (mỗi đơn gắn một shop). Admin xem tất cả đơn của mọi shop. Việc **cập nhật trạng thái** nằm ở `US-SELL-002`.
   - **Acceptance Criteria (AC):**
-    - [ ] `GET /api/v1/orders/my` (✅ Login) → đơn mình đã mua (phân trang, mới nhất trước), mỗi đơn có `seller.shopName`, `checkoutCode`.`
-    - [ ] `GET /api/v1/orders/my/:id` → chi tiết (items snapshot, recipient, status, totalAmount); đơn của người khác → 404.`
-    - [ ] `GET /api/v1/orders` (Admin) → tất cả đơn, lọc `status`, `sellerId`, `userId`.`
-    - [ ] `GET /api/v1/orders/:id` (Admin) → chi tiết đơn bất kỳ.`
-    - [ ] FE Customer: Trang lịch sử đơn + chi tiết đơn với badge trạng thái; đơn cùng `checkoutCode` được nhóm hiển thị.`
-    - [ ] FE Admin: Bảng quản lý đơn hàng.`
+    - [ ] `GET /api/v1/orders/my` (✅ Login) → đơn mình đã mua (phân trang, mới nhất trước), mỗi đơn có `seller.shopName`, `checkoutCode`.
+    - [ ] `GET /api/v1/orders/my/:id` → chi tiết (items snapshot, recipient, status, totalAmount); đơn của người khác → 404.
+    - [ ] `GET /api/v1/orders` (Admin) → tất cả đơn, lọc `status`, `sellerId`, `userId`.
+    - [ ] `GET /api/v1/orders/:id` (Admin) → chi tiết đơn bất kỳ.
+    - [ ] FE Customer: Trang lịch sử đơn + chi tiết đơn với badge trạng thái; đơn cùng `checkoutCode` được nhóm hiển thị.
+    - [ ] FE Admin: Bảng quản lý đơn hàng.
   - **Tasks:**
     - [ ] **Backend:** `GET /orders/my, GET /orders/my/:id (lọc theo userId)` · `GET /orders, GET /orders/:id (Admin guard)` · `Route order: /my, /selling trước /:id`
     - [ ] **Frontend:** `OrderHistoryPage, OrderDetailPage (Customer)` · `Admin: OrderTable`
@@ -392,16 +392,16 @@ schema-version: "1.3"
   - **Blocks:** `US-ADM-001`
   - **Mô tả:** Người bán xem các đơn chứa SP của mình và đẩy trạng thái giao hàng. Admin cập nhật được mọi đơn. Người mua chỉ xem.
   - **Acceptance Criteria (AC):**
-    - [ ] `GET /api/v1/orders/selling` → chỉ đơn có `sellerId` = mình, lọc theo `status`, phân trang.`
-    - [ ] `GET /api/v1/orders/selling/:id` → chi tiết; đơn của shop khác → 404.`
-    - [ ] `PATCH /api/v1/orders/:id/status` bởi Seller của đơn: `confirmed→shipping`, `shipping→delivered`, `confirmed→cancelled` (kèm `reason` bắt buộc) → 200.`
-    - [ ] Seller không phải chủ đơn → 403; Seller đặt `refunded` → 403.`
-    - [ ] Admin: ngoài các chuyển trên còn `cancelled→refunded` (chỉ khi `paymentStatus = paid`).`
-    - [ ] Không ai đặt tay `confirmed` / `pending` qua API → 400 (`confirmed` chỉ do VNPay).`
-    - [ ] Chuyển sai chiều (vd `delivered→shipping`) → 400 với thông báo rõ ràng.`
-    - [ ] Hủy đơn → hoàn stock đúng 1 lần; gọi hủy 2 lần không hoàn trùng.`
-    - [ ] Hai đơn con của cùng Checkout có trạng thái độc lập.`
-    - [ ] FE Seller: `SellerOrdersPage` — lọc trạng thái, nút Giao hàng / Đã giao / Hủy (dialog nhập lý do).`
+    - [ ] `GET /api/v1/orders/selling` → chỉ đơn có `sellerId` = mình, lọc theo `status`, phân trang.
+    - [ ] `GET /api/v1/orders/selling/:id` → chi tiết; đơn của shop khác → 404.
+    - [ ] `PATCH /api/v1/orders/:id/status` bởi Seller của đơn: `confirmed→shipping`, `shipping→delivered`, `confirmed→cancelled` (kèm `reason` bắt buộc) → 200.
+    - [ ] Seller không phải chủ đơn → 403; Seller đặt `refunded` → 403.
+    - [ ] Admin: ngoài các chuyển trên còn `cancelled→refunded` (chỉ khi `paymentStatus = paid`).
+    - [ ] Không ai đặt tay `confirmed` / `pending` qua API → 400 (`confirmed` chỉ do VNPay).
+    - [ ] Chuyển sai chiều (vd `delivered→shipping`) → 400 với thông báo rõ ràng.
+    - [ ] Hủy đơn → hoàn stock đúng 1 lần; gọi hủy 2 lần không hoàn trùng.
+    - [ ] Hai đơn con của cùng Checkout có trạng thái độc lập.
+    - [ ] FE Seller: `SellerOrdersPage` — lọc trạng thái, nút Giao hàng / Đã giao / Hủy (dialog nhập lý do).
   - **Tasks:**
     - [ ] **Backend:** `GET /orders/selling (+/:id)` · `PATCH /orders/:id/status (state machine + phân quyền Seller/Admin)` · `Dùng restockAndCancel()`
     - [ ] **Frontend:** `Seller: SellerOrdersPage, StatusActionButtons, CancelReasonDialog`
@@ -420,15 +420,15 @@ schema-version: "1.3"
   - **Blocks:** _(none)_
   - **Mô tả:** Admin xem danh sách user, ban/unban tài khoản vi phạm (kéo theo block SP của người bán đó) và block/unblock từng sản phẩm vi phạm.
   - **Acceptance Criteria (AC):**
-    - [ ] `GET /api/v1/admin/users` (Admin) → danh sách user, lọc `role`/`isActive`/`search`, phân trang.`
-    - [ ] `PATCH /api/v1/admin/users/:id/ban` → set `isActive = false`; user bị ban không đăng nhập được; **toàn bộ SP của user bị block** (`blockReason = seller_banned`).`
-    - [ ] `PATCH /api/v1/admin/users/:id/unban` → set `isActive = true`; chỉ mở lại SP có `blockReason = seller_banned`.`
-    - [ ] `GET /api/v1/admin/products` → mọi SP kể cả ẩn/bị block, lọc `isBlocked`, `sellerId`.`
-    - [ ] `PATCH /api/v1/admin/products/:id/block` với `reason` bắt buộc → SP biến khỏi danh sách công khai, Seller vẫn thấy kèm lý do và không tự mở lại được.`
-    - [ ] `PATCH /api/v1/admin/products/:id/unblock` → SP hiển thị lại (nếu `isActive = true`).`
-    - [ ] Admin không thể ban chính mình → trả về 400.`
-    - [ ] Login với tài khoản `isActive = false` → trả về 403 "Tài khoản đã bị khóa".`
-    - [ ] FE Admin: Trang danh sách user với nút Ban/Unban, badge trạng thái Active/Banned; trang `AdminProducts` với nút Block/Unblock.`
+    - [ ] `GET /api/v1/admin/users` (Admin) → danh sách user, lọc `role`/`isActive`/`search`, phân trang.
+    - [ ] `PATCH /api/v1/admin/users/:id/ban` → set `isActive = false`; user bị ban không đăng nhập được; **toàn bộ SP của user bị block** (`blockReason = seller_banned`).
+    - [ ] `PATCH /api/v1/admin/users/:id/unban` → set `isActive = true`; chỉ mở lại SP có `blockReason = seller_banned`.
+    - [ ] `GET /api/v1/admin/products` → mọi SP kể cả ẩn/bị block, lọc `isBlocked`, `sellerId`.
+    - [ ] `PATCH /api/v1/admin/products/:id/block` với `reason` bắt buộc → SP biến khỏi danh sách công khai, Seller vẫn thấy kèm lý do và không tự mở lại được.
+    - [ ] `PATCH /api/v1/admin/products/:id/unblock` → SP hiển thị lại (nếu `isActive = true`).
+    - [ ] Admin không thể ban chính mình → trả về 400.
+    - [ ] Login với tài khoản `isActive = false` → trả về 403 "Tài khoản đã bị khóa".
+    - [ ] FE Admin: Trang danh sách user với nút Ban/Unban, badge trạng thái Active/Banned; trang `AdminProducts` với nút Block/Unblock.
   - **Tasks:**
     - [ ] **Backend:** `GET /admin/users` · `PATCH /admin/users/:id/ban|unban (cascade block SP)` · `GET /admin/products` · `PATCH /admin/products/:id/block|unblock` · `Kiểm tra isActive trong Login service`
     - [ ] **Frontend:** `Admin: UserTable, BanConfirmDialog` · `Admin: AdminProducts (BlockDialog nhập lý do)`
