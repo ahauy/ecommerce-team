@@ -1,0 +1,298 @@
+# 07 — Tech Stack & Conventions
+
+## Monorepo Structure
+
+```
+ecommerce/                    ← root repo (monorepo)
+├── apps/
+│   ├── backend/              ← NestJS API
+│   └── frontend/             ← React 18 + Vite (clone từ react-boider-plate-ts)
+├── package.json              ← workspace root (pnpm workspaces)
+└── pnpm-workspace.yaml
+```
+
+## Frontend Stack (Template: react-boider-plate-ts)
+
+| Thư viện                     | Dùng cho                               |
+| ---------------------------- | -------------------------------------- |
+| **React 18 + Vite**          | Build tool + UI runtime                |
+| **TypeScript (strict)**      | Type safety                            |
+| **Tailwind CSS + shadcn/ui** | Styling + component library            |
+| **React Router v6**          | Routing, Private Route, lazy loading   |
+| **Zustand**                  | Global state: `authStore`, `cartStore` |
+| **TanStack Query**           | Server state, caching API calls        |
+| **Axios**                    | HTTP client (base URL = `/api/v1`)     |
+| **Formik + Yup**             | Forms + validation                     |
+| **i18next**                  | i18n — dùng tiếng Việt (`vi`)          |
+| **Lucide React**             | Icons                                  |
+| **react-toastify**           | Toast notifications                    |
+
+## Frontend Folder Structure
+
+```
+apps/frontend/
+├── src/
+│   ├── main.tsx
+│   ├── App.tsx                   # Router setup
+│   │
+│   ├── assets/                   # Images, fonts
+│   ├── components/               # Shared UI components
+│   │   ├── ui/                   # shadcn/ui generated components
+│   │   └── shared/               # Custom shared components
+│   │
+│   ├── hooks/                    # Custom hooks (useAuth, useCart...)
+│   ├── lib/                      # utils, cn helper, axios instance
+│   ├── stores/                   # Zustand stores
+│   │   ├── auth.store.ts
+│   │   └── cart.store.ts
+│   │
+│   ├── services/                 # API calls (grouped by module)
+│   │   ├── auth.service.ts
+│   │   ├── product.service.ts
+│   │   ├── cart.service.ts
+│   │   └── order.service.ts
+│   │
+│   ├── pages/                    # Route-level components
+│   │   ├── auth/
+│   │   │   ├── LoginPage.tsx
+│   │   │   └── RegisterPage.tsx
+│   │   ├── products/
+│   │   │   ├── ProductListPage.tsx
+│   │   │   └── ProductDetailPage.tsx
+│   │   ├── cart/
+│   │   │   └── CartPage.tsx
+│   │   ├── checkout/
+│   │   │   ├── CheckoutPage.tsx
+│   │   │   ├── OrderSuccessPage.tsx
+│   │   │   └── OrderFailPage.tsx
+│   │   ├── orders/
+│   │   │   └── OrderHistoryPage.tsx
+│   │   └── admin/
+│   │       ├── AdminDashboard.tsx
+│   │       ├── AdminProducts.tsx
+│   │       ├── AdminCategories.tsx
+│   │       ├── AdminOrders.tsx
+│   │       └── AdminUsers.tsx
+│   │
+│   ├── routes/                   # Route config + guards
+│   │   ├── PrivateRoute.tsx      # Redirect nếu chưa login
+│   │   ├── AdminRoute.tsx        # Redirect nếu không phải admin
+│   │   └── index.tsx
+│   │
+│   ├── types/                    # Shared TypeScript types
+│   │   ├── auth.types.ts
+│   │   ├── product.types.ts
+│   │   └── order.types.ts
+│   │
+│   └── locales/                  # i18n
+│       ├── vi.json
+│       └── en.json
+│
+├── .env.example
+├── vite.config.ts
+└── package.json
+```
+
+## Folder Structure — NestJS Backend
+
+```
+backend/
+├── src/
+│   ├── main.ts                    # Entry point
+│   ├── app.module.ts
+│   │
+│   ├── common/                    # Shared utilities
+│   │   ├── decorators/            # @CurrentUser, @Roles, etc.
+│   │   ├── guards/                # JwtAuthGuard, RolesGuard
+│   │   ├── filters/               # GlobalExceptionFilter
+│   │   ├── interceptors/          # ResponseInterceptor (wrap format)
+│   │   ├── pipes/                 # ValidationPipe
+│   │   └── utils/                 # helpers, slug generator, etc.
+│   │
+│   ├── config/                    # Configuration modules
+│   │   ├── database.config.ts
+│   │   ├── jwt.config.ts
+│   │   └── cloudinary.config.ts
+│   │
+│   ├── modules/
+│   │   ├── auth/
+│   │   │   ├── auth.module.ts
+│   │   │   ├── auth.controller.ts
+│   │   │   ├── auth.service.ts
+│   │   │   ├── strategies/        # JwtStrategy, JwtRefreshStrategy
+│   │   │   └── dto/               # RegisterDto, LoginDto
+│   │   │
+│   │   ├── users/
+│   │   │   ├── users.module.ts
+│   │   │   ├── users.service.ts
+│   │   │   ├── schemas/           # user.schema.ts
+│   │   │   └── dto/
+│   │   │
+│   │   ├── categories/
+│   │   │   ├── categories.module.ts
+│   │   │   ├── categories.controller.ts
+│   │   │   ├── categories.service.ts
+│   │   │   ├── schemas/           # category.schema.ts
+│   │   │   └── dto/
+│   │   │
+│   │   ├── products/
+│   │   │   ├── products.module.ts
+│   │   │   ├── products.controller.ts
+│   │   │   ├── products.service.ts
+│   │   │   ├── schemas/           # product.schema.ts
+│   │   │   └── dto/
+│   │   │
+│   │   ├── cart/
+│   │   │   ├── cart.module.ts
+│   │   │   ├── cart.controller.ts
+│   │   │   ├── cart.service.ts
+│   │   │   ├── schemas/           # cart.schema.ts
+│   │   │   └── dto/
+│   │   │
+│   │   ├── orders/
+│   │   │   ├── orders.module.ts
+│   │   │   ├── orders.controller.ts
+│   │   │   ├── orders.service.ts
+│   │   │   ├── schemas/           # order.schema.ts
+│   │   │   └── dto/
+│   │   │
+│   │   ├── payments/
+│   │   │   ├── payments.module.ts
+│   │   │   ├── payments.controller.ts
+│   │   │   ├── payments.service.ts
+│   │   │   └── schemas/           # payment.schema.ts
+│   │   │
+│   │   ├── upload/
+│   │   │   ├── upload.module.ts
+│   │   │   ├── upload.controller.ts
+│   │   │   └── upload.service.ts  # Cloudinary integration
+│   │   │
+│   │   └── admin/
+│   │       ├── admin.module.ts
+│   │       ├── admin.controller.ts
+│   │       └── admin.service.ts
+│   │
+├── test/                          # E2E tests
+├── .env
+├── .env.example
+└── package.json
+```
+
+---
+
+## Naming Conventions
+
+### Files & Folders
+
+| Loại        | Convention               | Ví dụ                       |
+| ----------- | ------------------------ | --------------------------- |
+| Module file | `<name>.module.ts`       | `products.module.ts`        |
+| Controller  | `<name>.controller.ts`   | `products.controller.ts`    |
+| Service     | `<name>.service.ts`      | `products.service.ts`       |
+| Schema      | `<name>.schema.ts`       | `product.schema.ts`         |
+| DTO         | `<action>-<name>.dto.ts` | `create-product.dto.ts`     |
+| Guard       | `<name>.guard.ts`        | `jwt-auth.guard.ts`         |
+| Decorator   | `<name>.decorator.ts`    | `current-user.decorator.ts` |
+
+### Variables & Functions
+
+| Loại                | Convention          | Ví dụ                               |
+| ------------------- | ------------------- | ----------------------------------- |
+| Variable / Function | `camelCase`         | `getUserById`, `totalAmount`        |
+| Class / Schema      | `PascalCase`        | `ProductSchema`, `CreateProductDto` |
+| Constant            | `UPPER_SNAKE_CASE`  | `JWT_SECRET`, `MAX_IMAGES`          |
+| Enum                | `PascalCase` values | `OrderStatus.PENDING`               |
+| MongoDB field       | `camelCase`         | `categoryId`, `createdAt`           |
+
+### API Endpoints
+
+- Dùng **noun, plural**: `/products`, `/categories`, `/orders`
+- Dùng **kebab-case**: `/order-items` không phải `/orderItems`
+- Không dùng động từ trong URL: `/products` (GET) thay vì `/getProducts`
+
+---
+
+## Enums (thống nhất giữa FE & BE)
+
+```typescript
+// Order Status
+export enum OrderStatus {
+  PENDING = "pending",
+  CONFIRMED = "confirmed",
+  SHIPPING = "shipping",
+  DELIVERED = "delivered",
+  CANCELLED = "cancelled",
+  REFUNDED = "refunded",
+}
+
+// Payment Status
+export enum PaymentStatus {
+  UNPAID = "unpaid",
+  PAID = "paid",
+  REFUNDED = "refunded",
+}
+
+// User Role
+export enum UserRole {
+  CUSTOMER = "customer",
+  ADMIN = "admin",
+}
+```
+
+---
+
+## Git Workflow
+
+### Branch Strategy
+
+```
+main          ← production-ready (chỉ merge từ dev sau review)
+  └── dev     ← integration branch (merge feature branches vào đây)
+        ├── feature/auth
+        ├── feature/category-product
+        ├── feature/cart
+        ├── feature/order-checkout
+        ├── feature/payment-vnpay
+        └── feature/admin-dashboard
+```
+
+### Commit Message — Conventional Commits
+
+```
+<type>(<scope>): <description>
+
+type:
+  feat     — tính năng mới
+  fix      — sửa bug
+  docs     — chỉ thay đổi tài liệu
+  refactor — refactor code
+  test     — thêm/sửa test
+  chore    — cấu hình, package, CI
+
+scope: auth | category | product | cart | order | payment | admin | upload
+
+Ví dụ:
+  feat(product): add text search by product name
+  fix(order): rollback stock when payment fails
+  docs(api): update order status endpoint docs
+  refactor(auth): extract token validation to helper
+```
+
+### Pull Request Rules
+
+1. Mở PR từ `feature/*` vào `dev`
+2. Cần ít nhất **1 người review** trước khi merge
+3. Resolve conflict trước khi request review
+4. Xóa branch sau khi merge
+
+---
+
+## Code Style
+
+- **Prettier** format on save — không tranh cãi style
+- **ESLint** — follow NestJS default config
+- **Max file length**: 300 dòng (nếu vượt, tách service/helper)
+- **Max function length**: 50 dòng
+- **No `any` type** — luôn có type rõ ràng
+- **DTOs phải có validation** — dùng `class-validator`
+- **Service không import trực tiếp Schema của module khác** — dùng qua Service của module đó
