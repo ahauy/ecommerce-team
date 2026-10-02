@@ -7,24 +7,28 @@ Danh sách dưới đây là gợi ý — team tự phân công feature cụ th�
 
 > **Phân công thực tế**: điền vào cột "Người thực hiện" sau khi team thống nhất.
 
+> ⚠️ **Lưu ý khối lượng:** mô hình sàn nhiều người bán làm Module 3 (ownership), 5 (tách đơn theo seller) và 8 (Seller Center) nặng hơn mô hình shop một chủ. Xem mục **Đường cắt** ở cuối nếu thiếu thời gian.
+
 ---
 
 ## Dependency Map
 
 ```
-[1] Auth & User
+[1] Auth & User (+ profile, shop setup)
     │
     ├──► [2] Category (cần auth Admin)
     │         │
-    │         └──► [3] Product (cần categoryId)
+    │         └──► [3] Product (cần categoryId + sellerId, ownership)
     │                   │
     │         ┌─────────┘
     │         │
-    ├──► [4] Cart (cần Product + Auth Customer)
+    ├──► [4] Cart (cần Product + Auth; nhóm theo seller)
     │         │
-    │         └──► [5] Order & Checkout (cần Cart + Product)
+    │         └──► [5] Order & Checkout (cần Cart + Product; tách Order theo seller)
     │                   │
-    │                   └──► [6] Payment VNPay (cần Order)
+    │                   ├──► [6] Payment VNPay (cần Checkout)
+    │                   │
+    │                   └──► [8] Seller Center — đơn bán (cần Order; xác nhận lại sau Payment)
     │
     └──► [7] Admin Dashboard (cần tất cả module trên)
 ```
@@ -42,12 +46,14 @@ Danh sách dưới đây là gợi ý — team tự phân công feature cụ th�
 | #   | Task                                                                | Loại | Độ ưu tiên  |
 | --- | ------------------------------------------------------------------- | ---- | ----------- |
 | 1.1 | Setup NestJS project + Mongoose + global pipes/filters/interceptors | BE   | 🔴 Critical |
-| 1.2 | User schema + CRUD service (internal)                               | BE   | 🔴 Critical |
-| 1.3 | `POST /auth/register` + `POST /auth/login`                          | BE   | 🔴 Critical |
-| 1.4 | JWT Strategy (access + refresh) + Guards                            | BE   | 🔴 Critical |
+| 1.2 | User schema (gồm `shopName`, `pickupAddress`) + CRUD service        | BE   | 🔴 Critical |
+| 1.3 | `POST /auth/register` + `POST /auth/login` (chặn user bị ban → 403) | BE   | 🔴 Critical |
+| 1.4 | JWT Strategy (access + refresh) + `JwtAuthGuard`, `OptionalJwtAuthGuard`, `RolesGuard` | BE | 🔴 Critical |
 | 1.5 | `POST /auth/refresh` + `POST /auth/logout`                          | BE   | 🔴 Critical |
-| 1.6 | UI: Form Đăng ký / Đăng nhập                                        | FE   | 🟡 High     |
-| 1.7 | FE: Lưu token, axios interceptor tự refresh                         | FE   | 🟡 High     |
+| 1.6 | `GET/PATCH /users/me` + `PATCH /users/me/shop`                      | BE   | 🟡 High     |
+| 1.7 | UI: Form Đăng ký / Đăng nhập                                        | FE   | 🟡 High     |
+| 1.8 | FE: Lưu token, axios interceptor tự refresh                         | FE   | 🟡 High     |
+| 1.9 | UI: Trang Profile                                                   | FE   | 🟢 Normal   |
 
 ---
 
@@ -61,28 +67,31 @@ Danh sách dưới đây là gợi ý — team tự phân công feature cụ th�
 | --- | ------------------------------------------------ | ---- | ----------- |
 | 2.1 | Category schema                                  | BE   | 🔴 Critical |
 | 2.2 | CRUD API `/api/v1/categories`                    | BE   | 🔴 Critical |
-| 2.3 | Validate: không xóa category còn SP              | BE   | 🟡 High     |
+| 2.3 | Validate: không xóa category còn SP (mọi shop)   | BE   | 🟡 High     |
 | 2.4 | Admin UI: Danh sách & CRUD category              | FE   | 🟡 High     |
 | 2.5 | Public UI: Hiện danh sách category (sidebar/nav) | FE   | 🟡 High     |
 
 ---
 
-### Module 3: Product
+### Module 3: Product (có ownership)
 
 **Người thực hiện:** `_______________`
 
-> Phụ thuộc: Module 1 (Admin guard), Module 2 (categoryId)
+> Phụ thuộc: Module 1 (auth + shop setup), Module 2 (categoryId)
 
-| #   | Task                                                 | Loại | Độ ưu tiên  |
-| --- | ---------------------------------------------------- | ---- | ----------- |
-| 3.1 | Product schema + index                               | BE   | 🔴 Critical |
-| 3.2 | CRUD API `/api/v1/products`                          | BE   | 🔴 Critical |
-| 3.3 | Search & Filter (text search, category, price range) | BE   | 🔴 Critical |
-| 3.4 | Cloudinary upload service                            | BE   | 🟡 High     |
-| 3.5 | `POST /upload/image` endpoint                        | BE   | 🟡 High     |
-| 3.6 | Public UI: Danh sách SP + filter                     | FE   | 🔴 Critical |
-| 3.7 | Public UI: Chi tiết sản phẩm                         | FE   | 🔴 Critical |
-| 3.8 | Admin UI: CRUD sản phẩm + upload ảnh                 | FE   | 🟡 High     |
+| #    | Task                                                                                         | Loại | Độ ưu tiên  |
+| ---- | -------------------------------------------------------------------------------------------- | ---- | ----------- |
+| 3.1  | Product schema (`sellerId`, `isActive`, `isBlocked`, `blockReason`) + index                  | BE   | 🔴 Critical |
+| 3.2  | `POST /products` (yêu cầu có shop, gán `sellerId` từ token) + `GET /products/my`             | BE   | 🔴 Critical |
+| 3.3  | `PATCH/DELETE /products/:id` + helper `assertOwnerOrAdmin` (403 sai chủ, Admin bypass)       | BE   | 🔴 Critical |
+| 3.4  | `GET /products` (chỉ SP hiển thị) + Search & Filter (text, category, price, `sellerId`)      | BE   | 🔴 Critical |
+| 3.5  | `GET /products/:id` (`OptionalJwtAuthGuard`; SP ẩn/block chỉ Owner/Admin xem được)           | BE   | 🟡 High     |
+| 3.6  | Cloudinary upload service + `POST /upload/image` (✅ Login, ≤5MB, jpg/png/webp)              | BE   | 🟡 High     |
+| 3.7  | `GET /shops/:sellerId`                                                                       | BE   | 🟢 Normal   |
+| 3.8  | Public UI: Danh sách SP + filter (+ hiện tên shop)                                           | FE   | 🔴 Critical |
+| 3.9  | Public UI: Chi tiết sản phẩm (+ link sang trang shop)                                        | FE   | 🔴 Critical |
+| 3.10 | Seller UI: `ShopSetupPage`, `MyProductsPage`, `ProductFormPage` (upload ≤5 ảnh)             | FE   | 🔴 Critical |
+| 3.11 | Public UI: `ShopPage`                                                                        | FE   | 🟢 Normal   |
 
 ---
 
@@ -92,32 +101,34 @@ Danh sách dưới đây là gợi ý — team tự phân công feature cụ th�
 
 > Phụ thuộc: Module 1 (auth), Module 3 (product)
 
-| #   | Task                                       | Loại | Độ ưu tiên  |
-| --- | ------------------------------------------ | ---- | ----------- |
-| 4.1 | Cart schema                                | BE   | 🔴 Critical |
-| 4.2 | Cart API (GET, add, update, delete, merge) | BE   | 🔴 Critical |
-| 4.3 | Validate quantity không vượt stock         | BE   | 🔴 Critical |
-| 4.4 | FE: Guest cart — localStorage util         | FE   | 🔴 Critical |
-| 4.5 | FE: UI giỏ hàng (Guest + Customer)         | FE   | 🔴 Critical |
-| 4.6 | FE: Merge cart khi đăng nhập               | FE   | 🟡 High     |
+| #   | Task                                                                     | Loại | Độ ưu tiên  |
+| --- | ------------------------------------------------------------------------ | ---- | ----------- |
+| 4.1 | Cart schema                                                              | BE   | 🔴 Critical |
+| 4.2 | Cart API (GET **nhóm theo seller**, add, update, delete, merge)          | BE   | 🔴 Critical |
+| 4.3 | Validate: quantity ≤ stock · chặn SP của chính mình · loại SP ẩn/block   | BE   | 🔴 Critical |
+| 4.4 | FE: Guest cart — localStorage util                                       | FE   | 🔴 Critical |
+| 4.5 | FE: UI giỏ hàng (Guest + Customer), **hiển thị theo từng shop**          | FE   | 🔴 Critical |
+| 4.6 | FE: Merge cart khi đăng nhập                                             | FE   | 🟡 High     |
 
 ---
 
-### Module 5: Order & Checkout
+### Module 5: Order & Checkout (tách đơn theo người bán)
 
 **Người thực hiện:** `_______________`
 
 > Phụ thuộc: Module 4 (cart), Module 3 (stock)
 
-| #   | Task                                               | Loại | Độ ưu tiên  |
-| --- | -------------------------------------------------- | ---- | ----------- |
-| 5.1 | Order schema (embed items, recipient)              | BE   | 🔴 Critical |
-| 5.2 | `POST /orders` — tạo đơn, trừ stock, tạo VNPay URL | BE   | 🔴 Critical |
-| 5.3 | `GET /orders/my` + `GET /orders/my/:id`            | BE   | 🟡 High     |
-| 5.4 | `GET /orders` + `PATCH /orders/:id/status` (Admin) | BE   | 🟡 High     |
-| 5.5 | FE: Trang Checkout (Guest form + Customer prefill) | FE   | 🔴 Critical |
-| 5.6 | FE: Trang xác nhận đơn hàng (success/fail)         | FE   | 🔴 Critical |
-| 5.7 | FE: Customer — Lịch sử đơn hàng                    | FE   | 🟡 High     |
+| #   | Task                                                                                                  | Loại | Độ ưu tiên  |
+| --- | ----------------------------------------------------------------------------------------------------- | ---- | ----------- |
+| 5.1 | Schemas: `Checkout` + `Order` (`checkoutId`, `sellerId`, `sellerShopName`, `cancelReason`, `cancelledBy`) | BE | 🔴 Critical |
+| 5.2 | `POST /orders`: nhóm theo seller → trừ stock nguyên tử (all-or-nothing) → tạo N Order + 1 Checkout → tạo VNPay URL | BE | 🔴 Critical |
+| 5.3 | Chặn mua SP của chính mình; tính giá từ DB (không tin client)                                         | BE   | 🔴 Critical |
+| 5.4 | Service `restockAndCancel(order)` dùng chung (cập nhật có điều kiện, hoàn stock đúng 1 lần)           | BE   | 🔴 Critical |
+| 5.5 | `GET /orders/my` + `GET /orders/my/:id`                                                               | BE   | 🟡 High     |
+| 5.6 | `GET /orders` + `GET /orders/:id` (Admin)                                                             | BE   | 🟡 High     |
+| 5.7 | FE: Trang Checkout (Guest form + Customer prefill từ `/users/me`)                                     | FE   | 🔴 Critical |
+| 5.8 | FE: Trang kết quả `/checkout/result` (liệt kê các đơn của checkout, success/fail)                     | FE   | 🔴 Critical |
+| 5.9 | FE: Customer — Lịch sử đơn mua (hiện shop, trạng thái từng đơn)                                       | FE   | 🟡 High     |
 
 ---
 
@@ -125,16 +136,18 @@ Danh sách dưới đây là gợi ý — team tự phân công feature cụ th�
 
 **Người thực hiện:** `_______________`
 
-> Phụ thuộc: Module 5 (order)
+> Phụ thuộc: Module 5 (checkout)
 
-| #   | Task                                                          | Loại | Độ ưu tiên  |
-| --- | ------------------------------------------------------------- | ---- | ----------- |
-| 6.1 | Tích hợp VNPay SDK / manual HMAC signing                      | BE   | 🔴 Critical |
-| 6.2 | `GET /payments/vnpay/return` — redirect handler               | BE   | 🔴 Critical |
-| 6.3 | `POST /payments/vnpay/ipn` — webhook + verify checksum        | BE   | 🔴 Critical |
-| 6.4 | Logic: success → confirmed, fail → cancelled + rollback stock | BE   | 🔴 Critical |
-| 6.5 | Payment schema (lưu raw VNPay data)                           | BE   | 🟢 Normal   |
-| 6.6 | FE: Trang redirect sau VNPay (success/fail UI)                | FE   | 🟡 High     |
+| #   | Task                                                                                           | Loại | Độ ưu tiên  |
+| --- | ---------------------------------------------------------------------------------------------- | ---- | ----------- |
+| 6.1 | Tích hợp VNPay SDK / manual HMAC signing (`vnp_TxnRef = checkoutCode`, amount × 100)           | BE   | 🔴 Critical |
+| 6.2 | Hàm xử lý kết quả **idempotent**: verify checksum + số tiền → cập nhật Checkout & mọi Order con | BE   | 🔴 Critical |
+| 6.3 | `GET /payments/vnpay/return` — gọi hàm 6.2 rồi redirect FE                                     | BE   | 🔴 Critical |
+| 6.4 | `GET /payments/vnpay/ipn` — gọi hàm 6.2, trả `RspCode`                                         | BE   | 🔴 Critical |
+| 6.5 | Logic: success → mọi Order `confirmed` + `paid`; fail → mọi Order `cancelled` + hoàn stock     | BE   | 🔴 Critical |
+| 6.6 | `@Cron` mỗi phút: Checkout `pending` quá `expiresAt` → `expired` + hủy Order + hoàn stock      | BE   | 🟡 High     |
+| 6.7 | Payment schema (lưu raw VNPay data, kể cả callback sai chữ ký / thanh toán muộn)               | BE   | 🟢 Normal   |
+| 6.8 | FE: Trang redirect sau VNPay (success/fail UI)                                                 | FE   | 🟡 High     |
 
 ---
 
@@ -144,27 +157,54 @@ Danh sách dưới đây là gợi ý — team tự phân công feature cụ th�
 
 > Phụ thuộc: tất cả module trên
 
-| #   | Task                                                       | Loại | Độ ưu tiên  |
-| --- | ---------------------------------------------------------- | ---- | ----------- |
-| 7.1 | Admin User management API (`GET /admin/users`, ban/unban)  | BE   | 🟡 High     |
-| 7.2 | Admin UI: Tổng quan dashboard (số liệu cơ bản)             | FE   | 🟢 Normal   |
-| 7.3 | Admin UI: Quản lý User                                     | FE   | 🟡 High     |
-| 7.4 | Admin UI: Quản lý Order + cập nhật trạng thái              | FE   | 🔴 Critical |
-| 7.5 | Admin UI: Quản lý Category + Product (nếu chưa làm ở trên) | FE   | 🟡 High     |
+| #   | Task                                                                                  | Loại | Độ ưu tiên  |
+| --- | ------------------------------------------------------------------------------------- | ---- | ----------- |
+| 7.1 | `GET /admin/users` + ban/unban **kéo theo block/unblock SP** (`seller_banned`)        | BE   | 🟡 High     |
+| 7.2 | `GET /admin/products` + `PATCH /admin/products/:id/block` (reason) / `unblock`        | BE   | 🟡 High     |
+| 7.3 | Admin UI: Tổng quan dashboard (số liệu cơ bản)                                        | FE   | 🟢 Normal   |
+| 7.4 | Admin UI: Quản lý User                                                                | FE   | 🟡 High     |
+| 7.5 | Admin UI: Quản lý Order + cập nhật trạng thái (kể cả hủy `pending`, refund)           | FE   | 🔴 Critical |
+| 7.6 | Admin UI: Quản lý Category + Product (xem mọi shop, block/unblock)                    | FE   | 🟡 High     |
+
+---
+
+### Module 8: Seller Center — Đơn bán
+
+**Người thực hiện:** `_______________`
+
+> Phụ thuộc: Module 5 (order), Module 6 (để đơn lên `confirmed`)
+
+| #   | Task                                                                                                        | Loại | Độ ưu tiên  |
+| --- | ----------------------------------------------------------------------------------------------------------- | ---- | ----------- |
+| 8.1 | `GET /orders/selling` + `GET /orders/selling/:id` (lọc theo `order.sellerId`, 404 nếu không phải của mình)  | BE   | 🔴 Critical |
+| 8.2 | `PATCH /orders/:id/status`: state machine + phân quyền (Seller của đơn / Admin; `refunded` chỉ Admin)       | BE   | 🔴 Critical |
+| 8.3 | Hủy `confirmed → cancelled` (bắt buộc `reason`) → gọi `restockAndCancel`                                    | BE   | 🟡 High     |
+| 8.4 | Seller UI: `SellerOrdersPage` — lọc trạng thái, nút Giao hàng / Đã giao / Hủy (dialog nhập lý do)           | FE   | 🔴 Critical |
 
 ---
 
 ## Timeline Gợi ý (1 tuần)
 
-| Ngày       | Mục tiêu                                                       |
-| ---------- | -------------------------------------------------------------- |
-| **Ngày 1** | Setup project · Module 1 BE hoàn tất · Module 2 & 3 BE bắt đầu |
-| **Ngày 2** | Module 2 & 3 BE hoàn tất · Module 4 BE · FE Auth xong          |
-| **Ngày 3** | Module 4 & 5 BE hoàn tất · FE Product + Cart                   |
-| **Ngày 4** | Module 6 (VNPay) · FE Checkout                                 |
-| **Ngày 5** | Module 7 Admin · FE Order history · Integration test           |
-| **Ngày 6** | Bug fix · Polish UI · Test E2E luồng chính                     |
-| **Ngày 7** | Buffer — fix critical bugs · Demo chuẩn bị                     |
+| Ngày       | Mục tiêu                                                                                        |
+| ---------- | ----------------------------------------------------------------------------------------------- |
+| **Ngày 1** | Setup project · Module 1 BE hoàn tất (gồm `/users/me`, shop setup) · Module 2 & 3 BE bắt đầu     |
+| **Ngày 2** | Module 2 & 3 BE hoàn tất (ownership) · Module 4 BE · FE Auth xong                               |
+| **Ngày 3** | Module 4 & 5 BE (tách đơn theo seller) · FE Product + Seller form + Cart                        |
+| **Ngày 4** | Module 6 (VNPay theo Checkout) · Module 8 BE · FE Checkout                                      |
+| **Ngày 5** | Module 7 Admin · Module 8 FE · FE Order history · Integration test                              |
+| **Ngày 6** | Bug fix · Polish UI · Test E2E luồng chính (mua nhiều shop + bán + xử lý đơn)                    |
+| **Ngày 7** | Buffer — fix critical bugs · Demo chuẩn bị                                                      |
+
+### ✂️ Đường cắt (nếu trễ tiến độ — cắt từ dưới lên)
+
+| Thứ tự cắt | Hạng mục                                           | Hậu quả                              |
+| ---------- | -------------------------------------------------- | ------------------------------------ |
+| 1          | `GET /shops/:sellerId` + `ShopPage` (3.7, 3.11)    | Không có trang shop; vẫn lọc `?sellerId=` |
+| 2          | Admin dashboard số liệu (7.3), Profile UI (1.9)    | Không ảnh hưởng luồng chính          |
+| 3          | Admin block SP (7.2, phần UI của 7.6)              | Mất kiểm duyệt SP, vẫn ban user được |
+| 4          | Seller hủy đơn (8.3) — chỉ giữ Giao hàng / Đã giao | Hủy đơn chỉ do Admin                 |
+
+> **Không được cắt:** tách đơn theo seller (5.2), ownership check (3.3), `restockAndCancel` (5.4), xử lý idempotent VNPay (6.2) — đây là lõi của yêu cầu "User đăng bán và mua".
 
 ---
 
@@ -176,4 +216,5 @@ Mỗi task hoàn thành khi:
 - [ ] Validate input (DTO) đầy đủ
 - [ ] FE gọi API thành công + hiển thị đúng UI
 - [ ] Không có console.error / unhandled exception
+- [ ] Với endpoint có ownership: đã test **sai chủ → 403/404**, **Admin bypass → OK**
 - [ ] PR đã được teammate review

@@ -17,18 +17,26 @@
 | Term                  | Short definition                                              | Notes                                    |
 | --------------------- | ------------------------------------------------------------- | ---------------------------------------- |
 | **Guest**             | User chưa đăng nhập                                           | Cart lưu localStorage                    |
-| **Customer**          | User đã đăng nhập, role=customer                              | Cart lưu DB                              |
-| **Admin**             | User role=admin                                               | Quản lý toàn bộ hệ thống                 |
+| **Customer**          | User đã đăng nhập, role=customer — vừa mua vừa bán được       | Cart lưu DB                              |
+| **Buyer**             | Customer đang đóng vai người mua                              | Không phải role                          |
+| **Seller**            | Customer là chủ (`sellerId`) của SP/đơn đang thao tác         | **Không phải role** — xác định bằng ownership |
+| **Admin**             | User role=admin                                               | Quản lý sàn, block SP, xử lý mọi đơn     |
+| **shop**              | Gian hàng của Seller: `shopName` + `pickupAddress` trên user  | Phải có mới được đăng bán                |
+| **sellerId**          | Chủ sở hữu SP / người bán của Order                           | Bất biến trên Product                    |
+| **ownership**         | Quy tắc: chỉ chủ SP/đơn (hoặc Admin) được ghi                 | Sai chủ → 403; đọc `/my` → 404           |
+| **Checkout**          | 1 lần bấm "Đặt hàng" = 1 giao dịch VNPay, gom N Order         | `checkoutCode` = `vnp_TxnRef`            |
+| **checkoutCode**      | Mã checkout tự generate                                       | e.g. `CHK-20261002-ABCD`                 |
+| **block**             | Admin gỡ SP vi phạm (`isBlocked`) — khác Seller ẩn (`isActive`) | Ban seller → block SP, reason `seller_banned` |
 | **SP**                | Sản phẩm (Product)                                            | Viết tắt dùng trong comment              |
 | **stock**             | Số lượng tồn kho của 1 SP                                     | Trừ ngay khi tạo Order                   |
-| **orderCode**         | Mã đơn hàng tự generate                                       | e.g. `ORD-20241002-ABCD`                 |
-| **snapshot**          | Dữ liệu SP embed vào Order                                    | Không bị thay đổi khi Admin sửa SP sau   |
-| **reserve inventory** | Trừ stock ngay khi tạo Order pending                          | Rollback nếu thanh toán thất bại         |
+| **orderCode**         | Mã đơn hàng tự generate — mỗi Order thuộc đúng 1 Seller       | e.g. `ORD-20261002-ABCD`                 |
+| **snapshot**          | Dữ liệu SP embed vào Order                                    | Không bị thay đổi khi Seller/Admin sửa SP sau |
+| **reserve inventory** | Trừ stock ngay khi tạo Order pending (nguyên tử `stock >= qty`) | Hoàn stock nếu thanh toán lỗi / hết hạn / hủy đơn |
 | **merge cart**        | Merge localStorage cart vào DB cart khi đăng nhập             |                                          |
 | **authStore**         | Zustand store lưu user + tokens                               | `apps/frontend/src/stores/auth.store.ts` |
 | **cartStore**         | Zustand store quản lý cart state                              | `apps/frontend/src/stores/cart.store.ts` |
 | **IPN**               | Instant Payment Notification — VNPay webhook server-to-server | Verify HMAC-SHA512                       |
-| **soft delete**       | Ẩn SP bằng `isActive=false`, không xóa khỏi DB                |                                          |
+| **soft delete**       | Ẩn SP bằng `isActive=false`, không xóa khỏi DB                | SP hiển thị khi `isActive && !isBlocked` |
 | **slug**              | URL-friendly version của name                                 | e.g. "iPhone 15 Pro" → "iphone-15-pro"   |
 
 ## Where to Look

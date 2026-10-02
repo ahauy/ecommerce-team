@@ -40,16 +40,16 @@
 
 ### HTTP Status Codes
 
-| Code | Ý nghĩa                                       |
-| ---- | --------------------------------------------- |
-| 200  | OK                                            |
-| 201  | Created                                       |
-| 400  | Bad Request (validation lỗi)                  |
-| 401  | Unauthorized (chưa đăng nhập / token hết hạn) |
-| 403  | Forbidden (không đủ quyền)                    |
-| 404  | Not Found                                     |
-| 409  | Conflict (email trùng, ...)                   |
-| 500  | Internal Server Error                         |
+| Code | Ý nghĩa                                                    |
+| ---- | ---------------------------------------------------------- |
+| 200  | OK                                                         |
+| 201  | Created                                                    |
+| 400  | Bad Request (validation lỗi, chuyển trạng thái sai, hết hàng) |
+| 401  | Unauthorized (chưa đăng nhập / token hết hạn)              |
+| 403  | Forbidden (không đủ quyền / không phải chủ sở hữu)         |
+| 404  | Not Found                                                  |
+| 409  | Conflict (email trùng, ...)                                |
+| 500  | Internal Server Error                                      |
 
 ### Auth Header
 
@@ -57,16 +57,30 @@
 Authorization: Bearer <access_token>
 ```
 
+### Chú giải cột Auth
+
+| Ký hiệu               | Ý nghĩa                                                                                          | Guard                     |
+| --------------------- | ------------------------------------------------------------------------------------------------ | ------------------------- |
+| ❌                    | Public, không cần token                                                                          | —                         |
+| ⚪ Optional           | Token không bắt buộc: có token → xử lý như Customer, không có → Guest                            | `OptionalJwtAuthGuard`    |
+| ✅ Login              | Mọi user đã đăng nhập (Customer hoặc Admin)                                                      | `JwtAuthGuard`            |
+| ✅ Login + Owner      | Phải là chủ sở hữu tài nguyên (SP / đơn bán). Sai chủ → **403**. **Admin được bypass**           | `JwtAuthGuard` + check ở service |
+| ✅ Admin              | Chỉ `role = admin`                                                                               | `JwtAuthGuard` + `RolesGuard` |
+
+> **Quy ước lỗi quyền sở hữu:**
+> - Endpoint **đọc** theo "của tôi" (`/orders/my/:id`, `/orders/selling/:id`) lọc theo owner trong query → không phải của mình trả **404** (không lộ sự tồn tại).
+> - Endpoint **ghi** lên tài nguyên có thật nhưng sai chủ (`PATCH /products/:id`...) trả **403**.
+
 ---
 
 ## Auth — `/api/v1/auth`
 
-| Method | Endpoint         | Auth        | Mô tả                         |
-| ------ | ---------------- | ----------- | ----------------------------- |
-| POST   | `/auth/register` | ❌          | Đăng ký tài khoản             |
-| POST   | `/auth/login`    | ❌          | Đăng nhập                     |
-| POST   | `/auth/refresh`  | ❌          | Làm mới Access Token          |
-| POST   | `/auth/logout`   | ✅ Customer | Đăng xuất (xóa refresh token) |
+| Method | Endpoint         | Auth      | Mô tả                         |
+| ------ | ---------------- | --------- | ----------------------------- |
+| POST   | `/auth/register` | ❌        | Đăng ký tài khoản             |
+| POST   | `/auth/login`    | ❌        | Đăng nhập                     |
+| POST   | `/auth/refresh`  | ❌        | Làm mới Access Token          |
+| POST   | `/auth/logout`   | ✅ Login  | Đăng xuất (xóa refresh token) |
 
 #### POST `/auth/register`
 
@@ -101,9 +115,16 @@ Authorization: Bearer <access_token>
   "data": {
     "accessToken": "eyJ...",
     "refreshToken": "eyJ...",
-    "user": { "id": "...", "email": "...", "fullName": "...", "role": "customer" }
+    "user": {
+      "id": "...",
+      "email": "...",
+      "fullName": "...",
+      "role": "customer",
+      "shopName": null          // null = chưa thiết lập gian hàng
+    }
   }
 }
+// 403 nếu tài khoản bị ban: { "success": false, "message": "Tài khoản đã bị khóa" }
 ```
 
 #### POST `/auth/refresh`
@@ -114,6 +135,62 @@ Authorization: Bearer <access_token>
 
 // Response 200
 { "success": true, "data": { "accessToken": "eyJ..." } }
+```
+
+---
+
+## User & Gian hàng — `/api/v1/users`, `/api/v1/shops`
+
+| Method | Endpoint            | Auth      | Mô tả                                                    |
+| ------ | ------------------- | --------- | -------------------------------------------------------- |
+| GET    | `/users/me`         | ✅ Login  | Lấy profile + thông tin gian hàng của mình               |
+| PATCH  | `/users/me`         | ✅ Login  | Cập nhật `fullName`, `phone`, `address` (dùng prefill checkout) |
+| PATCH  | `/users/me/shop`    | ✅ Login  | Thiết lập / sửa gian hàng: `shopName`, `pickupAddress`   |
+| GET    | `/shops/:sellerId`  | ❌        | Thông tin công khai của một gian hàng                    |
+
+#### GET `/users/me`
+
+```json
+// Response 200
+{
+  "success": true,
+  "data": {
+    "id": "...",
+    "email": "user@example.com",
+    "fullName": "Nguyễn Văn A",
+    "phone": "0901234567",
+    "address": "123 Nguyễn Huệ, Q1, TP.HCM",
+    "role": "customer",
+    "shopName": "Shop của A",
+    "pickupAddress": "45 Lê Lợi, Q1, TP.HCM"
+  }
+}
+```
+
+#### PATCH `/users/me/shop`
+
+```json
+// Request Body
+{
+  "shopName": "Shop của A",             // 3–50 ký tự
+  "pickupAddress": "45 Lê Lợi, Q1, TP.HCM"
+}
+```
+
+#### GET `/shops/:sellerId`
+
+```json
+// Response 200 — chỉ trả public info; 404 nếu user chưa có shopName hoặc đang bị ban
+{
+  "success": true,
+  "data": {
+    "sellerId": "...",
+    "shopName": "Shop của A",
+    "joinedAt": "2026-10-01T00:00:00.000Z",
+    "productCount": 12
+  }
+}
+// Danh sách SP của shop: GET /products?sellerId=...
 ```
 
 ---
@@ -160,14 +237,17 @@ Authorization: Bearer <access_token>
 
 ## Product — `/api/v1/products`
 
-| Method | Endpoint               | Auth     | Mô tả                                           |
-| ------ | ---------------------- | -------- | ----------------------------------------------- |
-| GET    | `/products`            | ❌       | Danh sách sản phẩm (filter, search, phân trang) |
-| GET    | `/products/:id`        | ❌       | Chi tiết sản phẩm                               |
-| POST   | `/products`            | ✅ Admin | Tạo sản phẩm                                    |
-| PATCH  | `/products/:id`        | ✅ Admin | Cập nhật sản phẩm                               |
-| DELETE | `/products/:id`        | ✅ Admin | Ẩn sản phẩm (soft delete)                       |
-| POST   | `/products/:id/images` | ✅ Admin | Upload ảnh (Cloudinary)                         |
+| Method | Endpoint               | Auth                  | Mô tả                                                                   |
+| ------ | ---------------------- | --------------------- | ----------------------------------------------------------------------- |
+| GET    | `/products`            | ❌                    | Danh sách SP **đang hiển thị** (filter, search, phân trang)             |
+| GET    | `/products/my`         | ✅ Login              | Danh sách SP **của mình** (gồm cả ẩn / bị block)                        |
+| GET    | `/products/:id`        | ⚪ Optional           | Chi tiết SP. SP ẩn/bị block: chỉ Owner/Admin xem được, người khác 404   |
+| POST   | `/products`            | ✅ Login              | Đăng bán SP mới (yêu cầu đã thiết lập gian hàng) — `sellerId` = mình    |
+| PATCH  | `/products/:id`        | ✅ Login + Owner      | Cập nhật SP (gồm `price`, `stock`, `isActive`)                          |
+| DELETE | `/products/:id`        | ✅ Login + Owner      | Ẩn sản phẩm (soft delete, `isActive = false`)                           |
+| POST   | `/products/:id/images` | ✅ Login + Owner      | Upload ảnh (Cloudinary) và gắn vào SP                                   |
+
+> Route `/products/my` phải khai báo **trước** `/products/:id` trong controller NestJS.
 
 #### GET `/products` — Query Params
 
@@ -175,44 +255,92 @@ Authorization: Bearer <access_token>
 ?page=1&limit=20
 &search=iphone           // tìm theo tên
 &categoryId=xxx          // lọc theo category
+&sellerId=xxx            // lọc theo người bán (trang shop)
 &minPrice=100000         // lọc giá tối thiểu
 &maxPrice=5000000        // lọc giá tối đa
 &sortBy=price            // price | createdAt | name
 &order=asc               // asc | desc
 ```
 
+> Chỉ trả SP có `isActive = true` **và** `isBlocked = false`.
+
+#### GET `/products/:id` — Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "...",
+    "name": "iPhone 15 Pro",
+    "price": 29990000,
+    "stock": 50,
+    "images": ["https://res.cloudinary.com/..."],
+    "category": { "id": "...", "name": "Điện thoại" },
+    "seller": { "id": "...", "shopName": "Shop của A" },
+    "isActive": true,
+    "isBlocked": false,
+    "blockReason": null
+  }
+}
+// isBlocked / blockReason chỉ trả về cho Owner và Admin
+```
+
 #### POST `/products`
 
 ```json
 {
-  "name": "iPhone 15 Pro",
+  "name": "iPhone 15 Pro",              // tối đa 120 ký tự
   "description": "Mô tả sản phẩm...",
   "price": 29990000,
   "stock": 50,
   "categoryId": "ObjectId...",
-  "images": ["https://res.cloudinary.com/..."]
+  "images": ["https://res.cloudinary.com/..."]  // tối đa 5
 }
+// 201 — data.sellerId tự gán từ token, KHÔNG nhận sellerId từ body
+// 403 nếu chưa thiết lập gian hàng: "Vui lòng thiết lập thông tin gian hàng trước khi đăng bán"
 ```
 
 ---
 
 ## Cart — `/api/v1/cart`
 
-> **Lưu ý:** Guest quản lý cart phía client (localStorage). Các endpoint này chỉ dành cho Customer đã đăng nhập.
+> **Lưu ý:** Guest quản lý cart phía client (localStorage). Các endpoint này dành cho user đã đăng nhập.
 
-| Method | Endpoint                 | Auth        | Mô tả                                 |
-| ------ | ------------------------ | ----------- | ------------------------------------- |
-| GET    | `/cart`                  | ✅ Customer | Lấy giỏ hàng                          |
-| POST   | `/cart/items`            | ✅ Customer | Thêm sản phẩm vào giỏ                 |
-| PATCH  | `/cart/items/:productId` | ✅ Customer | Cập nhật số lượng                     |
-| DELETE | `/cart/items/:productId` | ✅ Customer | Xóa sản phẩm khỏi giỏ                 |
-| DELETE | `/cart`                  | ✅ Customer | Xóa toàn bộ giỏ hàng                  |
-| POST   | `/cart/merge`            | ✅ Customer | Merge cart localStorage sau đăng nhập |
+| Method | Endpoint                 | Auth      | Mô tả                                 |
+| ------ | ------------------------ | --------- | ------------------------------------- |
+| GET    | `/cart`                  | ✅ Login  | Lấy giỏ hàng (đã **nhóm theo người bán**) |
+| POST   | `/cart/items`            | ✅ Login  | Thêm sản phẩm vào giỏ                 |
+| PATCH  | `/cart/items/:productId` | ✅ Login  | Cập nhật số lượng                     |
+| DELETE | `/cart/items/:productId` | ✅ Login  | Xóa sản phẩm khỏi giỏ                 |
+| DELETE | `/cart`                  | ✅ Login  | Xóa toàn bộ giỏ hàng                  |
+| POST   | `/cart/merge`            | ✅ Login  | Merge cart localStorage sau đăng nhập |
+
+#### GET `/cart`
+
+```json
+{
+  "success": true,
+  "data": {
+    "groups": [
+      {
+        "seller": { "id": "...", "shopName": "Shop của A" },
+        "items": [
+          { "productId": "...", "name": "...", "imageUrl": "...", "price": 100000, "quantity": 2, "stock": 10 }
+        ],
+        "subtotal": 200000
+      }
+    ],
+    "totalAmount": 200000
+  }
+}
+// Item có stock = 0 hoặc SP không còn hiển thị sẽ bị loại khỏi kết quả (BR-CART-004)
+```
 
 #### POST `/cart/items`
 
 ```json
 { "productId": "...", "quantity": 2 }
+// 400 nếu: SP của chính mình · vượt stock · SP ẩn/bị block
 ```
 
 #### POST `/cart/merge`
@@ -224,25 +352,32 @@ Authorization: Bearer <access_token>
     { "productId": "...", "quantity": 3 }
   ]
 }
+// SP của chính mình tự bị lọc bỏ; quantity cộng dồn và cap ở stock
 ```
 
 ---
 
 ## Order & Checkout — `/api/v1/orders`
 
-| Method | Endpoint             | Auth                  | Mô tả                         |
-| ------ | -------------------- | --------------------- | ----------------------------- |
-| POST   | `/orders`            | ❌ (Guest + Customer) | Tạo đơn hàng & khởi tạo VNPay |
-| GET    | `/orders/my`         | ✅ Customer           | Lịch sử đơn hàng của mình     |
-| GET    | `/orders/my/:id`     | ✅ Customer           | Chi tiết 1 đơn của mình       |
-| GET    | `/orders`            | ✅ Admin              | Tất cả đơn hàng               |
-| GET    | `/orders/:id`        | ✅ Admin              | Chi tiết đơn bất kỳ           |
-| PATCH  | `/orders/:id/status` | ✅ Admin              | Cập nhật trạng thái đơn       |
+> Một lần checkout có thể chứa SP của nhiều người bán → hệ thống tạo **1 Checkout + N Order** (mỗi người bán một Order), thanh toán **một lần** qua VNPay.
 
-#### POST `/orders` — Tạo đơn hàng
+| Method | Endpoint                  | Auth                       | Mô tả                                                      |
+| ------ | ------------------------- | -------------------------- | ---------------------------------------------------------- |
+| POST   | `/orders`                 | ⚪ Optional (Guest + Customer) | Tạo checkout + các order, trừ stock, khởi tạo VNPay    |
+| GET    | `/orders/my`              | ✅ Login                   | Lịch sử đơn **đã mua** của mình                            |
+| GET    | `/orders/my/:id`          | ✅ Login                   | Chi tiết 1 đơn mua của mình                                |
+| GET    | `/orders/selling`         | ✅ Login                   | Đơn hàng khách đặt mua SP **của mình** (đơn bán)           |
+| GET    | `/orders/selling/:id`     | ✅ Login                   | Chi tiết 1 đơn bán của mình                                |
+| GET    | `/orders`                 | ✅ Admin                   | Tất cả đơn hàng (lọc `status`, `sellerId`, `userId`)       |
+| GET    | `/orders/:id`             | ✅ Admin                   | Chi tiết đơn bất kỳ                                        |
+| PATCH  | `/orders/:id/status`      | ✅ Login + Owner (Seller của đơn) hoặc Admin | Cập nhật trạng thái đơn        |
+
+> `/orders/my` và `/orders/selling` phải khai báo **trước** `/orders/:id` trong controller NestJS.
+
+#### POST `/orders` — Tạo checkout
 
 ```json
-// Request Body
+// Request Body — Guest: recipient bắt buộc. Customer: có thể bỏ trống để dùng profile
 {
   "recipient": {
     "fullName": "Nguyễn Văn A",
@@ -251,50 +386,130 @@ Authorization: Bearer <access_token>
     "address": "123 Nguyễn Huệ, Q1, TP.HCM"
   },
   "items": [
-    { "productId": "...", "quantity": 2 }
+    { "productId": "...", "quantity": 2 },
+    { "productId": "...", "quantity": 1 }
   ]
 }
+// KHÔNG nhận price / sellerId từ client — server lấy từ DB.
 
 // Response 201
 {
   "success": true,
   "data": {
-    "orderId": "...",
-    "orderCode": "ORD-20241002-ABCD",
+    "checkoutId": "...",
+    "checkoutCode": "CHK-20261002-ABCD",
     "totalAmount": 59980000,
+    "expiresAt": "2026-10-02T10:30:00.000Z",
+    "orders": [
+      {
+        "orderId": "...",
+        "orderCode": "ORD-20261002-AAAA",
+        "seller": { "id": "...", "shopName": "Shop A" },
+        "totalAmount": 29990000
+      },
+      {
+        "orderId": "...",
+        "orderCode": "ORD-20261002-BBBB",
+        "seller": { "id": "...", "shopName": "Shop B" },
+        "totalAmount": 29990000
+      }
+    ],
     "vnpayUrl": "https://sandbox.vnpayment.vn/paymentv2/..."
   }
+}
+```
+
+Lỗi thường gặp:
+
+```json
+// 400 — thiếu hàng (không tạo gì cả, BR-CHK-002)
+{
+  "success": false,
+  "message": "Một số sản phẩm không đủ tồn kho",
+  "errors": [{ "productId": "...", "name": "iPhone 15 Pro", "available": 1, "requested": 3 }]
+}
+
+// 400 — mua SP của chính mình (BR-SELL-002)
+{ "success": false, "message": "Bạn không thể mua sản phẩm của chính mình" }
+```
+
+#### GET `/orders/my` — mỗi phần tử
+
+```json
+{
+  "id": "...",
+  "orderCode": "ORD-20261002-AAAA",
+  "checkoutCode": "CHK-20261002-ABCD",
+  "seller": { "id": "...", "shopName": "Shop A" },
+  "items": [ { "name": "...", "imageUrl": "...", "price": 100000, "quantity": 2 } ],
+  "totalAmount": 200000,
+  "status": "confirmed",
+  "paymentStatus": "paid",
+  "createdAt": "..."
 }
 ```
 
 #### PATCH `/orders/:id/status`
 
 ```json
-{ "status": "shipping" } // confirmed | shipping | delivered | cancelled | refunded
+// Seller của đơn hoặc Admin
+{ "status": "shipping" }                       // confirmed → shipping
+{ "status": "delivered" }                      // shipping → delivered
+{ "status": "cancelled", "reason": "Hết hàng thực tế" }   // confirmed → cancelled (reason bắt buộc)
+{ "status": "refunded" }                       // cancelled → refunded — CHỈ Admin, đơn đã paid
 ```
+
+| Tình huống                                   | Response |
+| -------------------------------------------- | -------- |
+| Chuyển sai chiều (vd `delivered → shipping`) | 400      |
+| `status = pending` / `confirmed` từ API      | 400 (`confirmed` chỉ do hệ thống qua VNPay) |
+| Thiếu `reason` khi `cancelled`               | 400      |
+| Seller không phải chủ đơn                    | 403      |
+| Seller đặt `refunded`                        | 403      |
 
 ---
 
 ## Payment — `/api/v1/payments`
 
-| Method | Endpoint                 | Auth | Mô tả                                         |
-| ------ | ------------------------ | ---- | --------------------------------------------- |
-| GET    | `/payments/vnpay/return` | ❌   | VNPay redirect sau thanh toán (user redirect) |
-| POST   | `/payments/vnpay/ipn`    | ❌   | VNPay IPN webhook (server-to-server)          |
+| Method | Endpoint                 | Auth | Mô tả                                              |
+| ------ | ------------------------ | ---- | -------------------------------------------------- |
+| GET    | `/payments/vnpay/return` | ❌   | VNPay redirect user về sau thanh toán              |
+| GET    | `/payments/vnpay/ipn`    | ❌   | VNPay IPN (server-to-server, **method GET**)       |
 
-> `vnpay/return`: Redirect user về FE với kết quả (success/fail)  
-> `vnpay/ipn`: Webhook server-to-server — xử lý thực tế, verify checksum, cập nhật Order
+> **Thanh toán theo Checkout:** `vnp_TxnRef = checkoutCode`, `vnp_Amount = totalAmount × 100`, `vnp_CreateDate` theo giờ Việt Nam (GMT+7).
+>
+> `vnpay/return` và `vnpay/ipn` đều: verify checksum HMAC-SHA512 → gọi **chung** hàm xử lý idempotent (BR-PAY-006) → khác nhau ở phần response:
+> - `return`: redirect trình duyệt về FE `FRONTEND_URL/checkout/result?checkoutCode=...&status=success|failed`.
+> - `ipn`: trả JSON cho VNPay.
+>
+> Lý do dùng chung: khi chạy `localhost`, VNPay **không gọi được IPN** (trừ khi dùng ngrok/cloudflared), nên Return URL phải đủ sức cập nhật đơn.
+
+#### IPN response cho VNPay
+
+```json
+{ "RspCode": "00", "Message": "Confirm Success" }
+```
+
+| RspCode | Khi nào                                                      |
+| ------- | ------------------------------------------------------------ |
+| `00`    | Xử lý thành công (kể cả thanh toán thất bại đã ghi nhận)     |
+| `01`    | Không tìm thấy `vnp_TxnRef`                                  |
+| `02`    | Checkout đã xử lý trước đó (idempotent)                      |
+| `04`    | Số tiền không khớp                                           |
+| `97`    | Sai chữ ký                                                   |
+| `99`    | Lỗi không xác định                                           |
 
 ---
 
 ## Upload — `/api/v1/upload`
 
-| Method | Endpoint        | Auth     | Mô tả                                 |
-| ------ | --------------- | -------- | ------------------------------------- |
-| POST   | `/upload/image` | ✅ Admin | Upload ảnh lên Cloudinary, trả về URL |
+| Method | Endpoint        | Auth      | Mô tả                                 |
+| ------ | --------------- | --------- | ------------------------------------- |
+| POST   | `/upload/image` | ✅ Login  | Upload ảnh lên Cloudinary, trả về URL |
 
 ```json
 // Request: multipart/form-data, field: "file"
+// Giới hạn: image/jpeg · image/png · image/webp, tối đa 5MB
 // Response 201
 {
   "success": true,
@@ -306,11 +521,17 @@ Authorization: Bearer <access_token>
 
 ## Admin — `/api/v1/admin`
 
-| Method | Endpoint                 | Auth     | Mô tả          |
-| ------ | ------------------------ | -------- | -------------- |
-| GET    | `/admin/users`           | ✅ Admin | Danh sách user |
-| PATCH  | `/admin/users/:id/ban`   | ✅ Admin | Ban user       |
-| PATCH  | `/admin/users/:id/unban` | ✅ Admin | Unban user     |
+| Method | Endpoint                       | Auth     | Mô tả                                                          |
+| ------ | ------------------------------ | -------- | -------------------------------------------------------------- |
+| GET    | `/admin/users`                 | ✅ Admin | Danh sách user (lọc `role`, `isActive`, `search`)              |
+| PATCH  | `/admin/users/:id/ban`         | ✅ Admin | Ban user **và block toàn bộ SP của user đó**                   |
+| PATCH  | `/admin/users/:id/unban`       | ✅ Admin | Unban user và mở lại SP có `blockReason = "seller_banned"`     |
+| GET    | `/admin/products`              | ✅ Admin | Tất cả SP (kể cả ẩn / bị block); lọc `isBlocked`, `sellerId`   |
+| PATCH  | `/admin/products/:id/block`    | ✅ Admin | Gỡ SP vi phạm — body `{ "reason": "..." }` bắt buộc            |
+| PATCH  | `/admin/products/:id/unblock`  | ✅ Admin | Mở lại SP bị block                                             |
+
+> Admin không thể ban chính mình → 400.
+> Xóa / sửa Category và quản lý Order dùng các endpoint ở các mục trên.
 
 ---
 
@@ -330,8 +551,14 @@ Authorization: Bearer <access_token>
 // 401 - Unauthorized
 { "success": false, "message": "Vui lòng đăng nhập để tiếp tục" }
 
-// 403 - Forbidden
+// 403 - Forbidden (chung)
 { "success": false, "message": "Bạn không có quyền thực hiện thao tác này" }
+
+// 403 - Sửa SP của người khác
+{ "success": false, "message": "Bạn chỉ có thể chỉnh sửa sản phẩm của chính mình" }
+
+// 403 - Chưa có gian hàng
+{ "success": false, "message": "Vui lòng thiết lập thông tin gian hàng trước khi đăng bán" }
 
 // 404 - Not Found
 { "success": false, "message": "Không tìm thấy sản phẩm" }

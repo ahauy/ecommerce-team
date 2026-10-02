@@ -62,8 +62,14 @@ VNPAY_HASH_SECRET=your_hash_secret
 VNPAY_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
 VNPAY_RETURN_URL=http://localhost:3000/api/v1/payments/vnpay/return
 VNPAY_IPN_URL=http://localhost:3000/api/v1/payments/vnpay/ipn
+# IPN là request GET từ server VNPay → localhost KHÔNG nhận được.
+# Dùng ngrok/cloudflared để test IPN, hoặc dựa vào Return URL (xử lý chung, idempotent).
 
-# ── Frontend URL (CORS) ───────────────────────────
+# ── Checkout ─────────────────────────────────────
+CHECKOUT_EXPIRE_MINUTES=30
+
+# ── Frontend URL (CORS + redirect sau thanh toán) ─
+# Return URL redirect về: ${FRONTEND_URL}/checkout/result?checkoutCode=...&status=success|failed
 FRONTEND_URL=http://localhost:5173
 ```
 
@@ -89,7 +95,9 @@ FRONTEND_URL=http://localhost:5173
 
 1. Đăng ký tại [https://sandbox.vnpayment.vn/devreg/](https://sandbox.vnpayment.vn/devreg/)
 2. Lấy `TmnCode` và `SecretKey`
-3. Dùng thẻ test: [https://sandbox.vnpayment.vn/apis/vnpay-demo/](https://sandbox.vnpayment.vn/apis/vnpay-demo/)
+3. Trong cấu hình merchant sandbox, khai báo **IPN URL** (cần URL public, ví dụ từ ngrok) nếu muốn test IPN thật
+   - Mỗi **Checkout** = một giao dịch: `vnp_TxnRef = checkoutCode`, `vnp_Amount = totalAmount × 100`
+4. Dùng thẻ test: [https://sandbox.vnpayment.vn/apis/vnpay-demo/](https://sandbox.vnpayment.vn/apis/vnpay-demo/)
    - Ngân hàng: NCB
    - Số thẻ: `9704198526191432198`
    - Tên: `NGUYEN VAN A`
@@ -119,6 +127,12 @@ app.enableCors({
   credentials: true,
 });
 ```
+
+---
+
+## Lưu ý về MongoDB
+
+Việc trừ / hoàn stock dùng **cập nhật nguyên tử có điều kiện** (`updateOne` với `stock: { $gte: qty }`) nên **không bắt buộc** replica set / transaction. Nếu team muốn dùng `session.withTransaction()` thì cần MongoDB Atlas hoặc replica set local.
 
 ---
 
