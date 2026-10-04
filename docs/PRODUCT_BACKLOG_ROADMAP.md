@@ -55,23 +55,23 @@ schema-version: "1.3"
 
 ## 📊 Bảng Ma Trận Ưu Tiên MoSCoW & RICE Score
 
-| Mã Epic     | Nghiệp vụ / Tính năng                                | Phân loại MoSCoW | RICE Score |    Mức ưu tiên    | Sprint khuyến nghị |
-| :---------- | :--------------------------------------------------- | :--------------: | :--------: | :---------------: | :----------------: |
-| **EPIC-01** | Auth & User (Đăng ký / Đăng nhập / JWT)              |  **Must Have**   |    9.5     | **P0 (Critical)** |      Sprint 1      |
-| **EPIC-02** | Category (Admin) & Product (Seller đăng bán + Search/Filter + Upload) |  **Must Have**   |    9.0     | **P0 (Core USP)** |      Sprint 1      |
-| **EPIC-03** | Cart (Guest localStorage + Customer DB + Merge)      |  **Must Have**   |    8.5     | **P0 (Core USP)** |      Sprint 1      |
+| Mã Epic     | Nghiệp vụ / Tính năng                                                     | Phân loại MoSCoW | RICE Score |    Mức ưu tiên    | Sprint khuyến nghị |
+| :---------- | :------------------------------------------------------------------------ | :--------------: | :--------: | :---------------: | :----------------: |
+| **EPIC-01** | Auth & User (Đăng ký / Đăng nhập / JWT)                                   |  **Must Have**   |    9.5     | **P0 (Critical)** |      Sprint 1      |
+| **EPIC-02** | Category (Admin) & Product (Seller đăng bán + Search/Filter + Upload)     |  **Must Have**   |    9.0     | **P0 (Core USP)** |      Sprint 1      |
+| **EPIC-03** | Cart (Guest localStorage + Customer DB + Merge)                           |  **Must Have**   |    8.5     | **P0 (Core USP)** |      Sprint 1      |
 | **EPIC-04** | Order & Checkout (Guest + Customer · tách đơn theo người bán · Inventory) |  **Must Have**   |    8.5     | **P0 (Critical)** |      Sprint 2      |
-| **EPIC-05** | Payment VNPay theo Checkout (IPN + Return + Rollback) |  **Must Have**   |    8.0     | **P0 (Critical)** |      Sprint 2      |
-| **EPIC-06** | Admin Dashboard (User · Category · Product block · Order) |  **Must Have**   |    7.5     |   **P1 (High)**   |      Sprint 2      |
-| **EPIC-07** | Go-Live & Production Hardening                       |  **Must Have**   |    7.0     | **P0 (Blocker)**  |      Sprint 3      |
-| **EPIC-08** | Seller (Gian hàng · Đăng bán · Xử lý đơn bán)        |  **Must Have**   |    9.0     | **P0 (Core USP)** |   Sprint 1 + 2     |
+| **EPIC-05** | Payment VNPay theo Checkout (IPN + Return + Rollback)                     |  **Must Have**   |    8.0     | **P0 (Critical)** |      Sprint 2      |
+| **EPIC-06** | Admin Dashboard (User · Category · Product block · Order)                 |  **Must Have**   |    7.5     |   **P1 (High)**   |      Sprint 2      |
+| **EPIC-07** | Go-Live & Production Hardening                                            |  **Must Have**   |    7.0     | **P0 (Blocker)**  |      Sprint 3      |
+| **EPIC-08** | Seller (Gian hàng · Đăng bán · Xử lý đơn bán)                             |  **Must Have**   |    9.0     | **P0 (Core USP)** |    Sprint 1 + 2    |
 
 ---
 
 ## 🗺️ Lộ Trình Phát Hành (Release Roadmap)
 
 ```text
-[ Sprint 0 - Setup & Architecture ] ──► [ IN PROGRESS 🔧 ]
+[ Sprint 0 - Setup & Architecture ] ──► [ DONE ✅ ]
   ├── SETUP-001: Khởi tạo repo, cấu hình NestJS project + Mongoose
   ├── SETUP-002: Cấu hình global pipes, filters, interceptors (response wrapper)
   └── SETUP-003: Viết .env.example + hướng dẫn setup Cloudinary / MongoDB / VNPay
@@ -107,10 +107,10 @@ schema-version: "1.3"
 > Sprint 0 là công việc setup một lần, không cần BA pipeline.  
 > Dùng Micro-Task Fast-Track: Setup → Verify → Commit.
 
-- [ ] **SETUP-001**: Khởi tạo NestJS project, cấu hình Mongoose, kết nối MongoDB
-- [ ] **SETUP-002**: Cấu hình global: `ValidationPipe`, `GlobalExceptionFilter`, `ResponseInterceptor` (wrap `{ success, data, message }`)
-- [ ] **SETUP-003**: Viết `.env.example` đầy đủ + hướng dẫn lấy credentials (MongoDB Atlas, Cloudinary, VNPay sandbox)
-- [ ] **SETUP-004**: Cấu hình CORS (cho phép `FRONTEND_URL`), setup Git branches (`main` / `dev` / `feature/*`)
+- [x] **SETUP-001**: Khởi tạo NestJS project, cấu hình Mongoose, kết nối MongoDB
+- [x] **SETUP-002**: Cấu hình global: `ValidationPipe`, `GlobalExceptionFilter`, `ResponseInterceptor` (wrap `{ success, data, message }`)
+- [x] **SETUP-003**: Viết `.env.example` đầy đủ + hướng dẫn lấy credentials (MongoDB Atlas, Cloudinary, VNPay sandbox)
+- [x] **SETUP-004**: Cấu hình CORS (cho phép `FRONTEND_URL`), setup Git branches (`main` / `dev` / `feature/*`)
 
 ---
 

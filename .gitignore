@@ -53,6 +53,7 @@ Cargo.lock.bak
 .env.*.local
 *.pem
 *.key
+atlas-credentials.env
 
 # IDE & Editor caches
 .idea/
