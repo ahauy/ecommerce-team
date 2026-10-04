@@ -25,6 +25,7 @@ import SidebarProvider from "./providers/SidebarProvider";
 import { showError } from "./helpers/toast";
 import BaseUrl from "./consts/baseUrl";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import DefaultLayout from "./layouts/DefaultLayout";
 import Homepage from "./pages/Homepage";
@@ -68,6 +69,7 @@ const App = () => {
       <Router>
         <Routes>
           <Route path={BaseUrl.Login} element={<Login />} />
+          <Route path={BaseUrl.Register} element={<Register />} />
           <Route path={BaseUrl.ForgotPassword} element={<ForgotPassword />} />
           <Route
             path={BaseUrl.Homepage}

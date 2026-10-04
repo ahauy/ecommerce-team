@@ -3,6 +3,7 @@ const BaseUrl = {
   Homepage: "/",
   Todos: "/todos",
   Login: "/login",
+  Register: "/register",
   Callbacks: "/login/callback",
   Logout: "/logout",
   AppManagement: "/apps",

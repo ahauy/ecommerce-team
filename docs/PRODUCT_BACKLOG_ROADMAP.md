@@ -76,8 +76,8 @@ schema-version: "1.3"
   ├── SETUP-002: Cấu hình global pipes, filters, interceptors (response wrapper)
   └── SETUP-003: Viết .env.example + hướng dẫn setup Cloudinary / MongoDB / VNPay
 
-[ Sprint 1 - Core Foundation (MVP Base) ] ──► [ TO DO 📋 ]
-  ├── US-AUTH-001: Đăng ký & Đăng nhập
+[ Sprint 1 - Core Foundation (MVP Base) ] ──► [ IN PROGRESS 🔧 ]
+  ├── [x] US-AUTH-001: Đăng ký & Đăng nhập
   ├── US-AUTH-002: JWT Refresh Token & Logout
   ├── US-SELL-001: Profile & Thiết lập gian hàng (/users/me, shop)
   ├── US-CAT-001:  Quản lý Category (Admin CRUD)
@@ -120,7 +120,7 @@ schema-version: "1.3"
 
 ---
 
-- [ ] **US-AUTH-001**: Đăng ký & Đăng nhập tài khoản
+- [x] **US-AUTH-001**: Đăng ký & Đăng nhập tài khoản
   - **Slug:** `auth-register-login`
   - **Effort:** M
   - **Context-budget:** single-session
@@ -129,16 +129,16 @@ schema-version: "1.3"
   - **Blocks:** `US-AUTH-002`, `US-SELL-001`, `US-CAT-001`, `US-PRD-001`, `US-CART-001`, `US-ORD-001`, `US-ADM-001`
   - **Mô tả:** Người dùng có thể tạo tài khoản mới bằng email & mật khẩu, và đăng nhập để nhận JWT token.
   - **Acceptance Criteria (AC):**
-    - [ ] `POST /api/v1/auth/register` với email/password/fullName hợp lệ → trả về 201 và thông tin user (không có password).
-    - [ ] `POST /api/v1/auth/register` với email đã tồn tại → trả về 409 Conflict.
-    - [ ] `POST /api/v1/auth/login` với đúng credentials → trả về `accessToken` + `refreshToken` + thông tin user.
-    - [ ] `POST /api/v1/auth/login` với sai password → trả về 401 Unauthorized.
-    - [ ] `POST /api/v1/auth/login` với tài khoản `isActive = false` → trả về 403 "Tài khoản đã bị khóa".
-    - [ ] Password được lưu dưới dạng bcrypt hash, không bao giờ trả về plain text.
-    - [ ] FE: Form đăng ký / đăng nhập hiển thị đúng validation errors (email format, password min length).
+    - [x] `POST /api/v1/auth/register` với email/password/fullName hợp lệ → trả về 201 và thông tin user (không có password).
+    - [x] `POST /api/v1/auth/register` với email đã tồn tại → trả về 409 Conflict.
+    - [x] `POST /api/v1/auth/login` với đúng credentials → trả về `accessToken` + `refreshToken` + thông tin user.
+    - [x] `POST /api/v1/auth/login` với sai password → trả về 401 Unauthorized.
+    - [x] `POST /api/v1/auth/login` với tài khoản `isActive = false` → trả về 403 "Tài khoản đã bị khóa".
+    - [x] Password được lưu dưới dạng bcrypt hash, không bao giờ trả về plain text.
+    - [x] FE: Form đăng ký / đăng nhập hiển thị đúng validation errors (email format, password min length).
   - **Tasks:**
-    - [ ] **Backend:** `User schema (email unique, password bcrypt, role enum, isActive, refreshToken)` · `POST /auth/register DTO + Service` · `POST /auth/login + JwtStrategy (access 15m)`
-    - [ ] **Frontend:** `Trang /register + /login` · `Axios instance với Authorization header` · `Lưu token vào localStorage/cookie`
+    - [x] **Backend:** `User schema (email unique, password bcrypt, role enum, isActive, refreshToken)` · `POST /auth/register DTO + Service` · `POST /auth/login + JwtStrategy (access 15m)`
+    - [x] **Frontend:** `Trang /register + /login` · `Axios instance với Authorization header` · `Lưu token vào localStorage/cookie`
   - **Deliverables khi [x]:**
     - `.specify/features/auth-register-login/baseline.md` (SIGNED-OFF)
     - `docs/features/auth-register-login/README.md`
