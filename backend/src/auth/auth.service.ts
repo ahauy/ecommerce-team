@@ -12,6 +12,10 @@ import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
+// Shared hash helper — used by login, refresh, and logout
+const sha256 = (token: string) =>
+  crypto.createHash('sha256').update(token).digest('hex');
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -87,14 +91,9 @@ export class AuthService {
     );
 
     // Hash refresh token using SHA-256 before saving to DB (BR-AUTH-010)
-    const hashedRefreshToken = crypto
-      .createHash('sha256')
-      .update(refreshToken)
-      .digest('hex');
-
     await this.usersService.updateRefreshToken(
       user._id.toString(),
-      hashedRefreshToken,
+      sha256(refreshToken),
     );
 
     const isProduction =
@@ -118,5 +117,37 @@ export class AuthService {
         shopName: user.shopName ?? null,
       },
     };
+  }
+
+  async refresh(rawRefreshToken: string): Promise<{ accessToken: string }> {
+    const hash = sha256(rawRefreshToken);
+    const user = await this.usersService.findByRefreshTokenHash(hash);
+
+    if (!user || !user.isActive) {
+      throw new UnauthorizedException(
+        'Refresh token không hợp lệ hoặc đã hết hạn',
+      );
+    }
+
+    const accessToken = this.jwtService.sign(
+      { sub: user._id.toString(), email: user.email, role: user.role },
+      {
+        secret: this.configService.get<string>(
+          'JWT_ACCESS_SECRET',
+          'default_access_secret',
+        ),
+        expiresIn: this.configService.get<string>(
+          'JWT_ACCESS_EXPIRES_IN',
+          '15m',
+        ) as never,
+      },
+    );
+
+    return { accessToken };
+  }
+
+  async logout(userId: string, res: Response): Promise<void> {
+    await this.usersService.updateRefreshToken(userId, null);
+    res.clearCookie('refreshToken', { path: '/api/v1/auth' });
   }
 }

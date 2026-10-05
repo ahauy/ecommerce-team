@@ -55,6 +55,13 @@ export class UsersService {
     return this.userModel.findById(id).exec();
   }
 
+  async findByRefreshTokenHash(hash: string): Promise<UserDocument | null> {
+    return this.userModel
+      .findOne({ refreshToken: hash })
+      .select('+refreshToken')
+      .exec();
+  }
+
   async updateRefreshToken(
     id: string,
     hashedToken: string | null,

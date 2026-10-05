@@ -34,7 +34,7 @@ export interface ApiResponse<T> {
 
 export const authApiClient = axios.create({
   baseURL: `${API_BASE_URL}/api/v1`,
-  withCredentials: true,
+  withCredentials: true, // sends httpOnly cookie on /auth/* requests
 });
 
 export const authService = {
@@ -52,6 +52,17 @@ export const authService = {
       payload,
     );
     return response.data;
+  },
+
+  async refresh(): Promise<ApiResponse<{ accessToken: string }>> {
+    const response = await authApiClient.post<ApiResponse<{ accessToken: string }>>(
+      '/auth/refresh',
+    );
+    return response.data;
+  },
+
+  async logout(): Promise<void> {
+    await authApiClient.post('/auth/logout');
   },
 };
 
