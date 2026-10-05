@@ -1,0 +1,366 @@
+openapi: 3.0.3
+info:
+  title: Seller Shop Profile API
+  version: 1.0.0
+  description: API contracts for seller profile and shop management
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development server
+  - url: https://api.example.com/api/v1
+    description: Production server
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    AdminBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    UserProfileResponse:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: objectid
+        email:
+          type: string
+          format: email
+        fullName:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        address:
+          type: string
+          nullable: true
+        isActive:
+          type: boolean
+        role:
+          type: string
+          enum: [customer, admin]
+        shopName:
+          type: string
+          nullable: true
+        shopSlug:
+          type: string
+          nullable: true
+        pickupAddress:
+          type: string
+          nullable: true
+        joinedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - _id
+        - email
+        - isActive
+        - role
+        - createdAt
+        - updatedAt
+    UpdateProfileRequest:
+      type: object
+      properties:
+        fullName:
+          type: string
+          minLength: 2
+          maxLength: 100
+        phone:
+          type: string
+          pattern: '^(\+84|0)[0-9]{9,10}$'
+        address:
+          type: string
+          maxLength: 500
+    SetupShopRequest:
+      type: object
+      required:
+        - shopName
+        - pickupAddress
+        - phone
+      properties:
+        shopName:
+          type: string
+          minLength: 3
+          maxLength: 50
+        pickupAddress:
+          type: string
+          minLength: 10
+          maxLength: 500
+        phone:
+          type: string
+          pattern: '^(\+84|0)[0-9]{9,10}$'
+    PublicShopResponse:
+      type: object
+      required:
+        - shopName
+        - shopSlug
+        - joinedAt
+        - productCount
+      properties:
+        shopName:
+          type: string
+        shopSlug:
+          type: string
+        joinedAt:
+          type: string
+          format: date-time
+        productCount:
+          type: integer
+          minimum: 0
+    BanUserRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+        message:
+          type: array
+          items:
+            type: string
+        error:
+          type: string
+      required:
+        - statusCode
+        - message
+        - error
+    ValidationErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - type: object
+          properties:
+            message:
+              type: array
+              items:
+                type: string
+              example:
+                - "shopName: Tên gian hàng phải từ 3-50 ký tự"
+                - "phone: Số điện thoại không hợp lệ"
+  responses:
+    UnauthorizedError:
+      description: Unauthorized - Invalid or missing JWT
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            statusCode: 401
+            message: "Unauthorized"
+            error: "Unauthorized"
+    ForbiddenError:
+      description: Forbidden - Account banned or insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            statusCode: 403
+            message: "Tài khoản đã bị khóa"
+            error: "Forbidden"
+    NotFoundError:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            statusCode: 404
+            message: "Không tìm thấy gian hàng"
+            error: "Not Found"
+    ValidationError:
+      description: Bad Request - Validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+paths:
+  /users/me:
+    get:
+      summary: Get current user profile with shop info
+      operationId: getCurrentUserProfile
+      security:
+        - BearerAuth: []
+      tags:
+        - Profile
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    patch:
+      summary: Update user profile (fullName, phone, address)
+      operationId: updateUserProfile
+      security:
+        - BearerAuth: []
+      tags:
+        - Profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+  /users/me/shop:
+    patch:
+      summary: Setup or update shop (shopName, pickupAddress, phone)
+      operationId: setupOrUpdateShop
+      security:
+        - BearerAuth: []
+      tags:
+        - Shop
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetupShopRequest'
+      responses:
+        '200':
+          description: Shop setup/updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+  /shops/{sellerId}:
+    get:
+      summary: View public shop info
+      operationId: getPublicShop
+      tags:
+        - Shop
+      parameters:
+        - name: sellerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: objectid
+          description: Seller user ID
+      responses:
+        '200':
+          description: Public shop info retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicShopResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+  /admin/users/{id}/ban:
+    patch:
+      summary: Ban user (cascades to shop and products)
+      operationId: banUser
+      security:
+        - AdminBearerAuth: []
+      tags:
+        - Admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: objectid
+          description: User ID to ban
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BanUserRequest'
+      responses:
+        '200':
+          description: User banned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/UserProfileResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: Forbidden - Admin role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+  /admin/users/{id}/unban:
+    patch:
+      summary: Unban user (restores shop and seller_banned products)
+      operationId: unbanUser
+      security:
+        - AdminBearerAuth: []
+      tags:
+        - Admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: objectid
+          description: User ID to unban
+      responses:
+        '200':
+          description: User unbanned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/UserProfileResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: Forbidden - Admin role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'

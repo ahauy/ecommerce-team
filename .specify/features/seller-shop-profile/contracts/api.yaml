@@ -1,0 +1,316 @@
+openapi: 3.0.3
+info:
+  title: Seller Shop Profile API
+  version: 1.0.0
+  description: API contracts for user profile and shop management
+servers:
+  - url: /api/v1
+    description: API v1
+paths:
+  /users/me:
+    get:
+      summary: Get current user profile with shop info
+      operationId: getCurrentUserProfile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User profile with shop info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetProfileResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/ForbiddenBanned'
+    patch:
+      summary: Update current user profile
+      operationId: updateUserProfile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: Updated user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetProfileResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/ForbiddenBanned'
+
+  /users/me/shop:
+    patch:
+      summary: Setup or update user shop
+      operationId: setupOrUpdateShop
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetupShopRequest'
+      responses:
+        '200':
+          description: Updated user profile with shop
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetProfileResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/ForbiddenBanned'
+        '409':
+          $ref: '#/components/responses/ConflictVersion'
+
+  /shops/{sellerId}:
+    get:
+      summary: Get public shop info by seller ID
+      operationId: getPublicShop
+      parameters:
+        - name: sellerId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+          description: MongoDB ObjectId of seller
+      responses:
+        '200':
+          description: Public shop info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicShopResponse'
+        '404':
+          $ref: '#/components/responses/ShopNotFound'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    GetProfileResponse:
+      type: object
+      required:
+        - user
+      properties:
+        user:
+          type: object
+          required:
+            - id
+            - email
+            - fullName
+            - phone
+            - address
+            - role
+            - isActive
+            - shop
+          properties:
+            id:
+              type: string
+              pattern: '^[0-9a-fA-F]{24}$'
+            email:
+              type: string
+              format: email
+            fullName:
+              type: string
+              minLength: 2
+              maxLength: 100
+            phone:
+              type: string
+              pattern: '^(\+84|0)[0-9]{9,10}$'
+            address:
+              type: string
+              nullable: true
+            role:
+              type: string
+              enum: [customer, admin]
+            isActive:
+              type: boolean
+            shop:
+              oneOf:
+                - $ref: '#/components/schemas/ShopInfo'
+                - type: 'null'
+
+    ShopInfo:
+      type: object
+      required:
+        - shopName
+        - shopSlug
+        - pickupAddress
+        - joinedAt
+      properties:
+        shopName:
+          type: string
+          minLength: 3
+          maxLength: 50
+        shopSlug:
+          type: string
+          pattern: '^[a-z0-9-]+$'
+        pickupAddress:
+          type: string
+          minLength: 10
+        joinedAt:
+          type: string
+          format: date-time
+
+    UpdateProfileRequest:
+      type: object
+      properties:
+        fullName:
+          type: string
+          minLength: 2
+          maxLength: 100
+        phone:
+          type: string
+          pattern: '^(\+84|0)[0-9]{9,10}$'
+        address:
+          type: string
+
+    SetupShopRequest:
+      type: object
+      required:
+        - shopName
+        - pickupAddress
+        - phone
+      properties:
+        shopName:
+          type: string
+          minLength: 3
+          maxLength: 50
+        pickupAddress:
+          type: string
+          minLength: 10
+        phone:
+          type: string
+          pattern: '^(\+84|0)[0-9]{9,10}$'
+
+    PublicShopResponse:
+      type: object
+      required:
+        - shopName
+        - shopSlug
+        - joinedAt
+        - productCount
+      properties:
+        shopName:
+          type: string
+        shopSlug:
+          type: string
+          pattern: '^[a-z0-9-]+$'
+        joinedAt:
+          type: string
+          format: date-time
+        productCount:
+          type: integer
+          minimum: 0
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid JWT
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: 'Unauthorized'
+            statusCode: 401
+
+    ForbiddenBanned:
+      description: Account banned
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: 'Tài khoản đã bị khóa'
+            statusCode: 403
+
+    ValidationError:
+      description: Validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+          example:
+            success: false
+            message: 'Validation failed'
+            statusCode: 400
+            errors:
+              - field: 'shopName'
+                message: 'Tên gian hàng phải từ 3-50 ký tự'
+
+    ConflictVersion:
+      description: Optimistic lock conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: 'Dữ liệu đã thay đổi, vui lòng thử lại'
+            statusCode: 409
+
+    ShopNotFound:
+      description: Shop not found or seller banned
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: 'Không tìm thấy gian hàng'
+            statusCode: 404
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - message
+        - statusCode
+      properties:
+        success:
+          type: boolean
+          const: false
+        message:
+          type: string
+        statusCode:
+          type: integer
+
+    ValidationErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - type: object
+          properties:
+            errors:
+              type: array
+              items:
+                type: object
+                required:
+                  - field
+                  - message
+                properties:
+                  field:
+                    type: string
+                  message:
+                    type: string
