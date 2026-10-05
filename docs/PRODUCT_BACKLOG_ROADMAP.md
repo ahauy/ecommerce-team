@@ -167,7 +167,7 @@ schema-version: "1.3"
 
 ---
 
-- [ ] **US-AUTH-002**: JWT Refresh Token & Đăng xuất
+- [x] **US-AUTH-002**: JWT Refresh Token & Đăng xuất
   - **Slug:** `auth-refresh-logout`
   - **Effort:** S
   - **Context-budget:** single-session
@@ -176,14 +176,14 @@ schema-version: "1.3"
   - **Blocks:** _(none)_
   - **Mô tả:** Access Token hết hạn sau 15 phút; hệ thống tự động làm mới bằng Refresh Token mà không cần người dùng đăng nhập lại.
   - **Acceptance Criteria (AC):**
-    - [ ] `POST /api/v1/auth/refresh` với Refresh Token hợp lệ → trả về `accessToken` mới.
-    - [ ] `POST /api/v1/auth/refresh` với Refresh Token hết hạn / không hợp lệ → trả về 401.
-    - [ ] `POST /api/v1/auth/logout` → xóa refreshToken trong DB; token cũ không dùng được nữa.
-    - [ ] FE: Axios interceptor tự động gọi `/auth/refresh` khi nhận 401, retry request gốc.
-    - [ ] FE: Nếu refresh thất bại → redirect về trang đăng nhập.
+    - [x] `POST /api/v1/auth/refresh` với Refresh Token hợp lệ → trả về `accessToken` mới.
+    - [x] `POST /api/v1/auth/refresh` với Refresh Token hết hạn / không hợp lệ → trả về 401.
+    - [x] `POST /api/v1/auth/logout` → xóa refreshToken trong DB; token cũ không dùng được nữa.
+    - [x] FE: Axios interceptor tự động gọi `/auth/refresh` khi nhận 401, retry request gốc.
+    - [x] FE: Nếu refresh thất bại → redirect về trang đăng nhập.
   - **Tasks:**
-    - [ ] **Backend:** `JwtRefreshStrategy` · `POST /auth/refresh` · `POST /auth/logout (xóa refreshToken field)`
-    - [ ] **Frontend:** `Axios response interceptor retry logic` · `Auth store (Zustand/Pinia/Redux) quản lý token state`
+    - [x] **Backend:** `JwtRefreshStrategy` · `POST /auth/refresh` · `POST /auth/logout (xóa refreshToken field)`
+    - [x] **Frontend:** `Axios response interceptor retry logic` · `Auth store (Zustand/Pinia/Redux) quản lý token state`
   - **Stitch Screens (`projects/6249429078653284294`):**
     - `projects/6249429078653284294/screens/8aef4bda458748e3965b9ff87dea6d9e` ("Đăng nhập #1 - Logout state")
   - **Deliverables khi [x]:**

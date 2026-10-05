@@ -31,7 +31,29 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: [
+          '"Inter Variable"',
+          "Inter",
+          "Helvetica",
+          "Arial",
+          "sans-serif",
+        ],
+        display: [
+          '"Inter Display"',
+          "Inter",
+          "Helvetica",
+          "Arial",
+          "sans-serif",
+        ],
+      },
+      boxShadow: {
+        card: "0 8px 8px rgba(0,0,0,0.1), 0 4px 4px rgba(0,0,0,0.1), 0 2px 2px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.1)",
+      },
       colors: {
+        "canvas-cream": "#fbfbf5",
+        aloe: "#c1fbd4",
+        pistachio: "#d4f9e0",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
