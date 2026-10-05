@@ -30,6 +30,23 @@ schema-version: "1.3"
 
 ---
 
+## 🎨 Stitch MCP Design System & Screen Mock Reference
+
+> **Stitch Project:** `Shopify Vietnam Marketplace Design System`  
+> **Project Resource ID:** `projects/6249429078653284294` (Project ID: `6249429078653284294`)  
+> **MCP Server:** `StitchMCP` / `stitch` (kết nối qua endpoint `https://stitch.googleapis.com/mcp`)  
+> **Design Tokens Authority:** [frontend/DESIGN.md](file:///Users/vutuanhau/Documents/PROJECT/ecommerce-team/frontend/DESIGN.md) (Single Source of Truth)
+>
+> **MANDATORY FRONTEND WORKFLOW (Khi chạy `/continue-project` hoặc vẽ/triển khai UI):**
+>
+> 1. Mỗi User Story có danh mục `Stitch Screens` tương ứng bên dưới.
+> 2. Trước khi viết hoặc sửa component/page frontend, agent (hoặc `frontend-developer`) **BẮT BUỘC** gọi tool Stitch MCP:
+>    `call_mcp_tool(ServerName: 'StitchMCP', ToolName: 'get_screen', Arguments: {name: 'projects/6249429078653284294/screens/<screenId>'})`
+> 3. Lấy mã HTML chuẩn từ `htmlCode.downloadUrl` và hình ảnh preview từ `screenshot.downloadUrl`.
+> 4. Triển khai giao diện React / Vite bám sát 100% cấu trúc DOM, Tailwind CSS classes và layout từ Stitch screen mock, kết hợp các token chuẩn trong [frontend/DESIGN.md](file:///Users/vutuanhau/Documents/PROJECT/ecommerce-team/frontend/DESIGN.md) (nút pill `rounded-full`, 2-canvas polarity, `ss03` font, 1px hairlines).
+
+---
+
 ## 🚫 Explicitly Out of Scope — Won't-Have for MVP
 
 > **CRITICAL:** Đây là "scope fence" bắt buộc — bất kỳ ai (người hay AI) muốn thêm item dưới đây phải mở PR thảo luận trước.
@@ -139,6 +156,11 @@ schema-version: "1.3"
   - **Tasks:**
     - [x] **Backend:** `User schema (email unique, password bcrypt, role enum, isActive, refreshToken)` · `POST /auth/register DTO + Service` · `POST /auth/login + JwtStrategy (access 15m)`
     - [x] **Frontend:** `Trang /register + /login` · `Axios instance với Authorization header` · `Lưu token vào localStorage/cookie`
+  - **Stitch Screens (`projects/6249429078653284294`):**
+    - `projects/6249429078653284294/screens/02985eddb2fb4abc9abbbacc958c5125` ("Đăng ký #1")
+    - `projects/6249429078653284294/screens/8aef4bda458748e3965b9ff87dea6d9e` ("Đăng nhập #1")
+    - `projects/6249429078653284294/screens/09105e18166d40c78a373db2fec4e69a` ("Đăng nhập #2")
+    - `projects/6249429078653284294/screens/768be101e7204ff781a68f919732ceb9` ("Đăng nhập #3")
   - **Deliverables khi [x]:**
     - `.specify/features/auth-register-login/baseline.md` (SIGNED-OFF)
     - `docs/features/auth-register-login/README.md`
@@ -162,6 +184,8 @@ schema-version: "1.3"
   - **Tasks:**
     - [ ] **Backend:** `JwtRefreshStrategy` · `POST /auth/refresh` · `POST /auth/logout (xóa refreshToken field)`
     - [ ] **Frontend:** `Axios response interceptor retry logic` · `Auth store (Zustand/Pinia/Redux) quản lý token state`
+  - **Stitch Screens (`projects/6249429078653284294`):**
+    - `projects/6249429078653284294/screens/8aef4bda458748e3965b9ff87dea6d9e` ("Đăng nhập #1 - Logout state")
   - **Deliverables khi [x]:**
     - `.specify/features/auth-refresh-logout/baseline.md` (SIGNED-OFF)
     - `docs/features/auth-refresh-logout/README.md`
@@ -185,6 +209,18 @@ schema-version: "1.3"
   - **Tasks:**
     - [ ] **Backend:** `UsersController (/users/me, /users/me/shop)` · `DTO validate` · `ShopsController GET /shops/:sellerId`
     - [ ] **Frontend:** `ProfilePage` · `ShopSetupPage` · `user.service.ts`, `shop.service.ts`
+  - **Stitch Screens (`projects/6249429078653284294`):**
+    - `projects/6249429078653284294/screens/9050b988ae13463ca6d2c730b07b15b4` ("Hồ sơ cá nhân #1")
+    - `projects/6249429078653284294/screens/a21dfd8e75df43268fa2d00b6cd6b893` ("Hồ sơ cá nhân #2")
+    - `projects/6249429078653284294/screens/ddd931344629411ea3eacc05c0af060d` ("Hồ sơ cá nhân #3")
+    - `projects/6249429078653284294/screens/395c3ba87bc74b328bd1789b50b81cb5` ("Hồ sơ cá nhân #4")
+    - `projects/6249429078653284294/screens/eafa6ea3a27449b1bcb52ea9328b4e48` ("Hồ sơ cá nhân #5")
+    - `projects/6249429078653284294/screens/83f84aab39b040cfbf1b4b8dd51895ea` ("Thiết lập gian hàng #1")
+    - `projects/6249429078653284294/screens/7e5b80bb13924e8cb1514e86b79b166a` ("Thiết lập gian hàng #2")
+    - `projects/6249429078653284294/screens/51af699cf89848f38ac24486deda345c` ("Thiết lập gian hàng #3")
+    - `projects/6249429078653284294/screens/f3b0cfacde2943db858d1c14d3aef36c` ("Thiết lập gian hàng #4")
+    - `projects/6249429078653284294/screens/31f0c44e07ff4c0dac56e269b5a3c287` ("Thiết lập gian hàng #5")
+    - `projects/6249429078653284294/screens/e1730c574a0543949db609de5e978b55` ("Gian hàng #1")
   - **Deliverables khi [x]:**
     - `.specify/features/seller-shop-profile/baseline.md` (SIGNED-OFF)
     - `docs/features/seller-shop-profile/README.md`
@@ -210,6 +246,10 @@ schema-version: "1.3"
   - **Tasks:**
     - [ ] **Backend:** `Category schema (name unique, slug, description, imageUrl, isActive)` · `CRUD endpoints` · `Validate no-delete khi có product` · `RolesGuard`
     - [ ] **Frontend:** `Admin: CategoryList, CategoryForm components` · `Public: CategoryNav/Sidebar`
+  - **Stitch Screens (`projects/6249429078653284294`):**
+    - `projects/6249429078653284294/screens/920a53a998bd4e8e8b0b16ec16a08793` ("Admin danh mục #1")
+    - `projects/6249429078653284294/screens/4ff01870d2a9498b8f48f72196b0383c` ("Admin danh mục #2")
+    - `projects/6249429078653284294/screens/b3ff9a13af8b42c7b154bc1730ab9471` ("Admin danh mục #3")
   - **Deliverables khi [x]:**
     - `.specify/features/category-management/baseline.md` (SIGNED-OFF)
     - `docs/features/category-management/README.md`
@@ -238,6 +278,14 @@ schema-version: "1.3"
   - **Tasks:**
     - [ ] **Backend:** `Product schema (sellerId, name, slug, description, price, stock, images[], categoryId, isActive, isBlocked, blockReason)` · `Indexes (text, sellerId, categoryId, price)` · `Upload service (Cloudinary SDK)` · `CRUD endpoints + assertOwnerOrAdmin`
     - [ ] **Frontend:** `Seller: MyProductsPage, ProductFormPage (image uploader)` · `Cloudinary upload helper`
+  - **Stitch Screens (`projects/6249429078653284294`):**
+    - `projects/6249429078653284294/screens/83cc94525dd147f7940b903c7d0c2c0e` ("Sản phẩm Seller #1")
+    - `projects/6249429078653284294/screens/5d142b4a1b0b4fa4a44dec4eb8a0f663` ("Sản phẩm Seller #2")
+    - `projects/6249429078653284294/screens/7a36342acde64677b81cae2e5ce5a869` ("Sản phẩm Seller #3")
+    - `projects/6249429078653284294/screens/f168b81425464e61b9921f046afe846c` ("Sửa sản phẩm #1")
+    - `projects/6249429078653284294/screens/5ec23849249240a0b66d803a5ee74208` ("Sửa sản phẩm #2")
+    - `projects/6249429078653284294/screens/21d590e68a854cf2972fdb21fdc22db5` ("Sửa sản phẩm #3")
+    - `projects/6249429078653284294/screens/bb1664e79d6c4819ad248a781219cc70` ("Sửa sản phẩm #4")
   - **Deliverables khi [x]:**
     - `.specify/features/product-management/baseline.md` (SIGNED-OFF)
     - `docs/features/product-management/README.md`
@@ -265,6 +313,13 @@ schema-version: "1.3"
   - **Tasks:**
     - [ ] **Backend:** `GET /products với query builder (search, filter, sort, paginate, sellerId)` · `GET /products/:id populate category + seller (OptionalJwtAuthGuard)`
     - [ ] **Frontend:** `ProductGrid, ProductCard, ProductDetail components` · `FilterSidebar, SearchBar` · `Pagination component`
+  - **Stitch Screens (`projects/6249429078653284294`):**
+    - `projects/6249429078653284294/screens/afed4199f8c8486ea1a1904e7a12d153` ("Trang chủ & Danh mục Sản phẩm")
+    - `projects/6249429078653284294/screens/8413ebf43e9d47b494683ca906fa588b` ("Trang chi tiết sản phẩm - còn hàng - chưa đăng nhập")
+    - `projects/6249429078653284294/screens/4c756c2b30054366b14cd2fd91a18fd8` ("Trang chi tiết sản phẩm - còn hàng - đã đăng nhập")
+    - `projects/6249429078653284294/screens/081b2700c87241cfbef33163c7e4c7a1` ("Trang chi tiết sản phẩm - hết hàng")
+    - `projects/6249429078653284294/screens/a802c43fb1634c28a481531f4921da36` ("Trang chi tiết sản phẩm - chủ shop")
+    - `projects/6249429078653284294/screens/1341ece6fb2b44368a32940c3b5938cc` ("Trang chi tiết sản phẩm - chủ shop - sản phẩm bị cấm")
   - **Deliverables khi [x]:**
     - `.specify/features/product-catalog-search/baseline.md` (SIGNED-OFF)
     - `docs/features/product-catalog-search/README.md`
@@ -291,6 +346,9 @@ schema-version: "1.3"
   - **Tasks:**
     - [ ] **Backend:** `Cart schema (userId unique, items[])` · `Cart CRUD service + group by sellerId khi GET` · `Guard: JwtAuthGuard (Admin → 403)`
     - [ ] **Frontend:** `cartStore (localStorage cho Guest, API cho Customer)` · `CartPage, CartItem components` · `Merge cart on login action`
+  - **Stitch Screens (`projects/6249429078653284294`):**
+    - `projects/6249429078653284294/screens/1d4ed0d033504890b15319f87737841e` ("Giỏ hàng #1")
+    - `projects/6249429078653284294/screens/a75d371cbb2348d88d117ee45c31a744` ("Giỏ hàng #2")
   - **Deliverables khi [x]:**
     - `.specify/features/cart-management/baseline.md` (SIGNED-OFF)
     - `docs/features/cart-management/README.md`
@@ -325,6 +383,9 @@ schema-version: "1.3"
   - **Tasks:**
     - [ ] **Backend:** `Checkout schema + Order schema (checkoutId, sellerId, sellerShopName, userId, recipient, items snapshot, totalAmount, status, paymentStatus)` · `POST /orders: group by seller, atomic decrement, session.withTransaction (all-or-nothing), generate VNPay URL` · `orderCode/checkoutCode generator` · `restockAndCancel() dùng chung`
     - [ ] **Frontend:** `CheckoutPage (Guest form / Customer prefill)` · `CheckoutResultPage (success/fail)`
+  - **Stitch Screens (`projects/6249429078653284294`):**
+    - `projects/6249429078653284294/screens/a9f65d6cc9de44bbb27efeec4e04885e` ("Thanh toán #1")
+    - `projects/6249429078653284294/screens/dcd5e43670f04767b433a747184b9d53` ("Thanh toán #2")
   - **Deliverables khi [x]:**
     - `.specify/features/order-checkout/baseline.md` (SIGNED-OFF)
     - `docs/features/order-checkout/README.md`
@@ -352,6 +413,11 @@ schema-version: "1.3"
   - **Tasks:**
     - [ ] **Backend:** `VNPay service (tạo URL, verify checksum)` · `processPaymentResult() idempotent` · `GET /payments/vnpay/ipn` · `GET /payments/vnpay/return` · `Payment schema` · `Scheduled job (@Cron) checkout expiry`
     - [ ] **Frontend:** `CheckoutResultPage (đọc checkoutCode từ query param)`
+  - **Stitch Screens (`projects/6249429078653284294`):**
+    - `projects/6249429078653284294/screens/8ae6276570db4feab1d1900f086080a7` ("Đặt hàng thành công #1")
+    - `projects/6249429078653284294/screens/e86a9d6dc00e46b08a2c1b0eb4c64195` ("Đặt hàng thành công #2")
+    - `projects/6249429078653284294/screens/77f9ff7b7697478f87b763edda743499` ("Đặt hàng thành công #3")
+    - `projects/6249429078653284294/screens/a752f82e0965438d80e3d2d0b2e5952f` ("Đặt hàng thành công #4")
   - **Deliverables khi [x]:**
     - `.specify/features/payment-vnpay/baseline.md` (SIGNED-OFF)
     - `docs/features/payment-vnpay/README.md`
@@ -376,6 +442,11 @@ schema-version: "1.3"
   - **Tasks:**
     - [ ] **Backend:** `GET /orders/my, GET /orders/my/:id (lọc theo userId)` · `GET /orders, GET /orders/:id (Admin guard)` · `Route order: /my, /selling trước /:id`
     - [ ] **Frontend:** `OrderHistoryPage, OrderDetailPage (Customer)` · `Admin: OrderTable`
+  - **Stitch Screens (`projects/6249429078653284294`):**
+    - `projects/6249429078653284294/screens/abc4f7ce9a6d47d18fd4da7b1b795f7f` ("Đơn mua #1")
+    - `projects/6249429078653284294/screens/85f7cc5578444927b949f7c172d5a3d5` ("Đơn mua #2")
+    - `projects/6249429078653284294/screens/1f1b19fb62d94d6a87b8e088d9204470` ("Đơn mua #3")
+    - `projects/6249429078653284294/screens/bb27c32c915444449dd7422d34dbe10f` ("Đơn mua #4")
   - **Deliverables khi [x]:**
     - `.specify/features/order-management/baseline.md` (SIGNED-OFF)
     - `docs/features/order-management/README.md`
@@ -404,6 +475,12 @@ schema-version: "1.3"
   - **Tasks:**
     - [ ] **Backend:** `GET /orders/selling (+/:id)` · `PATCH /orders/:id/status (state machine + phân quyền Seller/Admin)` · `Dùng restockAndCancel()`
     - [ ] **Frontend:** `Seller: SellerOrdersPage, StatusActionButtons, CancelReasonDialog`
+  - **Stitch Screens (`projects/6249429078653284294`):**
+    - `projects/6249429078653284294/screens/b30d797401a6417ea8867c848a24aae9` ("Đơn bán #1")
+    - `projects/6249429078653284294/screens/f341d2143d594f55936b40b371e28bfc` ("Đơn bán #2")
+    - `projects/6249429078653284294/screens/72383f62c34e4e628c0aaea30c9c6a88` ("Đơn bán #3")
+    - `projects/6249429078653284294/screens/2a049bb3254142ff9b1d5a109ba58e81` ("Đơn bán #4")
+    - `projects/6249429078653284294/screens/578e8e3373c64989ac9d43b04ca8ec63` ("Đơn bán #5")
   - **Deliverables khi [x]:**
     - `.specify/features/seller-order-fulfillment/baseline.md` (SIGNED-OFF)
     - `docs/features/seller-order-fulfillment/README.md`
@@ -431,6 +508,16 @@ schema-version: "1.3"
   - **Tasks:**
     - [ ] **Backend:** `GET /admin/users` · `PATCH /admin/users/:id/ban|unban (cascade block SP)` · `GET /admin/products` · `PATCH /admin/products/:id/block|unblock` · `Kiểm tra isActive trong Login service`
     - [ ] **Frontend:** `Admin: UserTable, BanConfirmDialog` · `Admin: AdminProducts (BlockDialog nhập lý do)`
+  - **Stitch Screens (`projects/6249429078653284294`):**
+    - `projects/6249429078653284294/screens/882346455a944424a5acdec0db64b694` ("Admin người dùng #1")
+    - `projects/6249429078653284294/screens/d665514709ad40a3be1507afa6df2591` ("Admin người dùng #2")
+    - `projects/6249429078653284294/screens/c4a639ff41c0469485df88e0bb39fe59` ("Admin người dùng #3")
+    - `projects/6249429078653284294/screens/622bb67cebe444f1926f2eac85381281` ("Admin người dùng #4")
+    - `projects/6249429078653284294/screens/87c65644d1de4c54b1ff120678a4596a` ("Admin sản phẩm #1")
+    - `projects/6249429078653284294/screens/849ea875dd5e4146832832bacd738dc9` ("Admin sản phẩm #2")
+    - `projects/6249429078653284294/screens/d824e21dffad4deb9cdc14482a542806` ("Admin đơn hàng #1")
+    - `projects/6249429078653284294/screens/d64dfcec7caf4709a0212debe1cac939` ("Admin đơn hàng #2")
+    - `projects/6249429078653284294/screens/c0dfe3dabd8e403b8b42088b4ddb17f6` ("Admin đơn hàng #3")
   - **Deliverables khi [x]:**
     - `.specify/features/admin-user-management/baseline.md` (SIGNED-OFF)
     - `docs/features/admin-user-management/README.md`
@@ -543,7 +630,7 @@ FRONTEND_URL="https://<your-frontend-domain>"
    - `Effort: L|XL` + `multi-session` → Full Feature BA (all 8 stages) + invoke `wayfinder`.
 6. **Step 6**: Trong Phase 5, phân rã từ `Tasks: Backend / Frontend` cho `backend-developer` và `frontend-developer`.
 7. **Step 7**: Với `US-DEPLOY-###`, thực thi Pre-Deploy Verification & Smoke Test (không chạy BA pipeline).
-8. **Step 8**: Chỉ đánh `[x]` sau khi `e2e-runner` pass, `tech-doc-architect` xong, `user-guide-creator` đã lưu ảnh Playwright thật.
+8. **Step 8**: Chỉ đánh `[x]` sau khi `e2e-runner` pass và hoàn thành Phase 6 (Review & Verification).
 
 ### Tài liệu tham chiếu (đọc trước khi implement):
 
