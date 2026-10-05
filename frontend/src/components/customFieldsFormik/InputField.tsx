@@ -4,7 +4,7 @@ import { AdditionalFormikProps } from "@/interfaces/common";
 import { Label } from "../ui/label";
 import { twMerge } from "tailwind-merge";
 import { get, isString } from "lodash";
-import CommonIcons from "../CommonIcons";
+import CommonIcons from "../commonIcons";
 
 interface InputFieldProps extends InputProps {
   label?: string | React.ReactNode;
@@ -33,7 +33,7 @@ const InputField = (props: InputFieldProps & AdditionalFormikProps) => {
   const [seeText, setSeeText] = useState(false);
 
   const msgError = get(touched, name) && (get(errors, name) as string);
-  console.log("msgError", msgError, name);
+  // console.log("msgError", msgError, name);
 
   const isPasswordType = type === "password";
 

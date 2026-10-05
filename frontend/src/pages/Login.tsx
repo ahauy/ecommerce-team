@@ -3,7 +3,8 @@ import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import AuthShell from '@/components/AuthShell';
+import CommonIcons from '@/components/commonIcons';
 import { Button } from '@/components/ui/button';
 import FormikField from '@/components/customFieldsFormik/FormikField';
 import InputField from '@/components/customFieldsFormik/InputField';
@@ -30,119 +31,101 @@ const Login: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-slate-50 p-4">
-      <div className="w-full max-w-md">
-        <div className="mb-6 text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Ecommerce Team
+    <AuthShell>
+      <div className="space-y-6">
+        <div className="text-center">
+          <h1 className="text-[28px] font-medium leading-tight tracking-tight text-black font-display">
+            Đăng nhập
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Sàn thương mại điện tử đa người bán
+          <p className="mt-2 text-sm text-zinc-500">
+            Đăng nhập để mua sắm và quản lý gian hàng của bạn.
           </p>
         </div>
 
-        <Card className="border border-slate-200 bg-white shadow-sm">
-          <CardHeader className="pb-4">
-            <h2 className="text-xl font-semibold text-slate-800">
-              Đăng nhập tài khoản
-            </h2>
-            <p className="text-xs text-slate-500">
-              Nhập email và mật khẩu của bạn để tiếp tục
-            </p>
-          </CardHeader>
-          <CardContent>
-            <Formik
-              initialValues={{
-                email: '',
-                password: '',
-              }}
-              validationSchema={validationSchema}
-              onSubmit={async (values, { setSubmitting, setStatus }) => {
-                setStatus(null);
-                try {
-                  const res = await authService.login({
-                    email: values.email,
-                    password: values.password,
-                  });
+        <Formik
+          initialValues={{
+            email: '',
+            password: '',
+          }}
+          validationSchema={validationSchema}
+          onSubmit={async (values, { setSubmitting, setStatus }) => {
+            setStatus(null);
+            try {
+              const res = await authService.login({
+                email: values.email,
+                password: values.password,
+              });
 
-                  if (res.data) {
-                    setAuth(res.data.user, res.data.accessToken);
-                    httpService.attachTokenToHeader(res.data.accessToken);
-                    httpService.saveTokenStorage(res.data.accessToken);
-                    httpService.saveUserStorage(res.data.user as any);
+              if (res.data) {
+                setAuth(res.data.user, res.data.accessToken);
+                httpService.attachTokenToHeader(res.data.accessToken);
+                httpService.saveTokenStorage(res.data.accessToken);
+                httpService.saveUserStorage(res.data.user as any);
 
-                    toast.success('Đăng nhập thành công!');
-                    navigate(BaseUrl.Homepage);
-                  }
-                } catch (error: unknown) {
-                  const errResponse = (error as { response?: { data?: { message?: string } } })?.response?.data;
-                  const message = errResponse?.message || 'Email hoặc mật khẩu không chính xác';
-                  setStatus(message);
-                  toast.error(message);
-                } finally {
-                  setSubmitting(false);
-                }
-              }}
-            >
-              {({ isSubmitting, status }) => (
-                <Form className="flex flex-col gap-4">
-                  {status && (
-                    <div className="rounded-md bg-red-50 p-3 text-sm text-red-600 border border-red-200">
-                      {status}
-                    </div>
-                  )}
-
-                  <FormikField
-                    component={InputField}
-                    name="email"
-                    type="email"
-                    label="Email"
-                    placeholder="name@example.com"
-                    required
-                  />
-
-                  <FormikField
-                    component={InputField}
-                    name="password"
-                    type="password"
-                    label="Mật khẩu"
-                    placeholder="Nhập mật khẩu"
-                    required
-                  />
-
-                  <div className="flex justify-end">
-                    <Link
-                      to={BaseUrl.ForgotPassword}
-                      className="text-xs text-slate-500 hover:text-slate-800 hover:underline"
-                    >
-                      Quên mật khẩu?
-                    </Link>
-                  </div>
-
-                  <Button
-                    type="submit"
-                    className="mt-2 w-full"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
-                  </Button>
-
-                  <div className="mt-2 text-center text-sm text-slate-500">
-                    Chưa có tài khoản?{' '}
-                    <Link
-                      to={BaseUrl.Register}
-                      className="font-medium text-slate-900 underline hover:text-slate-700"
-                    >
-                      Đăng ký ngay
-                    </Link>
-                  </div>
-                </Form>
+                toast.success('Đăng nhập thành công!');
+                navigate(BaseUrl.Homepage);
+              }
+            } catch (error: unknown) {
+              const errResponse = (error as { response?: { data?: { message?: string } } })?.response?.data;
+              const message = errResponse?.message || 'Email hoặc mật khẩu không chính xác';
+              setStatus(message);
+              toast.error(message);
+            } finally {
+              setSubmitting(false);
+            }
+          }}
+        >
+          {({ isSubmitting, status }) => (
+            <Form className="flex flex-col gap-5">
+              {status && (
+                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-[13px] text-red-600">
+                  {status}
+                </div>
               )}
-            </Formik>
-          </CardContent>
-        </Card>
+
+              <FormikField
+                component={InputField}
+                name="email"
+                type="email"
+                label="Email"
+                placeholder="name@example.com"
+                required
+              />
+
+              <FormikField
+                component={InputField}
+                name="password"
+                type="password"
+                label="Mật khẩu"
+                placeholder="Nhập mật khẩu"
+                required
+              />
+
+              <Button
+                type="submit"
+                className="h-11 w-full rounded-full bg-black text-base font-medium text-white shadow-none hover:bg-zinc-800 active:bg-zinc-700 disabled:opacity-60"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                {!isSubmitting && (
+                  <CommonIcons.ArrowRight size={16} className="ml-2" />
+                )}
+              </Button>
+
+              <div className="text-center text-[13px] text-zinc-500">
+                Chưa có tài khoản?{' '}
+                <Link
+                  to={BaseUrl.Register}
+                  className="font-medium text-black underline underline-offset-4 hover:opacity-70"
+                >
+                  Đăng ký
+                </Link>
+              </div>
+            </Form>
+          )}
+        </Formik>
       </div>
-    </div>
+    </AuthShell>
   );
 };
 
