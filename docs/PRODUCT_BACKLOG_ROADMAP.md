@@ -95,8 +95,8 @@ schema-version: "1.3"
 
 [ Sprint 1 - Core Foundation (MVP Base) ] ──► [ IN PROGRESS 🔧 ]
   ├── [x] US-AUTH-001: Đăng ký & Đăng nhập
-  ├── US-AUTH-002: JWT Refresh Token & Logout
-  ├── US-SELL-001: Profile & Thiết lập gian hàng (/users/me, shop)
+  ├── [x] US-AUTH-002: JWT Refresh Token & Logout
+  ├── [x] US-SELL-001: Profile & Thiết lập gian hàng (/users/me, shop)
   ├── US-CAT-001:  Quản lý Category (Admin CRUD)
   ├── US-PRD-001:  Đăng bán & quản lý Product (Seller own / Admin all + Cloudinary Upload)
   ├── US-PRD-002:  Tìm kiếm & Lọc sản phẩm (Public)
@@ -192,7 +192,7 @@ schema-version: "1.3"
 
 ---
 
-- [ ] **US-SELL-001**: Profile & Thiết lập gian hàng
+- [x] **US-SELL-001**: Profile & Thiết lập gian hàng
   - **Slug:** `seller-shop-profile`
   - **Effort:** S
   - **Context-budget:** single-session
@@ -201,14 +201,14 @@ schema-version: "1.3"
   - **Blocks:** `US-PRD-001`
   - **Mô tả:** Mọi user đã đăng nhập có profile (dùng prefill checkout) và có thể thiết lập gian hàng (`shopName`, `pickupAddress`) để đủ điều kiện đăng bán. Không có role seller riêng, không KYC, không duyệt.
   - **Acceptance Criteria (AC):**
-    - [ ] `GET /api/v1/users/me` → trả profile + `shopName`/`pickupAddress` (null nếu chưa có).
-    - [ ] `PATCH /api/v1/users/me` → cập nhật `fullName`, `phone`, `address`.
-    - [ ] `PATCH /api/v1/users/me/shop` với `shopName` (3–50 ký tự) + `pickupAddress` hợp lệ → 200; thiếu hoặc sai độ dài → 400.
-    - [ ] `GET /api/v1/shops/:sellerId` (public) → `shopName`, `joinedAt`, `productCount`; 404 nếu user chưa có shop hoặc đang bị ban.
-    - [ ] FE: `ProfilePage`, `ShopSetupPage`; nút "Đăng bán" dẫn tới ShopSetup nếu `shopName = null`.
+    - [x] `GET /api/v1/users/me` → trả profile + `shopName`/`pickupAddress` (null nếu chưa có).
+    - [x] `PATCH /api/v1/users/me` → cập nhật `fullName`, `phone`, `address`.
+    - [x] `PATCH /api/v1/users/me/shop` với `shopName` (3–50 ký tự) + `pickupAddress` hợp lệ → 200; thiếu hoặc sai độ dài → 400.
+    - [x] `GET /api/v1/shops/:sellerId` (public) → `shopName`, `joinedAt`, `productCount`; 404 nếu user chưa có shop hoặc đang bị ban.
+    - [x] FE: `ProfilePage`, `ShopSetupPage`; nút "Đăng bán" dẫn tới ShopSetup nếu `shopName = null`.
   - **Tasks:**
-    - [ ] **Backend:** `UsersController (/users/me, /users/me/shop)` · `DTO validate` · `ShopsController GET /shops/:sellerId`
-    - [ ] **Frontend:** `ProfilePage` · `ShopSetupPage` · `user.service.ts`, `shop.service.ts`
+    - [x] **Backend:** `UsersController (/users/me, /users/me/shop)` · `DTO validate` · `ShopsController GET /shops/:sellerId`
+    - [x] **Frontend:** `ProfilePage` · `ShopSetupPage` · `user.service.ts`, `shop.service.ts`
   - **Stitch Screens (`projects/6249429078653284294`):**
     - `projects/6249429078653284294/screens/9050b988ae13463ca6d2c730b07b15b4` ("Hồ sơ cá nhân #1")
     - `projects/6249429078653284294/screens/a21dfd8e75df43268fa2d00b6cd6b893` ("Hồ sơ cá nhân #2")
