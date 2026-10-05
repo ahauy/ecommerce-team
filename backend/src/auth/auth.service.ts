@@ -114,7 +114,7 @@ export class AuthService {
         email: user.email,
         fullName: user.fullName,
         role: user.role,
-        shopName: user.shopName ?? null,
+        shopName: user.shop?.shopName ?? null,
       },
     };
   }

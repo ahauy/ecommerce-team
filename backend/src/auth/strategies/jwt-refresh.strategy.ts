@@ -9,8 +9,10 @@ export interface JwtRefreshPayload {
 }
 
 // Extracts the raw refresh token from the httpOnly cookie (Path=/api/v1/auth)
-const fromCookie = (req: Request): string | null =>
-  req?.cookies?.refreshToken ?? null;
+const fromCookie = (req: Request): string | null => {
+  const cookies = req?.cookies as Record<string, string> | undefined;
+  return cookies?.refreshToken ?? null;
+};
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
@@ -30,8 +32,12 @@ export class JwtRefreshStrategy extends PassportStrategy(
   }
 
   // Passport validates JWT signature/expiry; we attach rawToken for the hash lookup
-  async validate(req: Request, payload: JwtRefreshPayload) {
-    const rawToken: string | undefined = req.cookies?.refreshToken;
+  validate(
+    req: Request,
+    payload: JwtRefreshPayload,
+  ): { id: string; rawToken: string } {
+    const cookies = req?.cookies as Record<string, string> | undefined;
+    const rawToken = cookies?.refreshToken;
     if (!rawToken)
       throw new UnauthorizedException('Refresh token không tìm thấy');
     return { id: payload.sub, rawToken };
