@@ -16,6 +16,10 @@ const BaseUrl = {
 
   ChangePassword: "/change-password",
   ForgotPassword: "/forgot-password",
+
+  Profile: "/profile",
+  ShopSetup: "/shop/setup",
+  PublicShop: "/shops/:sellerId",
 };
 
 export default BaseUrl;

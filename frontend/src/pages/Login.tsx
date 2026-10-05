@@ -78,7 +78,7 @@ const Login: React.FC = () => {
           {({ isSubmitting, status }) => (
             <Form className="flex flex-col gap-5">
               {status && (
-                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-[13px] text-red-600">
+                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-[13px] text-red-700">
                   {status}
                 </div>
               )}
