@@ -50,6 +50,11 @@
 
 | **DESIGN.md** | Single source of truth for frontend UI tokens, two-canvas polarity, pill buttons (`rounded-full`), and typography (`ss03`) | `frontend/DESIGN.md` |
 | **Stitch Project** | Canonical UI/UX design mock repository on Stitch (`Shopify Vietnam Marketplace Design System`), query via Stitch MCP (`get_screen`) | `projects/6249429078653284294` |
+| **accessToken** | Short-lived JWT (15m) in Authorization header | `JWT_ACCESS_EXPIRES_IN` |
+| **refreshToken** | Long-lived JWT (7d) in httpOnly cookie `Path=/api/v1/auth` | `JWT_REFRESH_EXPIRES_IN` |
+| **refreshToken hash** | SHA-256 hash of refreshToken stored in `users.refreshToken` | Never plain text |
+| **isRefreshing queue** | Frontend guard preventing concurrent refresh storms | `frontend/src/services/apiClient.ts` |
+| **single session model** | New login overwrites refreshToken hash, invalidating prior sessions | BR-AUTH-015 |
 
 ## Before / After (Usage Rule 2)
 
