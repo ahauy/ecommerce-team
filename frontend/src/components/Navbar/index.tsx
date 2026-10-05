@@ -10,7 +10,7 @@ import Sidebar from "../Sidebar";
 import ThemeToggle from "../ThemeToggle";
 
 export default function Navbar() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const { isOpen, toggle } = useSidebarHandler();
 
   const [openPopover, setPopover] = useState(false);
@@ -31,6 +31,12 @@ export default function Navbar() {
       </Popover>
 
       <div className="flex items-center gap-3">
+        <Link
+          to={BaseUrl.ShopSetup}
+          className="hidden sm:inline-flex items-center justify-center rounded-full border border-black/20 dark:border-white/20 px-3.5 py-1 text-xs font-medium text-foreground hover:bg-accent transition-colors"
+        >
+          Đăng bán
+        </Link>
         <ThemeToggle />
 
         <Popover open={openPopover} onOpenChange={setPopover}>
@@ -38,20 +44,31 @@ export default function Navbar() {
             <div className="navbar__avatar flex items-center gap-2 rounded-md hover:cursor-pointer">
               <Avatar>
                 <AvatarImage src="https://github.com/shadcnee.png" />
-                <AvatarFallback>D</AvatarFallback>
+                <AvatarFallback>
+                  {user?.firstname?.charAt(0) || user?.username?.charAt(0) || "U"}
+                </AvatarFallback>
               </Avatar>
               <div>
                 <p className="mb-1 text-sm font-medium leading-none">
-                  donezombie
+                  {user?.firstname
+                    ? `${user.firstname} ${user.lastname || ""}`.trim()
+                    : user?.username || "donezombie"}
                 </p>
                 <p className="text-xs leading-none text-muted-foreground">
-                  donezombie@gmail.com
+                  {user?.email || "donezombie@gmail.com"}
                 </p>
               </div>
             </div>
           </PopoverTrigger>
           <PopoverContent className="mr-2 mt-2 flex max-w-[200px] flex-col p-2">
             {[
+              {
+                label: "Profile",
+                href: BaseUrl.Profile,
+                function: () => {
+                  setPopover(false);
+                },
+              },
               {
                 label: "Change password",
                 href: BaseUrl.ChangePassword,

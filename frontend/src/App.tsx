@@ -31,6 +31,9 @@ import DefaultLayout from "./layouts/DefaultLayout";
 import Homepage from "./pages/Homepage";
 import ChangePassword from "./pages/ChangePassword";
 import Todos from "./pages/Todos";
+import ProfilePage from "./pages/ProfilePage";
+import ShopSetupPage from "./pages/ShopSetupPage";
+import PublicShopPage from "./pages/PublicShopPage";
 
 const ErrorFallback = ({ error, resetErrorBoundary }: any) => {
   return (
@@ -94,7 +97,24 @@ const App = () => {
             <Route index element={<Homepage />} />
             <Route path={BaseUrl.Todos} element={<Todos />} />
             <Route path={BaseUrl.ChangePassword} element={<ChangePassword />} />
+            <Route path={BaseUrl.Profile} element={<ProfilePage />} />
+            <Route path={BaseUrl.ShopSetup} element={<ShopSetupPage />} />
           </Route>
+
+          <Route
+            path={BaseUrl.PublicShop}
+            element={
+              <Suspense
+                fallback={
+                  <div className="p-2">
+                    <Loading />
+                  </div>
+                }
+              >
+                <PublicShopPage />
+              </Suspense>
+            }
+          />
 
           <Route path="*" element={<Page404 />} />
         </Routes>
