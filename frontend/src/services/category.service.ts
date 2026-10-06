@@ -2,6 +2,7 @@ import { apiClient } from './apiClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   CategoryItem,
+  PublicCategoryItem,
   AdminCategoryItem,
   CreateCategoryPayload,
   UpdateCategoryPayload,
@@ -24,8 +25,8 @@ function unwrapResponse<T>(data: ApiResponseEnvelope<T> | T): T {
 
 export const categoryService = {
   // ── Public Storefront Endpoints ─────────────────────────────────────────────
-  getCategories: async (): Promise<CategoryItem[]> => {
-    const res = await apiClient.get<ApiResponseEnvelope<CategoryItem[]> | CategoryItem[]>('/categories');
+  getCategories: async (): Promise<PublicCategoryItem[]> => {
+    const res = await apiClient.get<ApiResponseEnvelope<PublicCategoryItem[]> | PublicCategoryItem[]>('/categories');
     return unwrapResponse(res.data);
   },
 

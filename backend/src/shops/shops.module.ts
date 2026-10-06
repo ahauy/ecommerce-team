@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../users/schemas/user.schema';
@@ -12,4 +13,4 @@ import { ShopsController } from './shops.controller';
   controllers: [ShopsController],
   exports: [ShopsService],
 })
-export class ShopsModule {}
+export class ShopsModule { }

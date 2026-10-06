@@ -14,6 +14,14 @@ export interface CategoryItem {
   updatedAt: string;
 }
 
+/** Item trả về từ public `GET /categories` (chỉ category đang active) */
+export interface PublicCategoryItem {
+  id: string;
+  name: string;
+  slug: string;
+  imageUrl: string | null;
+}
+
 export interface AdminCategoryItem extends CategoryItem {
   productCount: number;
 }

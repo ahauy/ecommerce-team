@@ -61,8 +61,8 @@ describe('CategoryNav Component', () => {
 
   it('renders categories with pill styling and handles selection', () => {
     const mockCategories = [
-      { _id: '1', name: 'Gia dụng', slug: 'gia-dung', description: '', isActive: true },
-      { _id: '2', name: 'Thời trang', slug: 'thoi-trang', description: '', isActive: true },
+      { id: '1', name: 'Gia dụng', slug: 'gia-dung', imageUrl: null },
+      { id: '2', name: 'Thời trang', slug: 'thoi-trang', imageUrl: null },
     ];
     mockUseCategories.mockReturnValue({
       data: mockCategories,

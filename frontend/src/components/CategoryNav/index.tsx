@@ -1,6 +1,6 @@
 import React from 'react';
 import { categoryService } from '@/services/category.service';
-import { CategoryItem } from '@/interfaces/category';
+import { PublicCategoryItem } from '@/interfaces/category';
 
 export interface CategoryNavProps {
   selectedSlug?: string;
@@ -80,11 +80,11 @@ export const CategoryNav: React.FC<CategoryNavProps> = ({
         Tất cả
       </button>
 
-      {categories.map((cat: CategoryItem) => {
+      {categories.map((cat: PublicCategoryItem) => {
         const isSelected = selectedSlug === cat.slug;
         return (
           <button
-            key={cat._id}
+            key={cat.id}
             type="button"
             aria-pressed={isSelected}
             aria-current={isSelected ? 'page' : undefined}
