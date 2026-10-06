@@ -4,7 +4,7 @@ import { AdminCategoryItem } from '@/interfaces/category';
 import { categoryService } from '@/services/category.service';
 import AdminCategoryListTable from './components/AdminCategoryListTable';
 import CategoryFormDrawer from './components/CategoryFormDrawer';
-import DeleteWarningDialog from './components/DeleteWarningDialog';
+import DeleteWarningDialog from './dialogs/DeleteWarningDialog';
 import { showError, showSuccess } from '@/helpers/toast';
 
 type FilterStatus = 'all' | 'active' | 'hidden';

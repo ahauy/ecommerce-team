@@ -1,13 +1,10 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Formik, Form } from 'formik';
-import * as Yup from 'yup';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { vi } from 'vitest';
-import ProfileForm from '../ProfileForm';
+import { vi, describe, beforeEach, it, expect } from 'vitest';
+import ProfileForm from './ProfileForm';
 import { userService } from '@/services/user.service';
-import { toast } from '@/components/ui/use-toast';
 
 vi.mock('@/services/user.service', () => {
   const mockService = {

@@ -8,12 +8,12 @@ import { sleepTime } from "@/helpers/common";
 import { useAuth } from "@/providers/AuthenticationProvider";
 import { Form, Formik } from "formik";
 import { Link, Navigate } from "react-router-dom";
-import * as Yup from "yup";
+import { forgotPasswordSchema } from "./schemas/forgotPassword.schema";
 
 const ForgotPassword = () => {
   //! State
   const { toast } = useToast();
-  const { login, isLogged } = useAuth();
+  const { isLogged } = useAuth();
 
   //! Render
   if (isLogged) {
@@ -23,20 +23,18 @@ const ForgotPassword = () => {
   return (
     <div className="component:ForgotPassword flex h-[100vh] w-[100vw] items-center justify-center p-2">
       <Formik
-        validationSchema={Yup.object().shape({
-          username: Yup.string().required("Username is required field!"),
-          password: Yup.string().required("Password is required field!"),
-        })}
+        validationSchema={forgotPasswordSchema}
         initialValues={{
-          username: "",
-          password: "",
+          email: "",
         }}
-        onSubmit={async (values, { setSubmitting }) => {
+        onSubmit={async (_values, { setSubmitting }) => {
           try {
             setSubmitting(true);
-            const { username, password } = values;
             await sleepTime(1000);
-            login({ username, password });
+            toast({
+              title: "Email đã được gửi",
+              description: "Vui lòng kiểm tra hộp thư để nhận đường dẫn đặt lại mật khẩu.",
+            });
           } catch (error) {
             toast({
               variant: "destructive",
@@ -70,7 +68,7 @@ const ForgotPassword = () => {
                     required
                   />
 
-                  <Button type="submit" isLoading={isSubmitting}>
+                  <Button type="submit" isLoading={isSubmitting} className="rounded-full">
                     Continue
                   </Button>
 

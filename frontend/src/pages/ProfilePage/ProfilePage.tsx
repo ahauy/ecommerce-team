@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { userService } from '@/services/user.service';
-import ProfileForm from '@/components/ProfileForm/ProfileForm';
+import ProfileForm from './components/ProfileForm';
 import { Button } from '@/components/ui/button';
 import BaseUrl from '@/consts/baseUrl';
 import { User, Store, Calendar, MapPin, Phone, Mail, ExternalLink } from 'lucide-react';

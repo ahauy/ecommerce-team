@@ -1,6 +1,5 @@
 import React from 'react';
 import { Formik, Form, Field } from 'formik';
-import * as Yup from 'yup';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,8 +9,9 @@ import { useToast } from '@/components/ui/use-toast';
 import { userService, SetupShopDto } from '@/services/user.service';
 import BaseUrl from '@/consts/baseUrl';
 import { ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
+import { shopSetupValidationSchema } from '../schemas/shopSetup.schema';
 
-interface ShopSetupFormProps {
+export interface ShopSetupFormProps {
   initialValues?: {
     shopName?: string;
     pickupAddress?: string;
@@ -20,24 +20,7 @@ interface ShopSetupFormProps {
   onSuccess?: () => void;
 }
 
-const validationSchema = Yup.object().shape({
-  shopName: Yup.string()
-    .trim()
-    .min(3, 'Tên gian hàng phải từ 3-50 ký tự')
-    .max(50, 'Tên gian hàng tối đa 50 ký tự')
-    .required('Tên gian hàng không được để trống'),
-  pickupAddress: Yup.string()
-    .trim()
-    .min(10, 'Địa chỉ lấy hàng tối thiểu 10 ký tự')
-    .max(500, 'Địa chỉ tối đa 500 ký tự')
-    .required('Địa chỉ lấy hàng không được để trống'),
-  phone: Yup.string()
-    .trim()
-    .matches(/^(\+84|0)[0-9]{9,10}$/, 'Số điện thoại không hợp lệ')
-    .required('Số điện thoại không được để trống'),
-});
-
-const ShopSetupForm: React.FC<ShopSetupFormProps> = ({ initialValues, onSuccess }) => {
+export const ShopSetupForm: React.FC<ShopSetupFormProps> = ({ initialValues, onSuccess }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const setupShopMutation = userService.useSetupShop();
@@ -61,12 +44,12 @@ const ShopSetupForm: React.FC<ShopSetupFormProps> = ({ initialValues, onSuccess 
       } else {
         navigate(BaseUrl.Profile);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errResponse = err as { response?: { data?: { message?: string | string[] } } };
+      const rawMessage = errResponse?.response?.data?.message;
       const message =
-        err?.response?.data?.message ||
-        (Array.isArray(err?.response?.data?.message)
-          ? err?.response?.data?.message.join(', ')
-          : 'Có lỗi xảy ra khi thiết lập gian hàng. Vui lòng thử lại.');
+        (Array.isArray(rawMessage) ? rawMessage.join(', ') : rawMessage) ||
+        'Có lỗi xảy ra khi thiết lập gian hàng. Vui lòng thử lại.';
 
       toast({
         title: 'Thiết lập gian hàng thất bại',
@@ -84,7 +67,7 @@ const ShopSetupForm: React.FC<ShopSetupFormProps> = ({ initialValues, onSuccess 
         phone: initialValues?.phone || '',
       }}
       enableReinitialize
-      validationSchema={validationSchema}
+      validationSchema={shopSetupValidationSchema}
       onSubmit={handleSubmit}
     >
       {({ values, errors, touched, isSubmitting }) => {

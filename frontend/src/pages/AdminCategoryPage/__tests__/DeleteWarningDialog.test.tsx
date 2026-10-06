@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import DeleteWarningDialog from '../components/DeleteWarningDialog';
+import DeleteWarningDialog from '../dialogs/DeleteWarningDialog';
 import { AdminCategoryItem } from '@/interfaces/category';
 
 describe('DeleteWarningDialog Component (Stitch Screen 2)', () => {

@@ -1,9 +1,9 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { shopService } from '@/services/shop.service';
 import { Button } from '@/components/ui/button';
 import BaseUrl from '@/consts/baseUrl';
 import { Store, Calendar, Package, ArrowLeft, AlertCircle } from 'lucide-react';
+import { usePublicShop } from './hooks/usePublicShop';
 
 const formatJoinedDate = (dateStr?: string | null): string => {
   if (!dateStr) return '';
@@ -27,7 +27,7 @@ const formatJoinedDate = (dateStr?: string | null): string => {
 
 const PublicShopPage: React.FC = () => {
   const { sellerId = '' } = useParams<{ sellerId: string }>();
-  const { data: shop, isPending, isError } = shopService.useGetPublicShop(sellerId);
+  const { data: shop, isPending, isError } = usePublicShop(sellerId);
 
   if (isPending) {
     return (

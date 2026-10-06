@@ -1,39 +1,18 @@
 import { Formik, Form, Field } from 'formik';
-import * as Yup from 'yup';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { userService, UpdateProfileDto } from '@/services/user.service';
+import { profileValidationSchema } from '../../schemas/profile.schema';
 
-interface ProfileFormProps {
+export interface ProfileFormProps {
   initialValues?: {
     fullName: string;
     phone: string | null;
     address: string | null;
   };
 }
-
-const validationSchema = Yup.object().shape({
-  fullName: Yup.string()
-    .trim()
-    .min(2, 'Họ tên phải từ 2-100 ký tự')
-    .max(100, 'Họ tên tối đa 100 ký tự')
-    .required('Họ tên không được để trống'),
-  phone: Yup.string()
-    .transform((value) => (!value || !value.trim() ? null : value.trim()))
-    .nullable()
-    .notRequired()
-    .matches(/^(\+84|0)[0-9]{9,10}$/, {
-      message: 'Số điện thoại không hợp lệ',
-      excludeEmptyString: true,
-    }),
-  address: Yup.string()
-    .transform((value) => (!value || !value.trim() ? null : value.trim()))
-    .nullable()
-    .notRequired()
-    .max(500, 'Địa chỉ tối đa 500 ký tự'),
-});
 
 const ProfileForm = ({ initialValues }: ProfileFormProps) => {
   const { toast } = useToast();
@@ -68,7 +47,7 @@ const ProfileForm = ({ initialValues }: ProfileFormProps) => {
         address: initialValues?.address || '',
       }}
       enableReinitialize
-      validationSchema={validationSchema}
+      validationSchema={profileValidationSchema}
       onSubmit={handleSubmit}
     >
       {({ errors, touched, isSubmitting }) => (
