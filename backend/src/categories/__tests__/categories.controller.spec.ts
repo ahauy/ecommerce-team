@@ -48,8 +48,14 @@ describe('CategoriesController', () => {
 
   describe('findActive', () => {
     it('should return active categories for public storefront', async () => {
+      const publicCategories = [
+        { id: 'cat-1', name: 'Điện Thoại', slug: 'dien-thoai', imageUrl: null },
+        { id: 'cat-2', name: 'Laptop', slug: 'laptop', imageUrl: null },
+      ];
+      jest.spyOn(service, 'findActive').mockResolvedValue(publicCategories);
+
       const result = await controller.findActive();
-      expect(result).toEqual(mockCategories);
+      expect(result).toEqual(publicCategories);
       expect(service.findActive).toHaveBeenCalledTimes(1);
     });
   });

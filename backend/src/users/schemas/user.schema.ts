@@ -21,6 +21,9 @@ export class ShopSubDocument {
 
   @Prop({ type: Date, default: null })
   joinedAt?: Date | null;
+
+  @Prop({ type: Boolean, default: false })
+  isSetupCompleted?: boolean;
 }
 
 export type UserDocument = HydratedDocument<User>;
@@ -64,9 +67,6 @@ export class User extends Document {
 
   @Prop({ type: ShopSubDocument, default: null })
   shop?: ShopSubDocument | null;
-
-  @Prop({ type: Number, default: 0 })
-  version: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

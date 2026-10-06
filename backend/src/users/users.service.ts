@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Injectable,
   ConflictException,
@@ -15,7 +16,7 @@ export class UsersService {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
-  ) {}
+  ) { }
 
   async create(data: {
     email: string;
@@ -97,8 +98,7 @@ export class UsersService {
       throw new NotFoundException('Người dùng không tồn tại');
     }
 
-    const currentVersion = user.version;
-    const updateData: Record<string, unknown> = { version: currentVersion + 1 };
+    const updateData: Record<string, unknown> = {};
 
     if (dto.fullName !== undefined) {
       updateData.fullName = dto.fullName;
@@ -111,11 +111,7 @@ export class UsersService {
     }
 
     const updatedUser = await this.userModel
-      .findOneAndUpdate(
-        { _id: userId, version: currentVersion },
-        { $set: updateData },
-        { new: true },
-      )
+      .findOneAndUpdate({ _id: userId }, { $set: updateData }, { new: true })
       .exec();
 
     if (!updatedUser) {
@@ -135,8 +131,6 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('Người dùng không tồn tại');
     }
-
-    const currentVersion = user.version;
     const isFirstSetup = !user.shop?.shopName;
 
     const shopSlug = this.generateSlug(dto.shopName);
@@ -162,15 +156,10 @@ export class UsersService {
 
     const updateData: Record<string, unknown> = {
       shop: shopData,
-      version: currentVersion + 1,
     };
 
     const updatedUser = await this.userModel
-      .findOneAndUpdate(
-        { _id: userId, version: currentVersion },
-        { $set: updateData },
-        { new: true },
-      )
+      .findOneAndUpdate({ _id: userId }, { $set: updateData }, { new: true })
       .exec();
 
     if (!updatedUser) {
@@ -203,15 +192,12 @@ export class UsersService {
       address: user.address,
       role: user.role,
       isActive: user.isActive,
-      version: user.version,
-      shop: user.shop
-        ? {
-            shopName: user.shop.shopName!,
-            shopSlug: user.shop.shopSlug!,
-            pickupAddress: user.shop.pickupAddress!,
-            joinedAt: user.shop.joinedAt!,
-          }
-        : null,
+      shop: user.shop ? {
+        shopName: user.shop.shopName!,
+        shopSlug: user.shop.shopSlug!,
+        pickupAddress: user.shop.pickupAddress!,
+        joinedAt: user.shop.joinedAt!,
+      } : null,
     };
   }
 }
