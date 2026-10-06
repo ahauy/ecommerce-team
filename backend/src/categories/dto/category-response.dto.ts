@@ -9,6 +9,13 @@ export interface CategoryResponseDto {
   updatedAt: string;
 }
 
+export interface PublicCategoryResponseDto {
+  id: string;
+  name: string;
+  slug: string;
+  imageUrl: string | null;
+}
+
 export interface AdminCategoryResponseDto extends CategoryResponseDto {
   productCount: number;
 }

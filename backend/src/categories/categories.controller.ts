@@ -2,6 +2,7 @@ import { Controller, Get, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { CategoriesService } from './categories.service';
 import { CategoryDocument } from './schemas/category.schema';
+import { PublicCategoryResponseDto } from './dto/category-response.dto';
 
 @ApiTags('Categories (Storefront)')
 @Controller('categories')
@@ -16,7 +17,7 @@ export class CategoriesController {
     status: 200,
     description: 'List of active categories retrieved successfully',
   })
-  async findActive(): Promise<CategoryDocument[]> {
+  async findActive(): Promise<PublicCategoryResponseDto[]> {
     return this.categoriesService.findActive();
   }
 
