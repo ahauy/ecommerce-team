@@ -107,38 +107,67 @@ The application will be available at `http://localhost:5173` (or the port shown 
 - `pnpm lint` - Runs ESLint to analyze and lint the code
 - `pnpm preview` - Starts the Vite development server in preview mode to test the production build
 
-## 📁 Project Structure
+## 📁 Project Structure & Page-Centric Architecture
+
+The frontend strictly adheres to a **Page-Centric Architecture (Screaming Architecture & Colocation)**:
 
 ```
 src/
-├── @types/              # TypeScript type definitions
-├── assets/              # Static assets (images, icons, etc.)
-├── components/          # Reusable React components
-│   ├── commonIcons/     # Icon components
-│   ├── customFieldsFormik/  # Formik form field components
-│   ├── dialogs/         # Dialog/modal components
-│   ├── Examples/        # Example components
-│   ├── Footer/          # Footer component
-│   ├── Navbar/          # Navigation bar component
-│   ├── Sidebar/         # Sidebar component
-│   └── ui/              # shadcn/ui components
-├── consts/              # Constants and configuration
-├── helpers/             # Helper utility functions
-├── HOCs/                # Higher-Order Components
-├── hooks/               # Custom React hooks
-├── i18n/                # Internationalization configuration and translations
-│   ├── en/              # English translations
-│   └── vi/              # Vietnamese translations
-├── interfaces/          # TypeScript interfaces
-├── layouts/             # Layout components
-├── lib/                 # Library utilities
-├── modules/              # Feature modules
-├── pages/               # Page components
-├── providers/           # Context providers
-├── services/            # API service layer
-├── stores/              # Zustand stores
-└── styles/              # Global styles
+├── @types/                  # Global TypeScript type definitions
+├── assets/                  # Static assets (images, icons, etc.)
+├── components/              # GENUINELY SHARED components only (used across 2+ pages)
+│   ├── commonIcons/         # Reusable SVG icon components
+│   ├── customFieldsFormik/  # Reusable Formik form field components (InputField, FormikField, etc.)
+│   ├── dialogs/             # Shared dialogs/modals (DialogConfirm, etc.)
+│   ├── Footer/              # Shared footer component
+│   ├── Navbar/              # Shared navigation bar component
+│   ├── Sidebar/             # Shared responsive sidebar
+│   ├── ui/                  # shadcn/ui primitive accessible components
+│   ├── AuthShell.tsx        # Shared auth layout wrapper
+│   ├── PageWrapper.tsx      # Shared page wrapper
+│   └── PrivateRoute.tsx     # Route protection guard
+├── consts/                  # Global constants and route definitions
+├── helpers/                 # Shared helper utility functions (toast, common, slugify)
+├── HOCs/                    # Higher-Order Components
+├── hooks/                   # SHARED custom React hooks (used across 2+ pages)
+├── i18n/                    # Internationalization configuration and translations
+├── interfaces/              # Shared domain TypeScript interfaces
+├── layouts/                 # Page layout wrappers (DefaultLayout, etc.)
+├── pages/                   # Feature Pages (Each page is a self-contained module)
+│   ├── <PageName>/
+│   │   ├── components/      # UI components used ONLY by this page
+│   │   ├── services/        # API calls used ONLY by this page
+│   │   ├── hooks/           # Custom / TanStack Query hooks used ONLY by this page
+│   │   ├── dialogs/         # Dialogs / Modals used ONLY by this page
+│   │   ├── schemas/         # Formik + Yup validation schemas for this page
+│   │   ├── types.ts         # Types/DTOs scoped to this page
+│   │   └── index.tsx        # Page entry component
+├── providers/               # Global Context Providers (Auth, Theme, Sidebar)
+├── services/                # SHARED API service layer only (used across 2+ pages)
+│   ├── apiClient.ts         # Axios client instance with auth interceptors
+│   ├── auth.service.ts      # Authentication service
+│   ├── user.service.ts      # User profile & shop management service
+│   └── category.service.ts  # Category service (shared across AdminCategoryPage & CategoryNav)
+├── stores/                  # Zustand stores (authStore, cartStore)
+└── styles/                  # Global CSS styles & Tailwind configuration
 ```
+
+### 📐 Mandatory Frontend Architectural Rules
+
+1. **Locality / Colocation Principle**:
+   - Every page owns its own `components/`, `services/`, `hooks/`, `dialogs/`, `schemas/`, and `types.ts`.
+   - **Shared Only When Truly Shared**: DO NOT place any component, hook, dialog, or service into root `src/components/`, `src/services/`, or `src/hooks/` unless it is actively imported by **two or more distinct pages**.
+   - If an artifact is only used by one page, it **MUST** reside within that page's directory.
+2. **Form Handling: Formik + Yup**:
+   - All forms must use **Formik** (`<Formik>`, `<Form>`, `Field` or `FormikField`) paired with **Yup** for schema validation.
+   - Form schemas must be placed in `schemas/<feature>.schema.ts` within the page.
+3. **Data Fetching: TanStack Query**:
+   - All remote data fetching and server mutations must be managed via **TanStack Query** (`useQuery`, `useMutation`).
+   - Query keys must be structured (`[domain, entity, id/filter]`).
+   - Mutations must automatically invalidate related queries upon success.
+4. **Design Tokens & Anti-AI-Slop Governance**:
+   - Adhere strictly to `frontend/DESIGN.md`: universal pill buttons (`rounded-full` / `9999px`), two-canvas polarity, Neue Haas Grotesk / Inter (`ss03` font features), and subtle hairlines.
+
 
 ## 🎨 UI Components
 
