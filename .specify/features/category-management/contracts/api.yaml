@@ -1,0 +1,439 @@
+openapi: 3.0.3
+info:
+  title: Category Management API
+  description: API specifications for Category Catalog Management (US-CAT-001) in TeamShop marketplace.
+  version: 1.0.0
+servers:
+  - url: /api/v1
+    description: Current Base Path
+
+paths:
+  /categories:
+    get:
+      summary: Retrieve active categories for public storefront
+      description: Returns a list of all active categories (`isActive: true`) sorted alphabetically by name for public navigation and product filtering.
+      operationId: getPublicCategories
+      tags:
+        - Categories (Storefront)
+      responses:
+        '200':
+          description: List of active categories retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                  - message
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Thành công
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+    post:
+      summary: Create a new category (Admin only)
+      description: Creates a new category document. The system automatically transforms `name` into a lower-case kebab-case `slug` using Vietnamese transliteration.
+      operationId: createCategory
+      tags:
+        - Categories (Admin)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCategoryRequest'
+      responses:
+        '201':
+          description: Category created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                  - message
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Thành công
+                  data:
+                    $ref: '#/components/schemas/Category'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          description: Duplicate category name collision
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Tên danh mục đã tồn tại
+
+  /categories/{slug}:
+    get:
+      summary: Retrieve single category by slug (Public storefront)
+      description: Returns active category matching given URL slug.
+      operationId: getCategoryBySlug
+      tags:
+        - Categories (Storefront)
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          description: The unique URL slug of the category
+          schema:
+            type: string
+            example: thiet-bi-dien-tu
+      responses:
+        '200':
+          description: Category retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                  - message
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Thành công
+                  data:
+                    $ref: '#/components/schemas/Category'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /categories/{id}:
+    patch:
+      summary: Update category details (Admin only)
+      description: Updates category details (name, description, imageUrl, isActive). The `slug` is immutable and cannot be updated.
+      operationId: updateCategory
+      tags:
+        - Categories (Admin)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The 24-character hexadecimal MongoDB ObjectId
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: 6701a2b3c4d5e6f7a8b9c0d1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCategoryRequest'
+      responses:
+        '200':
+          description: Category updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                  - message
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Thành công
+                  data:
+                    $ref: '#/components/schemas/Category'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Rename collision with an existing category
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Tên danh mục đã tồn tại
+    delete:
+      summary: Delete category with referential check (Admin only)
+      description: Hard deletes category if zero products are associated with it. If product count > 0, deletion is rejected with 400 Bad Request.
+      operationId: deleteCategory
+      tags:
+        - Categories (Admin)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The 24-character hexadecimal MongoDB ObjectId
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: 6701a2b3c4d5e6f7a8b9c0d1
+      responses:
+        '200':
+          description: Category deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                  - message
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Xóa danh mục thành công
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 6701a2b3c4d5e6f7a8b9c0d1
+        '400':
+          description: Cannot delete category because products are referencing it
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: Không thể xóa danh mục đang có 12 sản phẩm liên kết
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /admin/categories:
+    get:
+      summary: Retrieve all categories with product counts (Admin only)
+      description: Returns all categories (both active and inactive) along with the count of associated products for administrative catalog management.
+      operationId: getAdminCategories
+      tags:
+        - Categories (Admin)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: All categories retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                  - message
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Thành công
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdminCategory'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Category:
+      type: object
+      required:
+        - _id
+        - name
+        - slug
+        - isActive
+        - createdAt
+        - updatedAt
+      properties:
+        _id:
+          type: string
+          example: 6701a2b3c4d5e6f7a8b9c0d1
+        name:
+          type: string
+          example: Thiết Bị Điện Tử
+        slug:
+          type: string
+          example: thiet-bi-dien-tu
+        description:
+          type: string
+          example: Điện thoại, máy tính bảng và phụ kiện công nghệ
+        imageUrl:
+          type: string
+          nullable: true
+          example: https://res.cloudinary.com/teamshop/image/upload/electronics.png
+        isActive:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-10-06T00:00:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2026-10-06T00:00:00.000Z'
+
+    AdminCategory:
+      allOf:
+        - $ref: '#/components/schemas/Category'
+        - type: object
+          required:
+            - productCount
+          properties:
+            productCount:
+              type: integer
+              minimum: 0
+              example: 48
+
+    CreateCategoryRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 50
+          example: Thiết Bị Điện Tử
+        description:
+          type: string
+          maxLength: 500
+          example: Điện thoại, máy tính bảng và phụ kiện công nghệ
+        imageUrl:
+          type: string
+          format: uri
+          example: https://res.cloudinary.com/teamshop/image/upload/electronics.png
+        isActive:
+          type: boolean
+          default: true
+          example: true
+
+    UpdateCategoryRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 50
+          example: Thiết Bị Điện Tử & Gia Dụng
+        description:
+          type: string
+          maxLength: 500
+          example: Mô tả cập nhật cho danh mục điện tử
+        imageUrl:
+          type: string
+          format: uri
+          example: https://res.cloudinary.com/teamshop/image/upload/electronics-v2.png
+        isActive:
+          type: boolean
+          example: false
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Tên danh mục đã tồn tại
+        errors:
+          type: array
+          items:
+            type: string
+          example: ["Tên danh mục phải có ít nhất 2 ký tự"]
+
+  responses:
+    BadRequestError:
+      description: Bad Request / Validation Failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: Validation failed
+            errors:
+              - Tên danh mục không được để trống
+    UnauthorizedError:
+      description: Missing or invalid authentication token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: Unauthorized
+    ForbiddenError:
+      description: User lacks Admin role permission
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: Quyền truy cập bị từ chối
+    NotFoundError:
+      description: Requested category was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: Không tìm thấy danh mục

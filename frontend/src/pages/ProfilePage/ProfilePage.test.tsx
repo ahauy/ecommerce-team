@@ -2,15 +2,34 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
+import { vi } from 'vitest';
 import ProfilePage from '../ProfilePage';
 import { userService } from '@/services/user.service';
 
-jest.mock('@/services/user.service');
-jest.mock('@/components/ui/use-toast', () => ({
-  toast: jest.fn(),
+vi.mock('@/services/user.service', () => {
+  const mockService = {
+    useGetProfile: vi.fn(),
+    useUpdateProfile: vi.fn(),
+    useSetupShop: vi.fn(),
+    getProfile: vi.fn(),
+    updateProfile: vi.fn(),
+    setupShop: vi.fn(),
+  };
+  return {
+    __esModule: true,
+    userService: mockService,
+    default: mockService,
+  };
+});
+const { mockToast } = vi.hoisted(() => ({
+  mockToast: vi.fn(),
+}));
+vi.mock('@/components/ui/use-toast', () => ({
+  useToast: () => ({ toast: mockToast }),
+  toast: mockToast,
 }));
 
-const mockUserService = userService as jest.Mocked<typeof userService>;
+const mockUserService = userService as any;
 
 const renderWithProviders = (component: React.ReactNode, profileData?: any) => {
   const queryClient = new QueryClient({
@@ -35,7 +54,7 @@ const renderWithProviders = (component: React.ReactNode, profileData?: any) => {
 
 describe('ProfilePage', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('shows loading state while fetching profile', () => {
@@ -73,8 +92,8 @@ describe('ProfilePage', () => {
 
     renderWithProviders(<ProfilePage />);
 
-    expect(screen.getByText('Nguyen Van A')).toBeInTheDocument();
-    expect(screen.getByText('test@example.com')).toBeInTheDocument();
+    expect(screen.getAllByText('Nguyen Van A')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('test@example.com')[0]).toBeInTheDocument();
     expect(screen.getByText('0987654321')).toBeInTheDocument();
     expect(screen.getByText('123 Le Loi, District 1, HCMC')).toBeInTheDocument();
     expect(screen.getByText('Chưa có gian hàng')).toBeInTheDocument();

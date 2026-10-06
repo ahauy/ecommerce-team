@@ -147,10 +147,10 @@ const ProfileForm = ({ initialValues }: ProfileFormProps) => {
           <div className="flex justify-end pt-4 border-t border-zinc-200">
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !!updateProfileMutation?.isPending}
               className="h-11 rounded-full bg-black text-white hover:bg-zinc-800 active:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50"
             >
-              {isSubmitting ? 'Đang lưu...' : 'Lưu thay đổi'}
+              {isSubmitting || updateProfileMutation?.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
             </Button>
           </div>
         </Form>

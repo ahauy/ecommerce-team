@@ -20,6 +20,7 @@ const BaseUrl = {
   Profile: "/profile",
   ShopSetup: "/shop/setup",
   PublicShop: "/shops/:sellerId",
+  AdminCategories: "/admin/categories",
 };
 
 export default BaseUrl;
