@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate, Navigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Formik, Form } from 'formik';
 import { toast } from 'react-toastify';
 import AuthShell from '@/components/AuthShell';
@@ -10,16 +10,21 @@ import InputField from '@/components/customFieldsFormik/InputField';
 import BaseUrl from '@/consts/baseUrl';
 import authService from '@/services/auth.service';
 import { useAuthStore } from '@/stores/auth.store';
-import httpService from '@/services/httpService';
 import { loginSchema } from './schemas/login.schema';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const isLogged = useAuthStore((state) => state.isLogged);
-  const setAuth = useAuthStore((state) => state.setAuth);
+  const location = useLocation();
+  const status = useAuthStore((state) => state.status);
+  const setSession = useAuthStore((state) => state.setSession);
 
-  if (isLogged) {
-    return <Navigate to={BaseUrl.Homepage} replace />;
+  // Quay lại trang người dùng đang định vào trước khi bị chuyển tới /login.
+  const redirectTo =
+    (location.state as { from?: { pathname?: string } } | null)?.from?.pathname ||
+    BaseUrl.Homepage;
+
+  if (status === 'authed') {
+    return <Navigate to={redirectTo} replace />;
   }
 
   return (
@@ -49,13 +54,9 @@ const LoginPage: React.FC = () => {
               });
 
               if (res.data) {
-                setAuth(res.data.user, res.data.accessToken);
-                httpService.attachTokenToHeader(res.data.accessToken);
-                httpService.saveTokenStorage(res.data.accessToken);
-                httpService.saveUserStorage(res.data.user as any);
-
+                setSession(res.data.user, res.data.accessToken);
                 toast.success('Đăng nhập thành công!');
-                navigate(BaseUrl.Homepage);
+                navigate(redirectTo, { replace: true });
               }
             } catch (error: unknown) {
               const errResponse = (error as { response?: { data?: { message?: string } } })?.response?.data;

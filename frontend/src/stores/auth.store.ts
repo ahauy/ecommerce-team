@@ -1,37 +1,31 @@
 import { create } from 'zustand';
 
+export type AuthStatus = 'booting' | 'guest' | 'authed';
+export type AuthRole = 'customer' | 'admin';
+
 export interface AuthUser {
   id: string;
   email: string;
   fullName: string;
-  role: 'customer' | 'admin';
-  shopName: string | null;
+  role: AuthRole;
 }
 
 interface AuthState {
+  /** booting: chưa biết phiên còn hiệu lực không (đang gọi /auth/refresh). */
+  status: AuthStatus;
   user: AuthUser | null;
+  /** Chỉ giữ trong memory — không ghi localStorage. */
   accessToken: string | null;
-  isLogged: boolean;
-  setAuth: (user: AuthUser, accessToken: string) => void;
+  setSession: (user: AuthUser, accessToken: string) => void;
   setAccessToken: (accessToken: string) => void;
-  clearAuth: () => void;
+  clear: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
+  status: 'booting',
   user: null,
   accessToken: null,
-  isLogged: false,
-  setAuth: (user, accessToken) =>
-    set({
-      user,
-      accessToken,
-      isLogged: true,
-    }),
+  setSession: (user, accessToken) => set({ status: 'authed', user, accessToken }),
   setAccessToken: (accessToken) => set({ accessToken }),
-  clearAuth: () =>
-    set({
-      user: null,
-      accessToken: null,
-      isLogged: false,
-    }),
+  clear: () => set({ status: 'guest', user: null, accessToken: null }),
 }));
