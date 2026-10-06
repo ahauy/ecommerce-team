@@ -12,6 +12,7 @@ import { ShopsModule } from './shops/shops.module';
 import { AdminModule } from './admin/admin.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ProductsModule } from './products/products.module';
     AdminModule,
     CategoriesModule,
     ProductsModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [
