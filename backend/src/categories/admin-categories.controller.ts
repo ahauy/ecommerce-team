@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Controller,
   Get,
@@ -36,7 +37,7 @@ import { CategoryDocument } from './schemas/category.schema';
 @Roles(UserRole.ADMIN)
 @ApiBearerAuth()
 export class AdminCategoriesController {
-  constructor(private readonly categoriesService: CategoriesService) {}
+  constructor(private readonly categoriesService: CategoriesService) { }
 
   @Get('admin/categories')
   @ApiOperation({
