@@ -34,6 +34,7 @@ import Todos from "./pages/Todos";
 import ProfilePage from "./pages/ProfilePage";
 import ShopSetupPage from "./pages/ShopSetupPage";
 import PublicShopPage from "./pages/PublicShopPage";
+import AdminCategoryPage from "./pages/AdminCategoryPage";
 
 const ErrorFallback = ({ error, resetErrorBoundary }: any) => {
   return (
@@ -99,6 +100,7 @@ const App = () => {
             <Route path={BaseUrl.ChangePassword} element={<ChangePassword />} />
             <Route path={BaseUrl.Profile} element={<ProfilePage />} />
             <Route path={BaseUrl.ShopSetup} element={<ShopSetupPage />} />
+            <Route path={BaseUrl.AdminCategories} element={<AdminCategoryPage />} />
           </Route>
 
           <Route
