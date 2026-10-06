@@ -52,13 +52,12 @@ describe('CategoriesService', () => {
           _id: 'cat-1',
           name: 'Đồ Gia Dụng',
           slug: 'do-gia-dung',
-          isActive: true,
+          imageUrl: 'https://example.com/gia-dung.png',
         },
         {
           _id: 'cat-2',
           name: 'Thời Trang',
           slug: 'thoi-trang',
-          isActive: true,
         },
       ];
       const mockChain = queryResult(active);
@@ -66,9 +65,18 @@ describe('CategoriesService', () => {
 
       const result = await service.findActive();
       expect(mockCategoryModel.find).toHaveBeenCalledWith({ isActive: true });
+      expect(mockChain.select).toHaveBeenCalledWith('name slug imageUrl');
       expect(mockChain.sort).toHaveBeenCalledWith({ name: 1 });
       expect(mockChain.collation).toHaveBeenCalledWith({ locale: 'vi' });
-      expect(result).toEqual(active);
+      expect(result).toEqual([
+        {
+          id: 'cat-1',
+          name: 'Đồ Gia Dụng',
+          slug: 'do-gia-dung',
+          imageUrl: 'https://example.com/gia-dung.png',
+        },
+        { id: 'cat-2', name: 'Thời Trang', slug: 'thoi-trang', imageUrl: null },
+      ]);
     });
 
     it('should return an empty array if no active categories exist', async () => {

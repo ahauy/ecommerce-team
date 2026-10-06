@@ -27,7 +27,7 @@ describe('categoryService', () => {
   describe('getCategories', () => {
     it('unwraps enveloped API response', async () => {
       const mockCategories = [
-        { _id: '1', name: 'Gia dụng', slug: 'gia-dung', description: '', isActive: true },
+        { id: '1', name: 'Gia dụng', slug: 'gia-dung', imageUrl: null },
       ];
       (apiClient.get as any).mockResolvedValueOnce({
         data: { success: true, message: 'Thành công', data: mockCategories },
@@ -40,7 +40,7 @@ describe('categoryService', () => {
 
     it('handles direct array response if not enveloped', async () => {
       const mockCategories = [
-        { _id: '2', name: 'Thời trang', slug: 'thoi-trang', description: '', isActive: true },
+        { id: '2', name: 'Thời trang', slug: 'thoi-trang', imageUrl: null },
       ];
       (apiClient.get as any).mockResolvedValueOnce({ data: mockCategories });
 

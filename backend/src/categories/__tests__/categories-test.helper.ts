@@ -16,6 +16,7 @@ export const queryResult = <T>(val: T) => {
   const queryChain: Record<string, jest.Mock> = {
     exec: jest.fn().mockResolvedValue(val),
   };
+  queryChain.select = jest.fn().mockReturnValue(queryChain);
   queryChain.sort = jest.fn().mockReturnValue(queryChain);
   queryChain.collation = jest.fn().mockReturnValue(queryChain);
   queryChain.lean = jest.fn().mockReturnValue(queryChain);

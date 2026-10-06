@@ -9,7 +9,10 @@ import { Model, Connection, Types } from 'mongoose';
 import { Category, CategoryDocument } from './schemas/category.schema';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { AdminCategoryResponseDto } from './dto/category-response.dto';
+import {
+  AdminCategoryResponseDto,
+  PublicCategoryResponseDto,
+} from './dto/category-response.dto';
 import { slugifyVietnamese } from './utils/slugify.util';
 
 @Injectable()
@@ -21,13 +24,21 @@ export class CategoriesService {
     private readonly connection: Connection,
   ) {}
 
-  async findActive(): Promise<CategoryDocument[]> {
-    return this.categoryModel
+  async findActive(): Promise<PublicCategoryResponseDto[]> {
+    const categories = await this.categoryModel
       .find({ isActive: true })
+      .select('name slug imageUrl')
       .sort({ name: 1 })
       .collation({ locale: 'vi' })
       .lean<CategoryDocument[]>()
       .exec();
+
+    return categories.map((cat) => ({
+      id: cat._id.toString(),
+      name: cat.name,
+      slug: cat.slug,
+      imageUrl: cat.imageUrl || null,
+    }));
   }
 
   async findBySlug(slug: string): Promise<CategoryDocument> {

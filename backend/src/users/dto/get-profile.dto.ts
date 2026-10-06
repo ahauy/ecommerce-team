@@ -38,9 +38,6 @@ export class GetProfileResponseDto {
   @ApiProperty({ example: true })
   isActive: boolean;
 
-  @ApiProperty({ example: 1 })
-  version: number;
-
   @ApiPropertyOptional({ type: ShopProfileDto, nullable: true })
   @IsOptional()
   @ValidateNested()
