@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import DeleteWarningDialog from '../dialogs/DeleteWarningDialog';
-import { AdminCategoryItem } from '@/interfaces/category';
+import { AdminCategoryItem } from '@/types/category.types';
 
 describe('DeleteWarningDialog Component (Stitch Screen 2)', () => {
   const blockedCategory: AdminCategoryItem = {

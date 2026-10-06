@@ -1,4 +1,4 @@
-import { UserInfo } from "@/interfaces/user";
+import { UserInfo } from "@/types/user.types";
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 
 export const TOKEN_KEY = "token";

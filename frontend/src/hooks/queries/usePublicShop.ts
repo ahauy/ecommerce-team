@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { shopService } from '../services/shop.service';
+import { shopService } from '@/services/shop.service';
 
 export const SHOP_KEY = (sellerId: string) => ['shop', 'public', sellerId];
 

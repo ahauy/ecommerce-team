@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import AdminCategoryPage from '../index';
 import { categoryService } from '@/services/category.service';
-import { AdminCategoryItem } from '@/interfaces/category';
+import { AdminCategoryItem } from '@/types/category.types';
 
 const { mockUseAdminCategories, mockUseDeleteCategory } = vi.hoisted(() => ({
   mockUseAdminCategories: vi.fn(),

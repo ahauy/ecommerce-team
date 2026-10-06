@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { AdminCategoryItem } from '@/interfaces/category';
+import { AdminCategoryItem } from '@/types/category.types';
 import { AlertCircle, AlertTriangle, X, Package, Folder } from 'lucide-react';
 
 export interface DeleteWarningDialogProps {

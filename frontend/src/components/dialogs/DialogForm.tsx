@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { DialogI } from "@/interfaces/common";
+import { DialogI } from "@/types/common.types";
 import ExampleComponents from "../Examples/ExampleComponents";
 
 interface DialogProps extends DialogI<any> {}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AdminCategoryItem } from '@/interfaces/category';
+import { AdminCategoryItem } from '@/types/category.types';
 import { Folder } from 'lucide-react';
 
 export interface AdminCategoryListTableProps {

@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { DialogI } from "@/interfaces/common";
+import { DialogI } from "@/types/common.types";
 import { Button } from "../ui/button";
 import { Form, Formik } from "formik";
 import { useTranslation } from "react-i18next";

@@ -1,5 +1,5 @@
 import { twMerge } from "tailwind-merge";
-import { AdditionalFormikProps, SelectOption } from "@/interfaces/common";
+import { AdditionalFormikProps, SelectOption } from "@/types/common.types";
 import { Label } from "../ui/label";
 import { get, isString } from "lodash";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { X, Lock, Check, Image as ImageIcon, Trash2 } from 'lucide-react';
-import { AdminCategoryItem, CreateCategoryPayload, UpdateCategoryPayload } from '@/interfaces/category';
+import { AdminCategoryItem, CreateCategoryPayload, UpdateCategoryPayload } from '@/types/category.types';
 import { categoryService } from '@/services/category.service';
 import { slugifyVietnamese } from '@/helpers/slugify';
 import { showError, showSuccess } from '@/helpers/toast';

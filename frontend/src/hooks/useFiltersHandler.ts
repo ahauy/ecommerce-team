@@ -1,4 +1,4 @@
-import { CommonFilters, Order } from "@/interfaces/common";
+import { CommonFilters, Order } from "@/types/common.types";
 import { cloneDeep, get } from "lodash";
 import React, { useCallback } from "react";
 

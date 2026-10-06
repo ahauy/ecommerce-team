@@ -1,5 +1,5 @@
 import React from "react";
-import { AdditionalFormikProps, SelectOption } from "@/interfaces/common";
+import { AdditionalFormikProps, SelectOption } from "@/types/common.types";
 import { Label } from "../ui/label";
 import { twMerge } from "tailwind-merge";
 import { get, isString } from "lodash";

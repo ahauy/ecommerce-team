@@ -28,79 +28,73 @@ ecommerce-team/              ← root repo (2 project độc lập, KHÔNG có p
 
 ## Frontend Folder Structure
 
-> Cây dưới đây là **đích đến**. Template hiện có `HOCs/`, `consts/`, `helpers/`, `interfaces/`, `i18n/`, `providers/`, `layouts/` và `stores/useStores.ts`. **Giữ nguyên cấu trúc template**, chỉ thêm thư mục/file mới (`pages/seller`, `pages/admin`, `services/*.service.ts`...) — không refactor template trong 1 tuần.
+> Giữ khung của template (`HOCs/`, `consts/`, `helpers/`, `i18n/`, `providers/`, `layouts/`), chỉ sắp xếp lại cho nhất quán. **Không refactor sâu trong 1 tuần.**
+
+### Nguyên tắc đặt file
+
+| Loại code | Đặt ở | Lý do |
+| --- | --- | --- |
+| Gọi API (axios) | `services/<domain>.service.ts` | 1 domain được nhiều page dùng chung (product: list, detail, my-products, admin, shop) |
+| Type / interface / DTO | `types/<domain>.types.ts` | Không copy type giữa các page, đổi API chỉ sửa 1 chỗ |
+| Hook TanStack Query | `hooks/queries/use<Domain>.ts` | Query key và invalidate tập trung theo domain |
+| Zustand store | `stores/<name>.store.ts` | Chỉ cho state client (auth, cart) |
+| Route + guard | `routes/` | `App.tsx` chỉ còn providers |
+| Yup schema, component con, dialog, test **chỉ của 1 page** | trong thư mục page đó | Đây là thứ duy nhất nên nằm trong page |
+
+> **KHÔNG** đặt `services/`, `types.ts`, `hooks/` bên trong thư mục page.
+
+### Cây thư mục
 
 ```
 frontend/
 ├── src/
 │   ├── main.tsx
-│   ├── App.tsx                   # Router setup
+│   ├── App.tsx                   # Providers + <Router><AppRoutes /></Router>
 │   │
-│   ├── assets/                   # Images, fonts
-│   ├── components/               # Shared UI components
-│   │   ├── ui/                   # shadcn/ui generated components
-│   │   └── shared/               # Custom shared components
-│   │
-│   ├── hooks/                    # Custom hooks (useAuth, useCart...)
-│   ├── lib/                      # utils, cn helper, axios instance
-│   ├── stores/                   # Zustand stores
-│   │   ├── auth.store.ts
-│   │   └── cart.store.ts
-│   │
-│   ├── services/                 # API calls (grouped by module)
-│   │   ├── auth.service.ts
-│   │   ├── product.service.ts
-│   │   ├── cart.service.ts
-│   │   ├── order.service.ts
-│   │   ├── user.service.ts           # /users/me, /users/me/shop
-│   │   └── shop.service.ts           # /shops/:sellerId
-│   │
-│   ├── pages/                    # Route-level components
-│   │   ├── auth/
-│   │   │   ├── LoginPage.tsx
-│   │   │   └── RegisterPage.tsx
-│   │   ├── products/
-│   │   │   ├── ProductListPage.tsx
-│   │   │   └── ProductDetailPage.tsx
-│   │   ├── cart/
-│   │   │   └── CartPage.tsx
-│   │   ├── checkout/
-│   │   │   ├── CheckoutPage.tsx
-│   │   │   ├── OrderSuccessPage.tsx
-│   │   │   └── OrderFailPage.tsx
-│   │   ├── orders/
-│   │   │   └── OrderHistoryPage.tsx  # đơn đã mua
-│   │   ├── shop/
-│   │   │   └── ShopPage.tsx          # trang công khai của 1 gian hàng
-│   │   ├── profile/
-│   │   │   └── ProfilePage.tsx
-│   │   ├── seller/                   # "Kênh người bán" (PrivateRoute)
-│   │   │   ├── ShopSetupPage.tsx     # thiết lập shopName, pickupAddress
-│   │   │   ├── MyProductsPage.tsx    # Sản phẩm của tôi
-│   │   │   ├── ProductFormPage.tsx   # Thêm / sửa SP + upload ảnh
-│   │   │   └── SellerOrdersPage.tsx  # Đơn bán + nút Giao hàng / Đã giao / Hủy
-│   │   └── admin/
-│   │       ├── AdminDashboard.tsx
-│   │       ├── AdminProducts.tsx     # xem mọi SP, block / unblock
-│   │       ├── AdminCategories.tsx
-│   │       ├── AdminOrders.tsx
-│   │       └── AdminUsers.tsx
-│   │
-│   ├── routes/                   # Route config + guards
+│   ├── routes/
+│   │   ├── index.tsx             # Toàn bộ <Routes>, Suspense, ErrorBoundary
 │   │   ├── PrivateRoute.tsx      # Redirect nếu chưa login
-│   │   ├── AdminRoute.tsx        # Redirect nếu không phải admin
-│   │   └── index.tsx
+│   │   └── AdminRoute.tsx        # (sẽ thêm) sau khi thống nhất auth
 │   │
-│   ├── types/                    # Shared TypeScript types
-│   │   ├── auth.types.ts
-│   │   ├── product.types.ts
-│   │   ├── shop.types.ts
-│   │   └── order.types.ts            # Order, Checkout
+│   ├── layouts/                  # DefaultLayout, ...
+│   ├── pages/                    # Gom theo nhóm; mỗi page là 1 thư mục
+│   │   ├── auth/                 # LoginPage, RegisterPage, ForgotPassword, ChangePassword
+│   │   ├── home/                 # Homepage
+│   │   ├── products/             # (sẽ thêm) ProductListPage, ProductDetailPage
+│   │   ├── cart/  checkout/  orders/   # (sẽ thêm)
+│   │   ├── shop/                 # PublicShopPage
+│   │   ├── profile/              # ProfilePage
+│   │   ├── seller/               # ShopSetupPage, (sẽ thêm) MyProductsPage, ProductFormPage, SellerOrdersPage
+│   │   ├── admin/                # AdminCategoryPage, (sẽ thêm) AdminProducts, AdminOrders, AdminUsers
+│   │   └── errors/               # Page404
+│   │       └── <PageName>/
+│   │           ├── index.tsx
+│   │           ├── components/   # chỉ của page này
+│   │           ├── dialogs/
+│   │           ├── schemas/      # Yup
+│   │           └── __tests__/
 │   │
-│   └── locales/                  # i18n
-│       ├── vi.json
-│       └── en.json
+│   ├── services/                 # API calls, nhóm theo domain
+│   │   ├── apiClient.ts          # axios instance + refresh token interceptor
+│   │   ├── auth.service.ts  user.service.ts  shop.service.ts  category.service.ts
+│   │   └── (sẽ thêm) product.service.ts  cart.service.ts  order.service.ts
+│   │
+│   ├── hooks/
+│   │   ├── queries/              # hook TanStack Query theo domain (usePublicShop, ...)
+│   │   └── use*.ts               # hook UI dùng chung
+│   │
+│   ├── types/                    # *.types.ts theo domain: common, user, category, product, shop, (order)
+│   ├── stores/                   # auth.store.ts, (sẽ thêm) cart.store.ts
+│   │
+│   ├── components/
+│   │   ├── ui/                   # shadcn/ui generated
+│   │   └── ...                   # component dùng chung (Navbar, Sidebar, CategoryNav, customFieldsFormik, dialogs)
+│   │
+│   ├── providers/  HOCs/  consts/  helpers/  lib/
+│   ├── i18n/                     # vi / en
+│   └── styles/  assets/  test/  @types/
 │
+├── DESIGN.md
 ├── .env.example
 ├── vite.config.ts
 └── package.json

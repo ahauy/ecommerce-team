@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import BaseUrl from '@/consts/baseUrl';
 import { Store, Calendar, Package, ArrowLeft, AlertCircle } from 'lucide-react';
-import { usePublicShop } from './hooks/usePublicShop';
+import { usePublicShop } from '@/hooks/queries/usePublicShop';
 
 const formatJoinedDate = (dateStr?: string | null): string => {
   if (!dateStr) return '';

@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import CategoryFormDrawer from '../components/CategoryFormDrawer';
 import { categoryService } from '@/services/category.service';
-import { AdminCategoryItem } from '@/interfaces/category';
+import { AdminCategoryItem } from '@/types/category.types';
 
 const { mockUseCreateCategory, mockUseUpdateCategory } = vi.hoisted(() => ({
   mockUseCreateCategory: vi.fn(),

@@ -8,7 +8,7 @@ import {
   UpdateCategoryPayload,
   DeleteCategoryResponse,
   ApiResponseEnvelope,
-} from '@/interfaces/category';
+} from '@/types/category.types';
 
 export const CATEGORY_QUERY_KEYS = {
   publicList: ['categories', 'public'] as const,

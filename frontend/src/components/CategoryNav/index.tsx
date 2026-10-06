@@ -1,6 +1,6 @@
 import React from 'react';
 import { categoryService } from '@/services/category.service';
-import { PublicCategoryItem } from '@/interfaces/category';
+import { PublicCategoryItem } from '@/types/category.types';
 
 export interface CategoryNavProps {
   selectedSlug?: string;

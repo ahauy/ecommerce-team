@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from "axios";
 import httpService from "../../../services/httpService";
-import { PromiseResponseBase } from "@/interfaces/common";
+import { PromiseResponseBase } from "@/types/common.types";
 import { RequestAddNewTodo, RequestGetTodos, Todo } from "@/pages/Todos/types";
 
 class TodoService {

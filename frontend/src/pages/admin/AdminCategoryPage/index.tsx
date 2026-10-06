@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Plus, Search, AlertCircle, RefreshCw } from 'lucide-react';
-import { AdminCategoryItem } from '@/interfaces/category';
+import { AdminCategoryItem } from '@/types/category.types';
 import { categoryService } from '@/services/category.service';
 import AdminCategoryListTable from './components/AdminCategoryListTable';
 import CategoryFormDrawer from './components/CategoryFormDrawer';

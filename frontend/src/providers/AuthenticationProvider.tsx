@@ -7,7 +7,7 @@ import {
 } from "react";
 import { PERMISSION_ENUM } from "@/consts/common";
 import httpService from "@/services/httpService";
-import { UserInfo } from "@/interfaces/user";
+import { UserInfo } from "@/types/user.types";
 import { toast } from "react-toastify";
 import BaseUrl from "@/consts/baseUrl";
 
