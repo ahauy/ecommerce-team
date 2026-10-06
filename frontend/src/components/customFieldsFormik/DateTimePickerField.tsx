@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { InputProps } from "../ui/input";
-import { AdditionalFormikProps, TimeValue } from "@/interfaces/common";
+import { AdditionalFormikProps, TimeValue } from "@/types/common.types";
 import { Label } from "../ui/label";
 import { twMerge } from "tailwind-merge";
 import { get, isString } from "lodash";

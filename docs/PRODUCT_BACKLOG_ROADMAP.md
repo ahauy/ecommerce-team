@@ -15,7 +15,7 @@ schema-version: "1.3"
 
 > **Sản phẩm:** `Ecommerce Team Project` — Sàn thương mại điện tử **nhiều người bán** (kiểu Shopee thu gọn): user vừa **đăng bán** vừa **mua** SP vật lý. Luồng: đăng bán SP → xem SP → giỏ hàng → checkout (tách đơn theo người bán) → thanh toán VNPay → người bán xử lý đơn.  
 > **Cập nhật lần cuối:** `2026-10-06`  
-> **Trạng thái tài liệu:** Living Document — Quản lý tiến độ và đồng bộ với `/command-continue-project`
+> **Trạng thái tài liệu:** Living Document — Quản lý tiến độ và đồng bộ với `/command-continue-project` (hoặc `/command-continue-frontend` cho Frontend)
 >
 > **Ký hiệu trạng thái:**
 >

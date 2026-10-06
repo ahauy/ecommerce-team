@@ -1,7 +1,6 @@
 import axios from 'axios';
-import { AuthUser } from '@/stores/auth.store';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import { API_PREFIX } from '@/lib/env';
+import type { AuthUser } from '@/stores/auth.store';
 
 export interface RegisterPayload {
   email: string;
@@ -32,9 +31,13 @@ export interface ApiResponse<T> {
   errors?: string[];
 }
 
+/**
+ * Axios riêng cho /auth/*: không có interceptor refresh (tránh vòng lặp)
+ * và không unwrap envelope — các hàm dưới đây trả nguyên ApiResponse<T>.
+ */
 export const authApiClient = axios.create({
-  baseURL: `${API_BASE_URL}/api/v1`,
-  withCredentials: true, // sends httpOnly cookie on /auth/* requests
+  baseURL: API_PREFIX,
+  withCredentials: true, // gửi httpOnly refresh cookie
 });
 
 export const authService = {

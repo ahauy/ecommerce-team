@@ -50,10 +50,11 @@ export const userService = {
     return response.data;
   },
 
-  useGetProfile: () => {
+  useGetProfile: (enabled = true) => {
     return useQuery({
       queryKey: USER_PROFILE_KEY,
       queryFn: userService.getProfile,
+      enabled,
     });
   },
 
