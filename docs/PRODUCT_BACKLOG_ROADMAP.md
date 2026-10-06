@@ -14,7 +14,7 @@ schema-version: "1.3"
 # 🗺️ Product Backlog & Execution Roadmap
 
 > **Sản phẩm:** `Ecommerce Team Project` — Sàn thương mại điện tử **nhiều người bán** (kiểu Shopee thu gọn): user vừa **đăng bán** vừa **mua** SP vật lý. Luồng: đăng bán SP → xem SP → giỏ hàng → checkout (tách đơn theo người bán) → thanh toán VNPay → người bán xử lý đơn.  
-> **Cập nhật lần cuối:** `2026-10-02`  
+> **Cập nhật lần cuối:** `2026-10-06`  
 > **Trạng thái tài liệu:** Living Document — Quản lý tiến độ và đồng bộ với `/command-continue-project`
 >
 > **Ký hiệu trạng thái:**
@@ -97,7 +97,7 @@ schema-version: "1.3"
   ├── [x] US-AUTH-001: Đăng ký & Đăng nhập
   ├── [x] US-AUTH-002: JWT Refresh Token & Logout
   ├── [x] US-SELL-001: Profile & Thiết lập gian hàng (/users/me, shop)
-  ├── US-CAT-001:  Quản lý Category (Admin CRUD)
+  ├── [x] US-CAT-001:  Quản lý Category (Admin CRUD)
   ├── US-PRD-001:  Đăng bán & quản lý Product (Seller own / Admin all + Cloudinary Upload)
   ├── US-PRD-002:  Tìm kiếm & Lọc sản phẩm (Public)
   └── US-CART-001: Giỏ hàng Guest (localStorage) + Customer (DB) + Merge
@@ -227,7 +227,7 @@ schema-version: "1.3"
 
 ---
 
-- [ ] **US-CAT-001**: Quản lý Category (Admin CRUD)
+- [x] **US-CAT-001**: Quản lý Category (Admin CRUD)
   - **Slug:** `category-management`
   - **Effort:** M
   - **Context-budget:** single-session
@@ -236,16 +236,16 @@ schema-version: "1.3"
   - **Blocks:** `US-PRD-001`
   - **Mô tả:** Admin có thể tạo, sửa, xóa danh mục sản phẩm (danh mục dùng chung toàn sàn — người bán chỉ chọn). Người dùng có thể xem danh sách danh mục để lọc sản phẩm.
   - **Acceptance Criteria (AC):**
-    - [ ] `GET /api/v1/categories` (public) → trả về danh sách category đang active.
-    - [ ] `POST /api/v1/categories` (Admin) → tạo category mới, `slug` tự động từ `name`.
-    - [ ] `POST /api/v1/categories` với tên trùng → trả về 409 Conflict.
-    - [ ] `PATCH /api/v1/categories/:id` (Admin) → cập nhật tên/mô tả/ảnh.
-    - [ ] `DELETE /api/v1/categories/:id` khi còn sản phẩm (của bất kỳ shop nào) đang dùng → trả về 400 với thông báo rõ ràng.
-    - [ ] FE Admin: Màn hình danh sách category, form tạo/sửa, nút xóa với confirm.
-    - [ ] FE Public: Danh mục hiển thị trên sidebar/nav để lọc sản phẩm.
+    - [x] `GET /api/v1/categories` (public) → trả về danh sách category đang active.
+    - [x] `POST /api/v1/categories` (Admin) → tạo category mới, `slug` tự động từ `name`.
+    - [x] `POST /api/v1/categories` với tên trùng → trả về 409 Conflict.
+    - [x] `PATCH /api/v1/categories/:id` (Admin) → cập nhật tên/mô tả/ảnh.
+    - [x] `DELETE /api/v1/categories/:id` khi còn sản phẩm (của bất kỳ shop nào) đang dùng → trả về 400 với thông báo rõ ràng.
+    - [x] FE Admin: Màn hình danh sách category, form tạo/sửa, nút xóa với confirm.
+    - [x] FE Public: Danh mục hiển thị trên sidebar/nav để lọc sản phẩm.
   - **Tasks:**
-    - [ ] **Backend:** `Category schema (name unique, slug, description, imageUrl, isActive)` · `CRUD endpoints` · `Validate no-delete khi có product` · `RolesGuard`
-    - [ ] **Frontend:** `Admin: CategoryList, CategoryForm components` · `Public: CategoryNav/Sidebar`
+    - [x] **Backend:** `Category schema (name unique, slug, description, imageUrl, isActive)` · `CRUD endpoints` · `Validate no-delete khi có product` · `RolesGuard`
+    - [x] **Frontend:** `Admin: CategoryList, CategoryForm components` · `Public: CategoryNav/Sidebar`
   - **Stitch Screens (`projects/6249429078653284294`):**
     - `projects/6249429078653284294/screens/920a53a998bd4e8e8b0b16ec16a08793` ("Admin danh mục #1")
     - `projects/6249429078653284294/screens/4ff01870d2a9498b8f48f72196b0383c` ("Admin danh mục #2")
