@@ -1,6 +1,6 @@
 import React from 'react';
 import { userService } from '@/services/user.service';
-import ShopSetupForm from '@/components/ShopSetupForm';
+import ShopSetupForm from './components/ShopSetupForm';
 import { Store, ShieldCheck } from 'lucide-react';
 
 const ShopSetupPage: React.FC = () => {

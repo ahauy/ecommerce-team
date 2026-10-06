@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
 import { X, Lock, Check, Image as ImageIcon, Trash2 } from 'lucide-react';
 import { AdminCategoryItem, CreateCategoryPayload, UpdateCategoryPayload } from '@/interfaces/category';
 import { categoryService } from '@/services/category.service';
@@ -14,7 +13,7 @@ export interface CategoryFormDrawerProps {
   onSuccess: () => void;
 }
 
-import { CategorySchema, CategoryFormValues } from './category.schema';
+import { CategorySchema, CategoryFormValues } from '../schemas/category.schema';
 
 export const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
   isOpen,

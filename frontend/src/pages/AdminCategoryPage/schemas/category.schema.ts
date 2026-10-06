@@ -20,3 +20,5 @@ export const CategorySchema = Yup.object().shape({
     .nullable(),
   isActive: Yup.boolean().required(),
 });
+
+export default CategorySchema;

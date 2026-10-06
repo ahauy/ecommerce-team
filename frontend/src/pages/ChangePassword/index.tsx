@@ -3,7 +3,7 @@ import InputField from "@/components/customFieldsFormik/InputField";
 import PageWrapper from "@/components/PageWrapper";
 import { Button } from "@/components/ui/button";
 import { Form, Formik } from "formik";
-import * as Yup from "yup";
+import { changePasswordSchema } from "./schemas/changePassword.schema";
 
 const ChangePassword = () => {
   return (
@@ -14,14 +14,7 @@ const ChangePassword = () => {
         </h1>
         <Formik
           initialValues={{ nextPassword: "", confirmPassword: "" }}
-          validationSchema={Yup.object().shape({
-            nextPassword: Yup.string().required(
-              "New password is required field!"
-            ),
-            confirmPassword: Yup.string().required(
-              "Confirm password is required field!"
-            ),
-          })}
+          validationSchema={changePasswordSchema}
           onSubmit={() => {}}
         >
           {() => {
@@ -45,7 +38,7 @@ const ChangePassword = () => {
                   placeholder="Confirm your new password"
                 />
 
-                <Button type="submit">Submit</Button>
+                <Button type="submit" className="rounded-full">Submit</Button>
               </Form>
             );
           }}

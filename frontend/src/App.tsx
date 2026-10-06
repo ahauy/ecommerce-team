@@ -15,6 +15,7 @@ import {
 import Page404 from "@/pages/Page404";
 
 import { ToastContainer } from "react-toastify";
+import { Toaster } from "@/components/ui/toaster";
 import { ErrorBoundary } from "react-error-boundary";
 import PrivateRoute from "@/components/PrivateRoute";
 import AuthenticationProvider from "./providers/AuthenticationProvider";
@@ -24,8 +25,8 @@ import Loading from "./components/ui/loading";
 import SidebarProvider from "./providers/SidebarProvider";
 import { showError } from "./helpers/toast";
 import BaseUrl from "./consts/baseUrl";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import ForgotPassword from "./pages/ForgotPassword";
 import DefaultLayout from "./layouts/DefaultLayout";
 import Homepage from "./pages/Homepage";
@@ -72,8 +73,8 @@ const App = () => {
     return (
       <Router>
         <Routes>
-          <Route path={BaseUrl.Login} element={<Login />} />
-          <Route path={BaseUrl.Register} element={<Register />} />
+          <Route path={BaseUrl.Login} element={<LoginPage />} />
+          <Route path={BaseUrl.Register} element={<RegisterPage />} />
           <Route path={BaseUrl.ForgotPassword} element={<ForgotPassword />} />
           <Route
             path={BaseUrl.Homepage}
@@ -132,6 +133,7 @@ const App = () => {
             <SidebarProvider>
               {renderContent()}
               <ToastContainer />
+              <Toaster />
             </SidebarProvider>
           </AuthenticationProvider>
         </QueryClientProvider>

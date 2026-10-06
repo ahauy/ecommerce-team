@@ -1,67 +1,65 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { Formik, Form } from 'formik';
-import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 import AuthShell from '@/components/AuthShell';
+import CommonIcons from '@/components/commonIcons';
 import { Button } from '@/components/ui/button';
 import FormikField from '@/components/customFieldsFormik/FormikField';
 import InputField from '@/components/customFieldsFormik/InputField';
 import BaseUrl from '@/consts/baseUrl';
 import authService from '@/services/auth.service';
+import { useAuthStore } from '@/stores/auth.store';
+import httpService from '@/services/httpService';
+import { loginSchema } from './schemas/login.schema';
 
-const validationSchema = Yup.object().shape({
-  fullName: Yup.string()
-    .trim()
-    .required('Họ và tên không được để trống'),
-  email: Yup.string()
-    .trim()
-    .email('Email không đúng định dạng')
-    .required('Email không được để trống'),
-  password: Yup.string()
-    .min(8, 'Mật khẩu phải có tối thiểu 8 ký tự')
-    .required('Mật khẩu không được để trống'),
-  confirmPassword: Yup.string()
-    .required('Vui lòng xác nhận mật khẩu')
-    .oneOf([Yup.ref('password')], 'Mật khẩu xác nhận không khớp'),
-});
-
-const Register: React.FC = () => {
+const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const isLogged = useAuthStore((state) => state.isLogged);
+  const setAuth = useAuthStore((state) => state.setAuth);
+
+  if (isLogged) {
+    return <Navigate to={BaseUrl.Homepage} replace />;
+  }
 
   return (
     <AuthShell>
       <div className="space-y-6">
         <div className="text-center">
           <h1 className="text-[28px] font-medium leading-tight tracking-tight text-black font-display">
-            Tạo tài khoản
+            Đăng nhập
           </h1>
           <p className="mt-2 text-sm text-zinc-500">
-            Điền các thông tin bên dưới để bắt đầu
+            Đăng nhập để mua sắm và quản lý gian hàng của bạn.
           </p>
         </div>
 
         <Formik
           initialValues={{
-            fullName: '',
             email: '',
             password: '',
-            confirmPassword: '',
           }}
-          validationSchema={validationSchema}
+          validationSchema={loginSchema}
           onSubmit={async (values, { setSubmitting, setStatus }) => {
             setStatus(null);
             try {
-              await authService.register({
-                fullName: values.fullName,
+              const res = await authService.login({
                 email: values.email,
                 password: values.password,
               });
-              toast.success('Đăng ký thành công! Vui lòng đăng nhập.');
-              navigate(BaseUrl.Login);
+
+              if (res.data) {
+                setAuth(res.data.user, res.data.accessToken);
+                httpService.attachTokenToHeader(res.data.accessToken);
+                httpService.saveTokenStorage(res.data.accessToken);
+                httpService.saveUserStorage(res.data.user as any);
+
+                toast.success('Đăng nhập thành công!');
+                navigate(BaseUrl.Homepage);
+              }
             } catch (error: unknown) {
               const errResponse = (error as { response?: { data?: { message?: string } } })?.response?.data;
-              const message = errResponse?.message || 'Đăng ký không thành công. Vui lòng thử lại.';
+              const message = errResponse?.message || 'Email hoặc mật khẩu không chính xác';
               setStatus(message);
               toast.error(message);
             } finally {
@@ -72,18 +70,10 @@ const Register: React.FC = () => {
           {({ isSubmitting, status }) => (
             <Form className="flex flex-col gap-5">
               {status && (
-                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-[13px] text-red-700">
                   {status}
                 </div>
               )}
-
-              <FormikField
-                component={InputField}
-                name="fullName"
-                label="Họ và tên"
-                placeholder="Nguyễn Văn A"
-                required
-              />
 
               <FormikField
                 component={InputField}
@@ -99,16 +89,7 @@ const Register: React.FC = () => {
                 name="password"
                 type="password"
                 label="Mật khẩu"
-                placeholder="Tối thiểu 8 ký tự"
-                required
-              />
-
-              <FormikField
-                component={InputField}
-                name="confirmPassword"
-                type="password"
-                label="Xác nhận mật khẩu"
-                placeholder="Nhập lại mật khẩu"
+                placeholder="Nhập mật khẩu"
                 required
               />
 
@@ -117,16 +98,19 @@ const Register: React.FC = () => {
                 className="h-11 w-full rounded-full bg-black text-base font-medium text-white shadow-none hover:bg-zinc-800 active:bg-zinc-700 disabled:opacity-60"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Đang xử lý...' : 'Tạo tài khoản'}
+                {isSubmitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                {!isSubmitting && (
+                  <CommonIcons.ArrowRight size={16} className="ml-2" />
+                )}
               </Button>
 
-              <div className="text-center text-sm text-zinc-500">
-                Đã có tài khoản?{' '}
+              <div className="text-center text-[13px] text-zinc-500">
+                Chưa có tài khoản?{' '}
                 <Link
-                  to={BaseUrl.Login}
+                  to={BaseUrl.Register}
                   className="font-medium text-black underline underline-offset-4 hover:opacity-70"
                 >
-                  Đăng nhập ngay
+                  Đăng ký
                 </Link>
               </div>
             </Form>
@@ -137,4 +121,4 @@ const Register: React.FC = () => {
   );
 };
 
-export default Register;
+export default LoginPage;

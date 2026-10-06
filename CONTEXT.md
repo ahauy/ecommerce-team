@@ -37,9 +37,9 @@
 | **IPN**                  | Instant Payment Notification — VNPay webhook server-to-server                                                                    | Verify HMAC-SHA512                                                    |
 | **soft delete**          | Ẩn SP bằng `isActive=false`, không xóa khỏi DB                                                                                   | SP hiển thị khi `isActive && !isBlocked`                              |
 | **slug**                 | URL-friendly version của name                                                                                                    | e.g. "iPhone 15 Pro" → "iphone-15-pro"                                |
-| **shopSlug**             | Auto-generated unique URL identifier derived from `shopName` (e.g., "my-shop-2")                                               | Stable; used in public shop URL `/shops/{shopSlug}`                   |
+| **shopSlug**             | Auto-generated unique URL identifier derived from `shopName` (e.g., "my-shop-2")                                                 | Stable; used in public shop URL `/shops/{shopSlug}`                   |
 | **pickupAddress**        | Free-text pickup location for seller's orders (min 10 chars)                                                                     | Not structured; phone is separate                                     |
-| **VN phone format**      | Regex `^(\+84|0)[0-9]{9,10}$` for Vietnamese mobile numbers                                                                      | Stored on User profile, required for shop setup                       |
+| **VN phone format**      | Regex `^(\+84                                                                                                                    | 0)[0-9]{9,10}$` for Vietnamese mobile numbers                         | Stored on User profile, required for shop setup |
 | **Order**                | Đơn của 1 Seller trong 1 Checkout; có state machine riêng                                                                        | `orders` collection; items embed                                      |
 | **recipient**            | Snapshot người nhận (fullName, phone, email, address)                                                                            | Dùng chung cho mọi Order con của Checkout                             |
 | **pending**              | Order đã tạo, stock đã giữ, **chờ thanh toán VNPay**                                                                             | Chỉ hệ thống chuyển tiếp/hủy                                          |
@@ -58,6 +58,10 @@
 | **refreshToken hash** | SHA-256 hash of refreshToken stored in `users.refreshToken` | Never plain text |
 | **isRefreshing queue** | Frontend guard preventing concurrent refresh storms | `frontend/src/services/apiClient.ts` |
 | **single session model** | New login overwrites refreshToken hash, invalidating prior sessions | BR-AUTH-015 |
+| **Page-Centric Architecture** | Mỗi page sở hữu trọn vẹn `components/`, `services/`, `hooks/`, `dialogs/`, `schemas/`, `types.ts` | `src/pages/<PageName>/` |
+| **Shared Boundary Rule** | Chỉ đưa component/service/hook/dialog ra root `src/` khi được dùng chung qua 2+ pages | Cấm để component/service đơn lẻ ở root |
+| **Formik + Yup** | Chuẩn hóa form handling & validation schemas trong toàn bộ frontend | Schemas đặt tại `schemas/<feature>.schema.ts` |
+| **TanStack Query** | Chuẩn hóa fetch, cache và mutation server state (`useQuery`, `useMutation`) | Tự động invalidate queries liên quan khi mutate |
 
 ## Before / After (Usage Rule 2)
 
