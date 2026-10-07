@@ -1,10 +1,12 @@
 import { Suspense } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary';
 
 import BaseUrl from '@/consts/baseUrl';
 import Loading from '@/components/ui/loading';
-import DefaultLayout from '@/layouts/DefaultLayout';
+import StorefrontLayout from '@/layouts/StorefrontLayout';
+import AdminLayout from '@/layouts/AdminLayout';
+import SellerLayout from '@/layouts/SellerLayout';
 import RequireAuth from '@/routes/RequireAuth';
 
 import Page404 from '@/pages/errors/Page404';
@@ -12,9 +14,17 @@ import Homepage from '@/pages/home/Homepage';
 import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
 import ProfilePage from '@/pages/profile/ProfilePage';
-import ShopSetupPage from '@/pages/seller/ShopSetupPage';
 import PublicShopPage from '@/pages/shop/PublicShopPage';
+import SellerLoginPage from '@/pages/seller/SellerLoginPage';
+import SellerRegisterPage from '@/pages/seller/SellerRegisterPage';
+import SellerProfilePage from '@/pages/seller/SellerProfilePage';
+import ShopSetupPage from '@/pages/seller/ShopSetupPage';
+import MyProductsPage from '@/pages/seller/MyProductsPage';
+import ProductFormPage from '@/pages/seller/ProductFormPage';
+import AdminLoginPage from '@/pages/admin/AdminLoginPage';
+import AdminProfilePage from '@/pages/admin/AdminProfilePage';
 import AdminCategoryPage from '@/pages/admin/AdminCategoryPage';
+import AdminComingSoonPage from '@/pages/admin/AdminComingSoonPage';
 
 const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => (
   <div role="alert" className="p-6 text-center">
@@ -41,26 +51,68 @@ const AppRoutes = () => {
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <Suspense fallback={<SuspenseFallback />}>
         <Routes>
-          {/* Public — auth */}
+          {/* ── Cổng xác thực riêng cho từng phân quyền (không layout) ───────── */}
           <Route path={BaseUrl.Login} element={<LoginPage />} />
           <Route path={BaseUrl.Register} element={<RegisterPage />} />
+          <Route path={BaseUrl.SellerLogin} element={<SellerLoginPage />} />
+          <Route path={BaseUrl.SellerRegister} element={<SellerRegisterPage />} />
+          <Route path={BaseUrl.AdminLogin} element={<AdminLoginPage />} />
 
-          {/* Public — gian hàng (BR-AUTH-012: Guest được xem) */}
-          <Route path={BaseUrl.PublicShop} element={<PublicShopPage />} />
+          {/* ── Redirect cho đường dẫn cũ ─────────────────────────────────────── */}
+          <Route path={BaseUrl.LegacyProfile} element={<Navigate to={BaseUrl.AccountProfile} replace />} />
+          <Route path={BaseUrl.LegacyShopSetup} element={<Navigate to={BaseUrl.ShopSetup} replace />} />
 
-          <Route element={<DefaultLayout />}>
-            {/* Public — Guest xem được */}
+          {/* ── 1. Storefront (Guest & Customer) ──────────────────────────────── */}
+          <Route element={<StorefrontLayout />}>
             <Route index element={<Homepage />} />
+            <Route path={BaseUrl.PublicShop} element={<PublicShopPage />} />
 
-            {/* Cần đăng nhập */}
-            <Route element={<RequireAuth />}>
-              <Route path={BaseUrl.Profile} element={<ProfilePage />} />
+            {/* Hồ sơ người mua: chưa đăng nhập → /login; admin → hồ sơ admin */}
+            <Route
+              element={
+                <RequireAuth
+                  role="customer"
+                  loginPath={BaseUrl.Login}
+                  forbiddenPath={BaseUrl.AdminProfile}
+                />
+              }
+            >
+              <Route path={BaseUrl.AccountProfile} element={<ProfilePage />} />
+            </Route>
+          </Route>
+
+          {/* ── 2. Seller (Kênh người bán) — Strict Isolation ─────────────────── */}
+          <Route element={<SellerLayout />}>
+            <Route
+              element={
+                <RequireAuth
+                  role="customer"
+                  loginPath={BaseUrl.SellerLogin}
+                  forbiddenPath={BaseUrl.AdminCategories}
+                />
+              }
+            >
+              <Route path={BaseUrl.SellerProducts} element={<MyProductsPage />} />
+              <Route path={BaseUrl.SellerProductCreate} element={<ProductFormPage />} />
+              <Route path={BaseUrl.SellerProductEdit} element={<ProductFormPage />} />
+              <Route path={BaseUrl.SellerProfile} element={<SellerProfilePage />} />
               <Route path={BaseUrl.ShopSetup} element={<ShopSetupPage />} />
             </Route>
+          </Route>
 
-            {/* Chỉ admin */}
-            <Route element={<RequireAuth role="admin" />}>
+          {/* ── 3. Admin (Cổng quản trị) — Strict Isolation ───────────────────── */}
+          <Route element={<AdminLayout />}>
+            <Route element={<RequireAuth role="admin" loginPath={BaseUrl.AdminLogin} />}>
               <Route path={BaseUrl.AdminCategories} element={<AdminCategoryPage />} />
+              <Route
+                path={BaseUrl.AdminUsers}
+                element={<AdminComingSoonPage title="Quản lý người dùng" />}
+              />
+              <Route
+                path={BaseUrl.AdminProducts}
+                element={<AdminComingSoonPage title="Kiểm duyệt sản phẩm" />}
+              />
+              <Route path={BaseUrl.AdminProfile} element={<AdminProfilePage />} />
             </Route>
           </Route>
 

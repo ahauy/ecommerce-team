@@ -3,7 +3,6 @@ import { BrowserRouter as Router } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
 
-import { Toaster } from "@/components/ui/toaster";
 import AppRoutes from "@/routes";
 import SidebarProvider from "./providers/SidebarProvider";
 import { queryClient } from "@/lib/queryClient";
@@ -22,7 +21,6 @@ const App = () => {
           <AppRoutes />
         </Router>
         <ToastContainer />
-        <Toaster />
       </SidebarProvider>
     </QueryClientProvider>
   );

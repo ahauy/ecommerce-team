@@ -1,6 +1,13 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { AdminCategoryItem } from '@/types/category.types';
 import { AlertCircle, AlertTriangle, X, Package, Folder } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export interface DeleteWarningDialogProps {
   isOpen: boolean;
@@ -17,21 +24,6 @@ export const DeleteWarningDialog: React.FC<DeleteWarningDialogProps> = ({
   onConfirmDelete,
   isDeleting = false,
 }) => {
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !isDeleting) {
-        onClose();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen, onClose, isDeleting]);
-
   if (!isOpen || !category) {
     return null;
   }
@@ -49,35 +41,37 @@ export const DeleteWarningDialog: React.FC<DeleteWarningDialogProps> = ({
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-headline"
-      data-testid="delete-warning-dialog"
-      onClick={handleBackdropClick}
-      className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] flex items-center justify-center p-4 animate-in fade-in duration-200"
-      style={{ fontFeatureSettings: '"ss03"' }}
-    >
-      <div className="max-w-lg w-full bg-white rounded-2xl p-6 flex flex-col relative border border-[#e4e4e7] shadow-[0_20px_40px_rgba(0,0,0,0.08)]">
+    <AlertDialog open={isOpen} onOpenChange={(open) => !open && !isDeleting && onClose()}>
+      <AlertDialogContent
+        data-testid="delete-warning-dialog"
+        onClick={handleBackdropClick}
+        className="max-w-lg w-full bg-white rounded-2xl p-6 flex flex-col relative border border-[#e4e4e7] shadow-[0_20px_40px_rgba(0,0,0,0.08)]"
+        style={{ fontFeatureSettings: '"ss03"' }}
+      >
         {/* Top Header */}
-        <div className="flex items-start justify-between pb-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-600 shrink-0">
-              {isBlocked ? <AlertTriangle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+        <AlertDialogHeader className="pb-3 text-left">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-600 shrink-0">
+                {isBlocked ? <AlertTriangle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+              </div>
+              <AlertDialogTitle id="modal-headline" className="text-lg font-medium text-black tracking-tight">
+                {isBlocked ? 'Không thể xóa danh mục' : 'Xác nhận xóa danh mục'}
+              </AlertDialogTitle>
             </div>
-            <h2 id="modal-headline" className="text-lg font-medium text-black tracking-tight">
-              {isBlocked ? 'Không thể xóa danh mục' : 'Xác nhận xóa danh mục'}
-            </h2>
+            <button
+              type="button"
+              aria-label="Đóng hộp thoại"
+              onClick={onClose}
+              className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-zinc-400 hover:text-black hover:bg-zinc-100 transition-colors -mr-2 -mt-2"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <button
-            type="button"
-            aria-label="Đóng hộp thoại"
-            onClick={onClose}
-            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-zinc-400 hover:text-black hover:bg-zinc-100 transition-colors -mr-2 -mt-2"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+          <AlertDialogDescription className="sr-only">
+            Xác nhận hoặc cảnh báo khi thực hiện xóa danh mục
+          </AlertDialogDescription>
+        </AlertDialogHeader>
 
         {/* Content Body */}
         {isBlocked ? (
@@ -167,8 +161,8 @@ export const DeleteWarningDialog: React.FC<DeleteWarningDialogProps> = ({
             </div>
           </>
         )}
-      </div>
-    </div>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 

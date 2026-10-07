@@ -21,12 +21,13 @@ vi.mock('@/services/user.service', () => {
     default: mockService,
   };
 });
-const { mockToast } = vi.hoisted(() => ({
-  mockToast: vi.fn(),
+const { mockShowSuccess, mockShowError } = vi.hoisted(() => ({
+  mockShowSuccess: vi.fn(),
+  mockShowError: vi.fn(),
 }));
-vi.mock('@/components/ui/use-toast', () => ({
-  useToast: () => ({ toast: mockToast }),
-  toast: mockToast,
+vi.mock('@/helpers/toast', () => ({
+  showSuccess: mockShowSuccess,
+  showError: mockShowError,
 }));
 
 const mockUserService = userService as any;
@@ -171,12 +172,7 @@ describe('ProfileForm', () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(mockToast).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: 'Cập nhật thành công',
-          variant: 'default',
-        })
-      );
+      expect(mockShowSuccess).toHaveBeenCalledWith('Thông tin hồ sơ đã được cập nhật');
     });
   });
 
@@ -195,12 +191,7 @@ describe('ProfileForm', () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(mockToast).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: 'Cập nhật thất bại',
-          variant: 'destructive',
-        })
-      );
+      expect(mockShowError).toHaveBeenCalledWith('Có lỗi xảy ra khi cập nhật thông tin');
     });
   });
 

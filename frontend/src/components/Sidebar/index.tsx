@@ -17,9 +17,9 @@ const MENU: MenuItem[] = [
   { label: "Trang chủ", href: BaseUrl.Homepage, icon: Home, visible: () => true },
   {
     label: "Hồ sơ cá nhân",
-    href: BaseUrl.Profile,
+    href: BaseUrl.AccountProfile,
     icon: User,
-    visible: (status) => status === "authed",
+    visible: (status, role) => status === "authed" && role === "customer",
   },
   {
     label: "Gian hàng",
@@ -55,7 +55,7 @@ const Sidebar = ({ forMobile }: { forMobile?: boolean }) => {
     >
       <div className="flex h-full w-full flex-col rounded-md border bg-card p-1 shadow-md">
         <div className="side-bar__logo px-2 pt-2">
-          <h3 className="text-xl">Marketplace</h3>
+          <h3 className="text-xl font-bold tracking-tight text-black">TeamShop</h3>
         </div>
 
         <nav className="side-bar__menu mt-8" aria-label="Menu chính">

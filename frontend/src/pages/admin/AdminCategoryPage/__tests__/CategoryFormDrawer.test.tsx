@@ -164,11 +164,11 @@ describe('CategoryFormDrawer Component (Stitch Screen 3)', () => {
       />
     );
 
-    fireEvent.keyDown(window, { key: 'Escape' });
+    fireEvent.keyDown(document, { key: 'Escape' });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('closes when clicking backdrop outside drawer content', () => {
+  it('closes when clicking backdrop outside drawer content', async () => {
     const onClose = vi.fn();
     render(
       <CategoryFormDrawer
@@ -179,8 +179,11 @@ describe('CategoryFormDrawer Component (Stitch Screen 3)', () => {
       />
     );
 
-    const backdrop = screen.getByTestId('category-form-drawer');
-    fireEvent.click(backdrop);
-    expect(onClose).toHaveBeenCalledTimes(1);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const overlay = document.querySelector('[data-state="open"].fixed.inset-0') || document.body;
+    fireEvent.pointerDown(overlay);
+    fireEvent.click(overlay);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(onClose).toHaveBeenCalled();
   });
 });

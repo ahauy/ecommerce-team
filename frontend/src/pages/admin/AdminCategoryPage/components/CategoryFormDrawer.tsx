@@ -1,10 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { X, Lock, Check, Image as ImageIcon, Trash2 } from 'lucide-react';
 import { AdminCategoryItem, CreateCategoryPayload, UpdateCategoryPayload } from '@/types/category.types';
 import { categoryService } from '@/services/category.service';
 import { slugifyVietnamese } from '@/helpers/slugify';
 import { showError, showSuccess } from '@/helpers/toast';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 
 export interface CategoryFormDrawerProps {
   isOpen: boolean;
@@ -28,21 +34,6 @@ export const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
   const updateMutation = categoryService.useUpdateCategory();
 
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !isSubmitting) {
-        onClose();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen, onClose, isSubmitting]);
 
   if (!isOpen) return null;
 
@@ -87,29 +78,21 @@ export const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
     }
   };
 
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget && !isSubmitting) {
-      onClose();
-    }
-  };
-
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="drawer-title"
-      data-testid="category-form-drawer"
-      onClick={handleBackdropClick}
-      className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] flex justify-end animate-in fade-in duration-200"
-      style={{ fontFeatureSettings: '"ss03"' }}
-    >
-      <div className="w-full max-w-lg bg-white h-full shadow-2xl flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-300">
+    <Sheet open={isOpen} onOpenChange={(open) => !open && !isSubmitting && onClose()}>
+      <SheetContent
+        side="right"
+        data-testid="category-form-drawer"
+        aria-describedby={undefined}
+        className="w-full max-w-lg p-0 flex flex-col justify-between overflow-hidden bg-white sm:max-w-lg border-l border-[#e4e4e7] [&>button]:hidden"
+        style={{ fontFeatureSettings: '"ss03"' }}
+      >
         {/* Header */}
-        <div className="p-6 bg-white border-b border-[#e4e4e7] flex items-start justify-between shrink-0">
+        <SheetHeader className="p-6 bg-white border-b border-[#e4e4e7] flex flex-row items-start justify-between shrink-0 space-y-0 text-left">
           <div className="space-y-1 pr-4">
-            <h2 id="drawer-title" className="text-2xl font-light text-black tracking-tight leading-snug">
+            <SheetTitle id="drawer-title" className="text-2xl font-light text-black tracking-tight leading-snug">
               {isEditMode ? 'Chỉnh sửa danh mục' : 'Thêm danh mục mới'}
-            </h2>
+            </SheetTitle>
             <p className="text-xs text-zinc-500 leading-relaxed">
               {isEditMode
                 ? 'Cập nhật thông tin danh mục hiển thị trên sàn.'
@@ -124,7 +107,7 @@ export const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
           >
             <X className="w-4 h-4" />
           </button>
-        </div>
+        </SheetHeader>
 
         {/* Form Body */}
         <Formik
@@ -299,8 +282,8 @@ export const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
             );
           }}
         </Formik>
-      </div>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 };
 

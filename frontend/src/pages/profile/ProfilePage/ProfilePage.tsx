@@ -4,27 +4,7 @@ import { userService } from '@/services/user.service';
 import ProfileForm from './components/ProfileForm';
 import { Button } from '@/components/ui/button';
 import BaseUrl from '@/consts/baseUrl';
-import { User, Store, Calendar, MapPin, Phone, Mail, ExternalLink } from 'lucide-react';
-
-const formatDate = (dateStr?: string | null): string => {
-  if (!dateStr) return '';
-  try {
-    if (dateStr.includes('T')) {
-      const [datePart] = dateStr.split('T');
-      const [y, m, d] = datePart.split('-');
-      if (y && m && d) {
-        return `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`;
-      }
-    }
-    const d = new Date(dateStr);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
-    return `${day}/${month}/${year}`;
-  } catch {
-    return dateStr;
-  }
-};
+import { User, Store, MapPin, Phone, Mail, ArrowRight } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
   const { data: profile, isPending, isError } = userService.useGetProfile();
@@ -54,17 +34,17 @@ const ProfilePage: React.FC = () => {
   return (
     <div
       data-testid="profile-page"
-      className="w-full min-h-screen bg-[#fbfbf5] py-8 md:py-12 px-4 sm:px-6 lg:px-8"
+      className="w-full bg-[#fbfbf5] py-6 md:py-8 px-4 sm:px-6 lg:px-8"
       style={{ fontFeatureSettings: '"ss03"' }}
     >
-      <div className="max-w-6xl mx-auto space-y-8">
+      <div className="w-full space-y-8">
         {/* Page Header */}
         <header className="space-y-1">
           <h1 className="text-3xl font-medium tracking-tight text-zinc-900">
             Hồ sơ cá nhân
           </h1>
           <p className="text-sm text-zinc-500">
-            Quản lý thông tin cá nhân và thông tin gian hàng của bạn.
+            Quản lý thông tin cá nhân và địa chỉ nhận hàng của bạn.
           </p>
         </header>
 
@@ -133,60 +113,33 @@ const ProfilePage: React.FC = () => {
               </div>
             </div>
 
-            {/* Shop Box / Card */}
-            {profile.shop ? (
-              <div className="bg-pistachio rounded-2xl p-6 border border-[#e4e4e7] shadow-sm space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Store className="w-5 h-5 text-zinc-900" />
-                    <h3 className="font-semibold text-zinc-900 text-base">Gian hàng của bạn</h3>
-                  </div>
-                  <Link
-                    to={`/shops/${profile.id}`}
-                    className="inline-flex items-center gap-1 text-xs font-medium text-zinc-800 hover:text-black hover:underline"
-                  >
-                    <span>Xem gian hàng</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </Link>
-                </div>
-
-                <div className="space-y-2 text-sm bg-white/70 backdrop-blur-sm rounded-xl p-4 border border-[#e4e4e7]">
-                  <div>
-                    <span className="text-xs text-zinc-500 block">Tên gian hàng</span>
-                    <span className="font-medium text-zinc-900">{profile.shop.shopName}</span>
-                  </div>
-                  <div>
-                    <span className="text-xs text-zinc-500 block">Đường dẫn</span>
-                    <span className="font-mono text-xs text-zinc-700 bg-zinc-100 px-2 py-0.5 rounded">
-                      {profile.shop.shopSlug}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs text-zinc-500 block">Địa chỉ lấy hàng</span>
-                    <span className="text-zinc-800">{profile.shop.pickupAddress}</span>
-                  </div>
-                  {profile.shop.joinedAt && (
-                    <div className="flex items-center gap-1.5 pt-1 text-xs text-zinc-600">
-                      <Calendar className="w-3.5 h-3.5 text-zinc-400" />
-                      <span>Tham gia từ ngày: </span>
-                      <span className="font-medium text-zinc-800">
-                        {formatDate(profile.shop.joinedAt)}
-                      </span>
-                    </div>
-                  )}
-                </div>
+            {/* Kênh người bán: thông tin gian hàng nằm ở /seller/profile */}
+            <div className="bg-pistachio rounded-2xl p-6 border border-[#e4e4e7] shadow-sm space-y-4">
+              <div className="flex items-center gap-2">
+                <Store className="w-5 h-5 text-zinc-900" />
+                <h3 className="font-semibold text-zinc-900 text-base">Kênh người bán</h3>
               </div>
-            ) : (
-              <div className="bg-pistachio rounded-2xl p-6 border border-[#e4e4e7] shadow-sm space-y-4">
-                <div className="flex items-center gap-2">
-                  <Store className="w-5 h-5 text-zinc-900" />
-                  <h3 className="font-semibold text-zinc-900 text-base">Gian hàng của bạn</h3>
-                </div>
-                <p className="text-sm font-medium text-zinc-800">Chưa có gian hàng</p>
-                <p className="text-xs text-zinc-600 leading-relaxed">
-                  Chỉ cần tên gian hàng và địa chỉ lấy hàng, không cần xác minh, lưu xong là bắt đầu bán được ngay.
-                </p>
-                <div className="pt-2">
+              {profile.shop ? (
+                <>
+                  <p className="text-xs text-zinc-700 leading-relaxed">
+                    Gian hàng của bạn đang hoạt động. Quản lý sản phẩm và thông tin gian hàng trong Kênh người bán.
+                  </p>
+                  <Button
+                    asChild
+                    className="w-full rounded-full bg-black text-white hover:bg-zinc-800 active:scale-[0.99] transition-all h-10 font-medium text-sm shadow-sm"
+                  >
+                    <Link to={BaseUrl.SellerProducts}>
+                      <span>Đến Kênh người bán</span>
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-medium text-zinc-800">Chưa có gian hàng</p>
+                  <p className="text-xs text-zinc-600 leading-relaxed">
+                    Chỉ cần tên gian hàng và địa chỉ lấy hàng, không cần xác minh, lưu xong là bắt đầu bán được ngay.
+                  </p>
                   <Button
                     asChild
                     className="w-full rounded-full bg-black text-white hover:bg-zinc-800 active:scale-[0.99] transition-all h-10 font-medium text-sm shadow-sm"
@@ -195,9 +148,9 @@ const ProfilePage: React.FC = () => {
                       Đăng bán
                     </Link>
                   </Button>
-                </div>
-              </div>
-            )}
+                </>
+              )}
+            </div>
           </div>
 
           {/* Right Column: Update Profile Form */}
@@ -207,7 +160,7 @@ const ProfilePage: React.FC = () => {
                 Thông tin cá nhân
               </h2>
               <p className="text-xs text-zinc-500 mt-1">
-                Số điện thoại và địa chỉ dùng để điền sẵn khi đặt hàng và thiết lập gian hàng.
+                Số điện thoại và địa chỉ dùng để điền sẵn khi đặt hàng.
               </p>
             </div>
 

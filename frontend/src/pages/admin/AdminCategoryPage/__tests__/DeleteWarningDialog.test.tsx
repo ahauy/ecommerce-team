@@ -119,7 +119,7 @@ describe('DeleteWarningDialog Component (Stitch Screen 2)', () => {
       />
     );
 
-    fireEvent.keyDown(window, { key: 'Escape' });
+    fireEvent.keyDown(document, { key: 'Escape' });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
@@ -137,5 +137,20 @@ describe('DeleteWarningDialog Component (Stitch Screen 2)', () => {
     const backdrop = screen.getByTestId('delete-warning-dialog');
     fireEvent.click(backdrop);
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders accessible description for screen readers', () => {
+    render(
+      <DeleteWarningDialog
+        isOpen={true}
+        category={blockedCategory}
+        onClose={vi.fn()}
+        onConfirmDelete={vi.fn()}
+      />
+    );
+
+    expect(
+      screen.getByText('Xác nhận hoặc cảnh báo khi thực hiện xóa danh mục')
+    ).toBeInTheDocument();
   });
 });

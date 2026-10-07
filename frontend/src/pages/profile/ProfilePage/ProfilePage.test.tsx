@@ -21,13 +21,6 @@ vi.mock('@/services/user.service', () => {
     default: mockService,
   };
 });
-const { mockToast } = vi.hoisted(() => ({
-  mockToast: vi.fn(),
-}));
-vi.mock('@/components/ui/use-toast', () => ({
-  useToast: () => ({ toast: mockToast }),
-  toast: mockToast,
-}));
 
 const mockUserService = userService as any;
 
@@ -45,7 +38,7 @@ const renderWithProviders = (component: React.ReactNode, profileData?: any) => {
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={['/profile']}>
+      <MemoryRouter initialEntries={['/account/profile']}>
         {component}
       </MemoryRouter>
     </QueryClientProvider>
@@ -100,7 +93,7 @@ describe('ProfilePage', () => {
     expect(screen.getByRole('button', { name: /đăng bán/i })).toBeInTheDocument();
   });
 
-  it('displays shop information when user has a shop', () => {
+  it('links to the seller channel (not shop details) when user has a shop', () => {
     const profileData = {
       id: '1',
       email: 'test@example.com',
@@ -127,10 +120,11 @@ describe('ProfilePage', () => {
 
     renderWithProviders(<ProfilePage />);
 
-    expect(screen.getByText('My Awesome Shop')).toBeInTheDocument();
-    expect(screen.getByText('my-awesome-shop')).toBeInTheDocument();
-    expect(screen.getByText('456 Nguyen Van Linh, District 7, HCMC')).toBeInTheDocument();
-    expect(screen.getByText('15/01/2024')).toBeInTheDocument();
+    const sellerLink = screen.getByRole('link', { name: /đến kênh người bán/i });
+    expect(sellerLink).toHaveAttribute('href', '/seller/products');
+    // Thông tin gian hàng thuộc /seller/profile, không hiển thị ở hồ sơ người mua
+    expect(screen.queryByText('My Awesome Shop')).not.toBeInTheDocument();
+    expect(screen.queryByText('my-awesome-shop')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /đăng bán/i })).not.toBeInTheDocument();
   });
 
@@ -158,10 +152,10 @@ describe('ProfilePage', () => {
 
     const dangBanButton = screen.getByRole('button', { name: /đăng bán/i });
     expect(dangBanButton).toBeInTheDocument();
-    expect(dangBanButton).toHaveAttribute('href', '/shop/setup');
+    expect(dangBanButton).toHaveAttribute('href', '/seller/setup');
   });
 
-  it('redirects to /shop/setup when clicking "Đăng bán" button', () => {
+  it('redirects to /seller/setup when clicking "Đăng bán" button', () => {
     const profileData = {
       id: '1',
       email: 'test@example.com',
@@ -184,7 +178,7 @@ describe('ProfilePage', () => {
     renderWithProviders(<ProfilePage />);
 
     const dangBanButton = screen.getByRole('button', { name: /đăng bán/i });
-    expect(dangBanButton).toHaveAttribute('href', '/shop/setup');
+    expect(dangBanButton).toHaveAttribute('href', '/seller/setup');
   });
 
   it('applies two-canvas light theme (cream background)', () => {
