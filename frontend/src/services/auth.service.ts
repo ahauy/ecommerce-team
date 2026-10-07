@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { API_PREFIX } from '@/lib/env';
-import type { AuthUser } from '@/stores/auth.store';
+import { useAuthStore, type AuthUser } from '@/stores/auth.store';
 
 export interface RegisterPayload {
   email: string;
@@ -64,8 +64,16 @@ export const authService = {
     return response.data;
   },
 
-  async logout(): Promise<void> {
-    await authApiClient.post('/auth/logout');
+  /**
+   * authApiClient không có interceptor gắn token, nên phải tự gửi Bearer.
+   * Thiếu header này, route /auth/logout (có guard JWT) trả 401 → cookie không bị xoá.
+   * Truyền accessToken khi chưa lưu token vào store (vd. vừa login ở cổng admin).
+   */
+  async logout(accessToken?: string): Promise<void> {
+    const token = accessToken ?? useAuthStore.getState().accessToken;
+    await authApiClient.post('/auth/logout', null, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
   },
 };
 

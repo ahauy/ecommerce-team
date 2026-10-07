@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import BaseUrl from '@/consts/baseUrl';
 import authService from '@/services/auth.service';
 import { useAuthStore } from '@/stores/auth.store';
@@ -26,7 +27,8 @@ export const useLogout = () => {
     try {
       await authService.logout();
     } catch {
-      // bỏ qua — vẫn xoá phiên cục bộ
+      // Vẫn xoá phiên cục bộ, nhưng báo để biết cookie phía server có thể chưa bị thu hồi.
+      toast.warn('Không thể thu hồi phiên trên máy chủ. Vui lòng kiểm tra kết nối.');
     }
     useAuthStore.getState().clear();
     queryClient.clear();
