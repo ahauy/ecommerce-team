@@ -104,11 +104,11 @@ describe('UsersService', () => {
         address: user.address,
         role: user.role,
         isActive: user.isActive,
-        version: user.version,
         shop: {
           shopName: 'Test Shop',
           shopSlug: 'test-shop',
           pickupAddress: '123 Test St',
+          phone: '0901234567',
           joinedAt: new Date('2024-01-15T10:30:00.000Z'),
         },
       });
@@ -154,11 +154,14 @@ describe('UsersService', () => {
       expect(result.fullName).toBe('New Name');
       expect(result.phone).toBe('0987654321');
       expect(result.address).toBe('New Address');
-      expect(result.version).toBe(2);
       expect(userModel.findOneAndUpdate).toHaveBeenCalledWith(
-        { _id: user._id.toString(), version: 1 },
+        { _id: user._id.toString() },
         expect.objectContaining({
-          $set: expect.objectContaining({ version: 2 }),
+          $set: expect.objectContaining({
+            fullName: 'New Name',
+            phone: '0987654321',
+            address: 'New Address',
+          }),
         }),
         { new: true },
       );
