@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { useAuthStore } from '@/stores/auth.store';
 import { useProductDetail, useSetProductActive } from '@/hooks/queries/useProducts';
+import { useAddToCart } from '@/hooks/queries/useCart';
 import { getHttpStatus, formatVnd } from '@/helpers/format';
+import { getApiMessage } from '@/helpers/apiError';
 import { showError, showSuccess } from '@/helpers/toast';
 import { cn } from '@/lib/utils';
 import ProductBreadcrumb from './components/ProductBreadcrumb';
@@ -41,6 +42,7 @@ const ProductDetailPage: React.FC = () => {
     status !== 'booting'
   );
   const setActive = useSetProductActive();
+  const addToCart = useAddToCart();
 
   useEffect(() => {
     if (product?.name) document.title = `${product.name} | TeamShop`;
@@ -83,9 +85,14 @@ const ProductDetailPage: React.FC = () => {
       : `Còn ${product.stock} sản phẩm trong kho`;
 
   const handleAddToCart = (quantity: number) => {
-    // TODO(US-CART-001): gọi cartStore.add(product.id, quantity) — Guest: localStorage, Customer: POST /cart/items.
-    void quantity;
-    toast.info('Giỏ hàng sắp ra mắt. Bạn vui lòng quay lại sau nhé!');
+    // Guest: lưu localStorage; Customer: POST /cart/items (BR-CART-001/002).
+    addToCart.mutate(
+      { productId: product.id, quantity, stock: product.stock },
+      {
+        onSuccess: () => showSuccess('Đã thêm vào giỏ hàng'),
+        onError: (err) => showError(getApiMessage(err)),
+      }
+    );
   };
 
   const handleToggleActive = () => {

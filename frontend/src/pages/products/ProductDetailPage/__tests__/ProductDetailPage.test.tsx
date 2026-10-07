@@ -4,18 +4,22 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { ProductDetail } from '@/types/product.types';
 import { useAuthStore } from '@/stores/auth.store';
 
-const { mockDetail, mockProducts, mockShop, mockMutate, mockToastInfo } = vi.hoisted(() => ({
+const { mockDetail, mockProducts, mockShop, mockMutate, mockToastInfo, mockAddToCart } = vi.hoisted(() => ({
   mockDetail: vi.fn(),
   mockProducts: vi.fn(),
   mockShop: vi.fn(),
   mockMutate: vi.fn(),
   mockToastInfo: vi.fn(),
+  mockAddToCart: vi.fn(),
 }));
 
 vi.mock('@/hooks/queries/useProducts', () => ({
   useProductDetail: mockDetail,
   useProducts: mockProducts,
   useSetProductActive: () => ({ mutate: mockMutate, isPending: false }),
+}));
+vi.mock('@/hooks/queries/useCart', () => ({
+  useAddToCart: () => ({ mutate: mockAddToCart, isPending: false }),
 }));
 vi.mock('@/hooks/queries/usePublicShop', () => ({ usePublicShop: mockShop }));
 vi.mock('react-toastify', () => ({ toast: { info: mockToastInfo, success: vi.fn(), error: vi.fn() } }));
@@ -135,11 +139,15 @@ describe('ProductDetailPage', () => {
     expect(screen.getByTestId('qty-value')).toHaveTextContent('1');
   });
 
-  it('add to cart does not break while the cart feature is pending', () => {
+  it('add to cart sends the product id, chosen quantity and current stock', () => {
     mockDetail.mockReturnValue(ok(product));
     renderPage();
+    fireEvent.click(screen.getByRole('button', { name: 'Tăng số lượng' }));
     fireEvent.click(screen.getByRole('button', { name: /Thêm vào giỏ/ }));
-    expect(mockToastInfo).toHaveBeenCalled();
+    expect(mockAddToCart).toHaveBeenCalledWith(
+      { productId: 'p1', quantity: 2, stock: 24 },
+      expect.objectContaining({ onSuccess: expect.any(Function), onError: expect.any(Function) })
+    );
   });
 
   it('out of stock: disables purchase buttons and explains why', () => {

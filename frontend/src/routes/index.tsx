@@ -16,6 +16,7 @@ import RegisterPage from '@/pages/auth/RegisterPage';
 import ProfilePage from '@/pages/profile/ProfilePage';
 import PublicShopPage from '@/pages/shop/PublicShopPage';
 import ProductDetailPage from '@/pages/products/ProductDetailPage';
+import CartPage from '@/pages/cart/CartPage';
 import SellerLoginPage from '@/pages/seller/SellerLoginPage';
 import SellerRegisterPage from '@/pages/seller/SellerRegisterPage';
 import SellerProfilePage from '@/pages/seller/SellerProfilePage';
@@ -68,6 +69,8 @@ const AppRoutes = () => {
             <Route index element={<Homepage />} />
             <Route path={BaseUrl.PublicShop} element={<PublicShopPage />} />
             <Route path={BaseUrl.ProductDetail} element={<ProductDetailPage />} />
+            {/* Giỏ hàng: Guest (localStorage) và Customer (DB) đều vào được; Admin thấy thông báo không có giỏ. */}
+            <Route path={BaseUrl.Cart} element={<CartPage />} />
 
             {/* Hồ sơ người mua: chưa đăng nhập → /login; admin → hồ sơ admin */}
             <Route
