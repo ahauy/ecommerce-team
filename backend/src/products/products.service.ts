@@ -52,8 +52,8 @@ const toOwner = (p: ProductDocument): OwnerProductDto => ({
   description: p.description,
   isBlocked: p.isBlocked,
   blockReason: p.blockReason ?? null,
-  createdAt: p.createdAt.toISOString(),
-  updatedAt: p.updatedAt.toISOString(),
+  createdAt: p.createdAt?.toISOString(),
+  updatedAt: p.updatedAt?.toISOString(),
 });
 
 const isDuplicateKey = (err: unknown): boolean =>
@@ -198,8 +198,8 @@ export class ProductsService {
         shopName: seller?.shop?.shopName ?? null,
       },
       isActive: product.isActive,
-      createdAt: product.createdAt.toISOString(),
-      updatedAt: product.updatedAt.toISOString(),
+      createdAt: product.createdAt?.toISOString(),
+      updatedAt: product.updatedAt?.toISOString(),
       ...(canManage && {
         isBlocked: product.isBlocked,
         blockReason: product.blockReason ?? null,
