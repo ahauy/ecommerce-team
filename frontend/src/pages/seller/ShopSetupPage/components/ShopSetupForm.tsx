@@ -203,13 +203,7 @@ export const ShopSetupForm: React.FC<ShopSetupFormProps> = ({ initialValues, onS
             </div>
 
             {/* Actions */}
-            <div className="pt-4 flex items-center justify-between gap-4 border-t border-[#e4e4e7]">
-              <Link
-                to={BaseUrl.SellerProducts}
-                className="text-sm text-zinc-500 hover:text-zinc-900 transition-colors underline-offset-4 hover:underline"
-              >
-                Để sau
-              </Link>
+            <div className="pt-4 flex items-center justify-end gap-4 border-t border-[#e4e4e7]">
               <Button
                 type="submit"
                 disabled={isSubmitting || setupShopMutation.isPending}

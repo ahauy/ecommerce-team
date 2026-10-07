@@ -174,13 +174,13 @@ const SellerProfilePage: React.FC = () => {
               <div className="flex items-center gap-2.5 text-zinc-600">
                 <Phone className="w-4 h-4 text-zinc-400 shrink-0" />
                 <span className="text-zinc-800 font-medium">
-                  {profile.phone || 'Chưa cập nhật số điện thoại'}
+                  {profile.shop?.phone || 'Chưa cập nhật số điện thoại'}
                 </span>
               </div>
               <div className="flex items-start gap-2.5 text-zinc-600">
                 <MapPin className="w-4 h-4 text-zinc-400 shrink-0 mt-0.5" />
                 <span className="text-zinc-800 font-medium">
-                  {profile.address || 'Chưa cập nhật địa chỉ cá nhân'}
+                  {profile.shop?.pickupAddress || 'Chưa cập nhật địa chỉ gian hàng'}
                 </span>
               </div>
             </div>

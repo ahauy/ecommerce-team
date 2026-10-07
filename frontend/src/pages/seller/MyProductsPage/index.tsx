@@ -37,7 +37,7 @@ const MyProductsPage: React.FC = () => {
   const categoriesMap = useMemo(() => {
     const map: Record<string, string> = {};
     categories.forEach((cat) => {
-      map[cat._id] = cat.name;
+      map[cat.id] = cat.name;
     });
     return map;
   }, [categories]);

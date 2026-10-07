@@ -34,7 +34,7 @@ const ShopSetupPage: React.FC = () => {
             initialValues={{
               shopName: profile?.shop?.shopName || '',
               pickupAddress: profile?.shop?.pickupAddress || profile?.address || '',
-              phone: profile?.phone || '',
+              phone: profile?.shop?.phone || '',
             }}
           />
         )}
