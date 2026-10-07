@@ -4,6 +4,7 @@ const BaseUrl = {
   Login: "/login",
   Register: "/register",
   PublicShop: "/shops/:sellerId",
+  ProductDetail: "/products/:id",
   AccountProfile: "/account/profile",
 
   // ── Seller (Kênh người bán) ────────────────────────────────────────────────
@@ -26,5 +27,14 @@ const BaseUrl = {
   LegacyProfile: "/profile",
   LegacyShopSetup: "/shop/setup",
 };
+
+/** Đường dẫn trang chi tiết sản phẩm. */
+export const productPath = (id: string): string => `/products/${id}`;
+
+/** Đường dẫn trang gian hàng công khai. */
+export const shopPath = (sellerId: string): string => `/shops/${sellerId}`;
+
+/** Đường dẫn trang sửa sản phẩm của người bán. */
+export const sellerProductEditPath = (id: string): string => `/seller/products/${id}/edit`;
 
 export default BaseUrl;

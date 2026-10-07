@@ -15,6 +15,7 @@ import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
 import ProfilePage from '@/pages/profile/ProfilePage';
 import PublicShopPage from '@/pages/shop/PublicShopPage';
+import ProductDetailPage from '@/pages/products/ProductDetailPage';
 import SellerLoginPage from '@/pages/seller/SellerLoginPage';
 import SellerRegisterPage from '@/pages/seller/SellerRegisterPage';
 import SellerProfilePage from '@/pages/seller/SellerProfilePage';
@@ -66,6 +67,7 @@ const AppRoutes = () => {
           <Route element={<StorefrontLayout />}>
             <Route index element={<Homepage />} />
             <Route path={BaseUrl.PublicShop} element={<PublicShopPage />} />
+            <Route path={BaseUrl.ProductDetail} element={<ProductDetailPage />} />
 
             {/* Hồ sơ người mua: chưa đăng nhập → /login; admin → hồ sơ admin */}
             <Route

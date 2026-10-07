@@ -14,6 +14,7 @@ export const useCreateProductMutation = () => {
       productFormService.createProduct(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MY_PRODUCTS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
     },
   });
 };
@@ -26,6 +27,7 @@ export const useUpdateProductMutation = () => {
       productFormService.updateProduct(id, payload),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: MY_PRODUCTS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
       queryClient.invalidateQueries({ queryKey: [...PRODUCT_DETAIL_QUERY_KEY, id] });
     },
   });

@@ -1,41 +1,52 @@
 import React, { useEffect, useState } from 'react';
-import { Star } from 'lucide-react';
 import { categoryService } from '@/services/category.service';
 import { cn } from '@/lib/utils';
-import {
-  RATING_OPTIONS,
-  countActiveFilters,
-  type FilterValues,
-} from '../hooks/useCatalogFilters';
+import type { FilterValues } from '../hooks/useCatalogFilters';
 
 interface ProductFilterPanelProps {
   value: FilterValues;
   onChange: (patch: Partial<FilterValues>) => void;
-  onClear: () => void;
   /**
-   * true  → khoảng giá cập nhật ngay khi gõ (dùng trong Drawer, có nút "Áp dụng" riêng).
-   * false → có nút "Lọc" riêng cho khoảng giá (dùng ở Sidebar desktop).
+   * true  → khoảng giá cập nhật ngay khi gõ (Drawer đã có nút "Áp dụng" riêng).
+   * false → có nút "Áp dụng" riêng cho khoảng giá (Sidebar desktop).
    */
   instantPrice?: boolean;
 }
 
 const BlockTitle: React.FC<React.PropsWithChildren> = ({ children }) => (
-  <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">{children}</h3>
+  <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">{children}</h3>
 );
 
-const inputClass =
-  'h-10 w-full rounded-lg border border-[#e4e4e7] bg-white px-3 text-sm text-black placeholder:text-zinc-400 focus:border-black focus:outline-none';
+const digits = (raw: string) => raw.replace(/\D/g, '');
+const withDots = (raw: string) => (raw ? Number(raw).toLocaleString('vi-VN') : '');
+
+const PriceInput: React.FC<{
+  label: string;
+  placeholder: string;
+  value: string;
+  onChange: (next: string) => void;
+}> = ({ label, placeholder, value, onChange }) => (
+  <div className="relative min-w-0 flex-1">
+    <input
+      type="text"
+      inputMode="numeric"
+      aria-label={label}
+      placeholder={placeholder}
+      value={withDots(value)}
+      onChange={(e) => onChange(digits(e.target.value))}
+      className="h-10 w-full rounded-lg border border-[#e4e4e7] bg-white pl-3 pr-7 text-sm text-black placeholder:text-zinc-400 focus:border-black focus:outline-none"
+    />
+    <span aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400">
+      ₫
+    </span>
+  </div>
+);
 
 /** Nội dung bộ lọc dùng chung cho Sidebar (desktop) và Drawer (mobile). */
-const ProductFilterPanel: React.FC<ProductFilterPanelProps> = ({
-  value,
-  onChange,
-  onClear,
-  instantPrice = false,
-}) => {
+const ProductFilterPanel: React.FC<ProductFilterPanelProps> = ({ value, onChange, instantPrice = false }) => {
   const { data: categories = [], isLoading, isError, refetch } = categoryService.useCategories();
 
-  // Giá nhập dở (chưa bấm "Lọc") — đồng bộ lại khi giá trị thật đổi (vd. Xóa bộ lọc).
+  // Giá nhập dở (chưa bấm "Áp dụng") — đồng bộ lại khi giá trị thật đổi (vd. Thiết lập lại).
   const [minDraft, setMinDraft] = useState(value.minPrice);
   const [maxDraft, setMaxDraft] = useState(value.maxPrice);
   const [priceError, setPriceError] = useState('');
@@ -46,10 +57,7 @@ const ProductFilterPanel: React.FC<ProductFilterPanelProps> = ({
     setPriceError('');
   }, [value.minPrice, value.maxPrice]);
 
-  const sanitize = (raw: string) => raw.replace(/\D/g, '');
-
-  const handlePriceInput = (field: 'minPrice' | 'maxPrice', raw: string) => {
-    const next = sanitize(raw);
+  const handlePriceInput = (field: 'minPrice' | 'maxPrice', next: string) => {
     if (field === 'minPrice') setMinDraft(next);
     else setMaxDraft(next);
     if (instantPrice) onChange({ [field]: next });
@@ -64,17 +72,16 @@ const ProductFilterPanel: React.FC<ProductFilterPanelProps> = ({
     onChange({ minPrice: minDraft, maxPrice: maxDraft });
   };
 
-  const hasActive = countActiveFilters(value) > 0;
+  const options = [{ id: '__all', slug: '', name: 'Tất cả danh mục', productCount: undefined as number | undefined }, ...categories];
 
   return (
-    <div className="space-y-7" style={{ fontFeatureSettings: '"ss03"' }}>
-      {/* Khối 1: Danh mục */}
-      <section aria-label="Danh mục sản phẩm">
-        <BlockTitle>Danh mục sản phẩm</BlockTitle>
+    <div className="space-y-6">
+      <section aria-label="Danh mục">
+        <BlockTitle>Danh mục</BlockTitle>
         {isLoading ? (
           <div data-testid="filter-category-loading" className="space-y-2">
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="h-9 animate-pulse rounded-full bg-zinc-200" />
+              <div key={i} className="h-7 animate-pulse rounded-full bg-zinc-100" />
             ))}
           </div>
         ) : isError ? (
@@ -89,54 +96,49 @@ const ProductFilterPanel: React.FC<ProductFilterPanelProps> = ({
             </button>
           </div>
         ) : (
-          <ul className="space-y-1">
-            {[{ id: '__all', slug: '', name: 'Tất cả' }, ...categories].map((cat) => {
+          <div role="radiogroup" aria-label="Danh mục" className="space-y-0.5">
+            {options.map((cat) => {
               const selected = value.category === cat.slug;
               return (
-                <li key={cat.id}>
-                  <button
-                    type="button"
-                    aria-pressed={selected}
-                    onClick={() => onChange({ category: cat.slug })}
+                <button
+                  key={cat.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  onClick={() => onChange({ category: cat.slug })}
+                  className={cn(
+                    'flex min-h-[34px] w-full items-center gap-3 rounded-lg px-1 py-1.5 text-left text-[13px] transition-colors hover:text-black',
+                    selected ? 'font-semibold text-black' : 'text-zinc-600'
+                  )}
+                >
+                  <span
+                    aria-hidden="true"
                     className={cn(
-                      'flex min-h-[36px] w-full items-center rounded-full px-4 py-1.5 text-left text-sm transition-colors',
-                      selected
-                        ? 'bg-[#c1fbd4] font-semibold text-black'
-                        : 'text-zinc-700 hover:bg-white hover:text-black'
+                      'flex h-4 w-4 shrink-0 items-center justify-center rounded-full border',
+                      selected ? 'border-black' : 'border-zinc-300'
                     )}
                   >
-                    <span className="truncate">{cat.name}</span>
-                  </button>
-                </li>
+                    {selected && <span className="h-2 w-2 rounded-full bg-black" />}
+                  </span>
+                  <span className="flex-1 truncate">{cat.name}</span>
+                  {typeof cat.productCount === 'number' && (
+                    <span className="text-xs font-normal text-zinc-400">{cat.productCount}</span>
+                  )}
+                </button>
               );
             })}
-          </ul>
+          </div>
         )}
       </section>
 
-      {/* Khối 2: Khoảng giá */}
+      <div className="border-t border-[#ececef]" />
+
       <section aria-label="Khoảng giá">
-        <BlockTitle>Khoảng giá (₫)</BlockTitle>
+        <BlockTitle>Khoảng giá</BlockTitle>
         <div className="flex items-center gap-2">
-          <input
-            type="text"
-            inputMode="numeric"
-            aria-label="Giá từ"
-            placeholder="Từ"
-            value={minDraft}
-            onChange={(e) => handlePriceInput('minPrice', e.target.value)}
-            className={inputClass}
-          />
-          <span className="text-zinc-400">–</span>
-          <input
-            type="text"
-            inputMode="numeric"
-            aria-label="Giá đến"
-            placeholder="Đến"
-            value={maxDraft}
-            onChange={(e) => handlePriceInput('maxPrice', e.target.value)}
-            className={inputClass}
-          />
+          <PriceInput label="Giá từ" placeholder="0" value={minDraft} onChange={(v) => handlePriceInput('minPrice', v)} />
+          <span aria-hidden="true" className="text-zinc-400">–</span>
+          <PriceInput label="Giá đến" placeholder="Tối đa" value={maxDraft} onChange={(v) => handlePriceInput('maxPrice', v)} />
         </div>
         {priceError && (
           <p role="alert" className="mt-2 text-xs font-medium text-red-600">
@@ -147,60 +149,12 @@ const ProductFilterPanel: React.FC<ProductFilterPanelProps> = ({
           <button
             type="button"
             onClick={applyPrice}
-            className="mt-3 h-10 w-full rounded-full bg-black text-xs font-semibold text-white transition-colors hover:bg-zinc-800"
+            className="mt-3 h-11 w-full rounded-full bg-black text-sm font-semibold text-white transition-colors hover:bg-zinc-800"
           >
-            Lọc
+            Áp dụng
           </button>
         )}
       </section>
-
-      {/* Khối 3: Đánh giá sao */}
-      <section aria-label="Đánh giá">
-        <BlockTitle>Đánh giá</BlockTitle>
-        <ul className="space-y-1">
-          {RATING_OPTIONS.map((rating) => {
-            const selected = value.minRating === rating;
-            return (
-              <li key={rating}>
-                <button
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => onChange({ minRating: selected ? null : rating })}
-                  className={cn(
-                    'flex min-h-[36px] w-full items-center gap-2 rounded-full px-4 py-1.5 text-left text-sm transition-colors',
-                    selected
-                      ? 'bg-[#c1fbd4] font-semibold text-black'
-                      : 'text-zinc-700 hover:bg-white hover:text-black'
-                  )}
-                >
-                  <span className="flex" aria-hidden="true">
-                    {[1, 2, 3, 4, 5].map((n) => (
-                      <Star
-                        key={n}
-                        className={cn(
-                          'h-4 w-4',
-                          n <= rating ? 'fill-amber-400 text-amber-400' : 'text-zinc-300'
-                        )}
-                      />
-                    ))}
-                  </span>
-                  <span>từ {rating} sao</span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
-
-      {/* Khối 4: Xóa bộ lọc */}
-      <button
-        type="button"
-        onClick={onClear}
-        disabled={!hasActive}
-        className="h-10 w-full rounded-full border border-[#e4e4e7] bg-white text-xs font-semibold text-zinc-700 transition-colors hover:border-black hover:text-black disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        Xóa tất cả bộ lọc
-      </button>
     </div>
   );
 };
