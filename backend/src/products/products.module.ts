@@ -6,6 +6,7 @@ import {
 } from '../categories/schemas/category.schema';
 import { User, UserSchema } from '../users/schemas/user.schema';
 import { AuthModule } from '../auth/auth.module';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { Product, ProductSchema } from './schemas/product.schema';
 import { ProductsService } from './products.service';
 import { ProductsController } from './products.controller';
@@ -20,7 +21,7 @@ import { ProductsController } from './products.controller';
     AuthModule,
   ],
   controllers: [ProductsController],
-  providers: [ProductsService],
+  providers: [ProductsService, RolesGuard],
   exports: [ProductsService],
 })
 export class ProductsModule {}

@@ -18,6 +18,9 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
+import { Roles, RolesGuard } from '../auth/guards/roles.guard';
+import { ShopRequiredGuard } from '../auth/guards/shop-required.guard';
+import { UserRole } from '../users/schemas/user.schema';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
 import { AuthUser, ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -74,12 +77,13 @@ export class ProductsController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, ShopRequiredGuard)
+  @Roles(UserRole.CUSTOMER)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a product (requires shop setup)' })
   @ApiResponse({ status: 201, description: 'Product created' })
   @ApiResponse({ status: 400, description: 'Validation error' })
-  @ApiResponse({ status: 403, description: 'Shop not set up' })
+  @ApiResponse({ status: 403, description: 'Admin / shop not set up' })
   create(@Request() req: AuthRequest, @Body() dto: CreateProductDto) {
     return this.productsService.create(req.user, dto);
   }

@@ -42,6 +42,25 @@ describe('JwtStrategy', () => {
     role: 'customer',
   };
 
+  it.each([
+    [{ shopName: 'Shop A', pickupAddress: '123 Đường ABC, Quận 1' }, true],
+    [{ shopName: 'Shop A', pickupAddress: null }, false],
+    [{ shopName: null, pickupAddress: null }, false],
+    [null, false],
+  ])(
+    'hasShop phản ánh việc đã thiết lập gian hàng (%o)',
+    async (shop, expected) => {
+      (usersService.findById as jest.Mock).mockResolvedValue({
+        ...mockUser,
+        shop,
+      });
+
+      const result = await strategy.validate(payload);
+
+      expect(result.hasShop).toBe(expected);
+    },
+  );
+
   it('should validate and return user payload including isActive', async () => {
     (usersService.findById as jest.Mock).mockResolvedValue(mockUser);
 
@@ -52,6 +71,7 @@ describe('JwtStrategy', () => {
       email: 'user@example.com',
       role: 'customer',
       isActive: true,
+      hasShop: false,
     });
     expect(usersService.findById).toHaveBeenCalledWith(
       '66a1b2c3d4e5f67890123456',

@@ -75,7 +75,6 @@ export class ProductsService {
     user: AuthUser,
     dto: CreateProductDto,
   ): Promise<OwnerProductDto> {
-    await this.assertShopSetup(user.id);
     this.assertCloudinaryImages(dto.images);
     await this.assertCategoryUsable(dto.categoryId);
 
@@ -268,20 +267,6 @@ export class ProductsService {
     return (
       user.role === UserRole.ADMIN || product.sellerId.toString() === user.id
     );
-  }
-
-  private async assertShopSetup(userId: string): Promise<void> {
-    const owner = await this.userModel
-      .findById(userId)
-      .select('shop')
-      .lean<{ shop?: { shopName?: string; pickupAddress?: string } | null }>()
-      .exec();
-
-    if (!owner?.shop?.shopName || !owner.shop.pickupAddress) {
-      throw new ForbiddenException(
-        'Vui lòng thiết lập thông tin gian hàng trước khi đăng bán',
-      );
-    }
   }
 
   private async assertCategoryUsable(categoryId: string): Promise<void> {
