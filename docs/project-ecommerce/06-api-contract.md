@@ -306,18 +306,21 @@ Authorization: Bearer <access_token>
 
 ## Cart — `/api/v1/cart`
 
-> **Lưu ý:** Guest quản lý cart phía client (localStorage). Các endpoint này dành cho user đã đăng nhập.
+> **Guest** giữ giỏ ở localStorage (chỉ `productId` + `quantity`, BR-CART-001) — không gọi các endpoint này.
+> Ngay sau khi đăng nhập, FE gọi `POST /cart/merge` rồi xóa localStorage (BR-CART-002).
+> Mọi endpoint yêu cầu đăng nhập (thiếu token → 401); **Admin → 403** (BR-AUTH-011).
+> Mọi endpoint (kể cả ghi) đều trả về **toàn bộ giỏ** theo cùng định dạng `GET /cart`.
 
-| Method | Endpoint                 | Auth      | Mô tả                                 |
-| ------ | ------------------------ | --------- | ------------------------------------- |
-| GET    | `/cart`                  | ✅ Login  | Lấy giỏ hàng (đã **nhóm theo người bán**) |
-| POST   | `/cart/items`            | ✅ Login  | Thêm sản phẩm vào giỏ                 |
-| PATCH  | `/cart/items/:productId` | ✅ Login  | Cập nhật số lượng                     |
-| DELETE | `/cart/items/:productId` | ✅ Login  | Xóa sản phẩm khỏi giỏ                 |
-| DELETE | `/cart`                  | ✅ Login  | Xóa toàn bộ giỏ hàng                  |
-| POST   | `/cart/merge`            | ✅ Login  | Merge cart localStorage sau đăng nhập |
+| Method | Endpoint                 | Auth                  | Mô tả                                                     |
+| ------ | ------------------------ | --------------------- | --------------------------------------------------------- |
+| GET    | `/cart`                  | ✅ Login (Customer)   | Lấy giỏ hàng (đã **nhóm theo người bán**)                  |
+| POST   | `/cart/items`            | ✅ Login (Customer)   | Thêm SP vào giỏ (đã có thì **cộng dồn**) — 201            |
+| PATCH  | `/cart/items/:productId` | ✅ Login (Customer)   | Đặt lại số lượng                                          |
+| DELETE | `/cart/items/:productId` | ✅ Login (Customer)   | Xóa SP khỏi giỏ (idempotent: không có trong giỏ vẫn 200)  |
+| DELETE | `/cart`                  | ✅ Login (Customer)   | Xóa toàn bộ giỏ hàng                                      |
+| POST   | `/cart/merge`            | ✅ Login (Customer)   | Merge giỏ localStorage sau đăng nhập — 200                |
 
-#### GET `/cart`
+#### GET `/cart` — Response
 
 ```json
 {
@@ -327,7 +330,25 @@ Authorization: Bearer <access_token>
       {
         "seller": { "id": "...", "shopName": "Shop của A" },
         "items": [
-          { "productId": "...", "name": "...", "imageUrl": "...", "price": 100000, "quantity": 2, "stock": 10 }
+          {
+            "product": {
+              "id": "...",
+              "name": "Áo thun",
+              "slug": "ao-thun-k3f9a1",
+              "imageUrl": "https://res.cloudinary.com/...",
+              "price": 100000,
+              "stock": 10
+            },
+            "quantity": 2,
+            "status": "available",
+            "lineTotal": 200000
+          },
+          {
+            "product": { "id": "...", "name": "Quần jean", "slug": "quan-jean-8b2c0d", "imageUrl": null, "price": 300000, "stock": 1 },
+            "quantity": 3,
+            "status": "exceeds_stock",
+            "lineTotal": 900000
+          }
         ],
         "subtotal": 200000
       }
@@ -335,15 +356,41 @@ Authorization: Bearer <access_token>
     "totalAmount": 200000
   }
 }
-// Item có stock = 0 hoặc SP không còn hiển thị sẽ bị loại khỏi kết quả (BR-CART-004)
 ```
+
+| `status`        | Điều kiện                                    | Mua được | FE hiển thị                          |
+| --------------- | -------------------------------------------- | -------- | ------------------------------------ |
+| `available`     | Đang bán, `quantity <= stock`                | ✅       | Bình thường                          |
+| `exceeds_stock` | Đang bán, `0 < stock < quantity`             | ❌       | "Chỉ còn {stock} sản phẩm" — yêu cầu giảm số lượng |
+| `out_of_stock`  | Đang bán, `stock = 0`                        | ❌       | "Hết hàng"                           |
+| `unavailable`   | `isActive = false` hoặc `isBlocked = true`   | ❌       | "Sản phẩm ngừng bán"                 |
+
+> - `price` luôn là giá **hiện tại** (BR-CART-007). `lineTotal = price × quantity`.
+> - `subtotal` / `totalAmount` chỉ cộng các item `available`.
+> - Thứ tự: SP thêm gần nhất nằm đầu; nhóm theo thứ tự xuất hiện của item đầu tiên của mỗi shop.
+> - SP không còn tồn tại trong DB tự bị loại khỏi giỏ (BR-CART-004).
 
 #### POST `/cart/items`
 
 ```json
 { "productId": "...", "quantity": 2 }
-// 400 nếu: SP của chính mình · vượt stock · SP ẩn/bị block
 ```
+
+| Lỗi | Khi nào |
+| --- | ------- |
+| 400 `Sản phẩm không tồn tại hoặc đã ngừng bán` | SP không có / bị ẩn / bị block |
+| 400 `Bạn không thể mua sản phẩm của chính mình` | BR-CART-006 |
+| 400 `Sản phẩm đã hết hàng` | `stock = 0` |
+| 400 `Số lượng vượt quá tồn kho (còn {stock} sản phẩm)` | số lượng đang có + thêm > `stock` |
+| 400 `Giỏ hàng tối đa 100 sản phẩm` | BR-CART-009 |
+
+#### PATCH `/cart/items/:productId`
+
+```json
+{ "quantity": 1 }
+```
+
+> 404 `Sản phẩm không có trong giỏ hàng`; các lỗi 400 như `POST /cart/items` (trừ giới hạn 100 SP).
 
 #### POST `/cart/merge`
 
@@ -354,8 +401,12 @@ Authorization: Bearer <access_token>
     { "productId": "...", "quantity": 3 }
   ]
 }
-// SP của chính mình tự bị lọc bỏ; quantity cộng dồn và cap ở stock
+// tối đa 100 phần tử; quantity là số nguyên >= 1
 ```
+
+> Theo BR-CART-008: gộp trùng `productId`, cộng dồn với số lượng đang có và cap ở `stock` (không làm giảm số lượng đang có); SP không tồn tại / ngừng bán / hết hàng / của chính mình **bị bỏ qua, không báo lỗi**.
+
+> **409** `Giỏ hàng vừa được cập nhật ở nơi khác, vui lòng thử lại` — hai thao tác ghi cùng lúc trên cùng giỏ (vd 2 tab); FE tải lại giỏ rồi thử lại.
 
 ---
 

@@ -6,7 +6,7 @@ import {
   Type,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { validate } from 'class-validator';
+import { validate, ValidationError } from 'class-validator';
 
 @Injectable()
 export class ValidationPipe implements PipeTransform<
@@ -28,10 +28,7 @@ export class ValidationPipe implements PipeTransform<
     });
 
     if (errors.length > 0) {
-      const messages = errors.map((error) => {
-        const constraints = error.constraints || {};
-        return Object.values(constraints).join(', ');
-      });
+      const messages = this.collectMessages(errors);
       throw new BadRequestException({
         statusCode: 400,
         message: messages,
@@ -40,6 +37,16 @@ export class ValidationPipe implements PipeTransform<
     }
 
     return object;
+  }
+
+  private collectMessages(errors: ValidationError[]): string[] {
+    return errors.flatMap((error) => {
+      const own = Object.values(error.constraints ?? {});
+      return [
+        ...(own.length > 0 ? [own.join(', ')] : []),
+        ...this.collectMessages(error.children ?? []),
+      ];
+    });
   }
 
   private toValidate(metatype: Type<unknown>): boolean {
