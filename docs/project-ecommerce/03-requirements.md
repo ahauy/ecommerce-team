@@ -30,7 +30,7 @@
 | BR-AUTH-009 | Ban có hiệu lực **ngay**: `JwtStrategy.validate` đọc `isActive` từ DB mỗi request — access token còn hạn của user bị ban bị từ chối (403) |
 | BR-AUTH-010 | `users.refreshToken` lưu **hash** (SHA-256), không lưu raw; mỗi user 1 refresh token (đăng nhập thiết bị mới vô hiệu hóa token cũ) |
 | BR-AUTH-011 | Admin **chỉ kiểm duyệt**: block/unblock SP, ban/unban user, xem đơn, hủy / hoàn tiền đơn đã thanh toán. Admin **không mua** (thêm giỏ, `POST /orders` → 403) và **không đăng bán** (không có gian hàng, `POST /products` → 403) |
-| BR-AUTH-012 | Guest (chưa đăng nhập) **chỉ xem**. Mọi thao tác giỏ hàng / checkout / đơn hàng yêu cầu đăng nhập — **không có Guest checkout, không có giỏ localStorage, không merge cart** |
+| BR-AUTH-012 | Guest (chưa đăng nhập) xem SP / shop / category và **có giỏ hàng lưu localStorage** (BR-CART-001). Checkout / đơn hàng yêu cầu đăng nhập — **không có Guest checkout** |
 
 ### User & Shop (gian hàng)
 
@@ -85,12 +85,15 @@
 
 | ID          | Rule                                                                                                          |
 | ----------- | ------------------------------------------------------------------------------------------------------------- |
-| BR-CART-001 | Guest: cart lưu client-side (localStorage). Không persist DB                                                  |
-| BR-CART-002 | Customer: cart lưu DB. Khi đăng nhập, merge cart local vào cart DB                                            |
-| BR-CART-003 | Số lượng trong cart không được vượt quá `stock` hiện tại                                                      |
-| BR-CART-004 | Xóa item khỏi cart khi `stock = 0` **hoặc** SP không còn hiển thị (`isActive = false` / `isBlocked = true`) lúc user load lại giỏ |
+| BR-CART-001 | Guest: cart lưu client-side (localStorage), chỉ gồm `productId` + `quantity`. Không persist DB (không có `userId`) |
+| BR-CART-002 | Customer: cart lưu DB (1 user 1 cart). Ngay sau khi đăng nhập, FE gọi `POST /cart/merge` với cart localStorage rồi xóa localStorage |
+| BR-CART-003 | Thêm / sửa số lượng: tổng số lượng của 1 SP trong giỏ không được vượt quá `stock` hiện tại → 400. Khi tải lại giỏ mà `stock` đã giảm xuống dưới số lượng (vẫn > 0): **giữ nguyên số lượng**, đánh dấu `exceeds_stock`; người dùng phải tự giảm số lượng mới mua được SP đó |
+| BR-CART-004 | SP hết hàng (`stock = 0`) hoặc ngừng bán (`isActive = false` / `isBlocked = true`) **vẫn giữ trong giỏ** và được đánh dấu (`out_of_stock` / `unavailable`); không mua được, không tính vào tổng tiền; người dùng tự xóa. Chỉ SP không còn tồn tại trong DB mới tự bị loại khỏi giỏ |
 | BR-CART-005 | Giỏ hàng cho phép trộn SP của nhiều người bán; khi hiển thị, nhóm theo người bán (như Shopee)                 |
-| BR-CART-006 | Không thêm SP của chính mình vào giỏ; khi merge cart, tự lọc bỏ các SP này                                    |
+| BR-CART-006 | Không thêm SP của chính mình vào giỏ (400); khi merge cart, tự lọc bỏ các SP này                              |
+| BR-CART-007 | Giá trong giỏ **luôn là giá hiện tại** của SP (không lưu giá trong cart DB); Order vẫn tính lại giá từ DB lúc tạo |
+| BR-CART-008 | Merge: gộp trùng `productId`, cộng dồn với số lượng đang có và cap ở `stock` (không làm giảm số lượng đang có); tự bỏ qua SP không tồn tại / ngừng bán / hết hàng / của chính mình |
+| BR-CART-009 | Giỏ tối đa 100 SP khác nhau; thêm SP thứ 101 → 400; merge bỏ qua phần vượt                                     |
 
 ### Checkout (nhóm đơn) — một lần thanh toán, nhiều đơn
 

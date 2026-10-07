@@ -206,10 +206,11 @@
 | IPN và Return URL đến gần như cùng lúc                             | Xử lý idempotent theo trạng thái checkout — chỉ lần đến trước có hiệu lực              |
 | Chạy `localhost`, VNPay không gọi được IPN                         | Return URL cũng cập nhật đơn (BR-PAY-006); hoặc dùng ngrok cho IPN                     |
 | Refresh Token hết hạn                                              | Redirect về trang đăng nhập                                                            |
-| Guest bấm "Đăng nhập" khi đang có hàng trong giỏ                   | Sau đăng nhập, merge cart local vào cart DB                                            |
+| Guest bấm "Đăng nhập" khi đang có hàng trong giỏ                   | Sau đăng nhập, FE gọi `POST /cart/merge` rồi xóa localStorage (BR-CART-002, BR-CART-008) |
 | Seller tự mua SP của mình                                          | Chặn ở thêm giỏ, merge cart (tự lọc) và `POST /orders` (400)                           |
-| Seller sửa giá khi SP đang nằm trong giỏ người khác                | Giá giỏ chỉ để hiển thị; **tính lại giá từ DB** khi tạo Order                          |
-| Seller giảm stock xuống dưới số lượng trong giỏ                    | Áp dụng BR-CART-003 khi load lại giỏ / lỗi hết hàng khi checkout                       |
+| Seller sửa giá khi SP đang nằm trong giỏ người khác                | Giỏ luôn hiện giá mới (BR-CART-007); **tính lại giá từ DB** khi tạo Order              |
+| Seller giảm stock xuống dưới số lượng trong giỏ                    | Giữ nguyên số lượng, item `exceeds_stock` — người mua phải giảm số lượng (BR-CART-003) |
+| Seller ẩn SP / Admin block SP / SP hết hàng khi đang nằm trong giỏ | Item vẫn ở trong giỏ, đánh dấu `unavailable` / `out_of_stock`, không mua được (BR-CART-004) |
 | Seller ẩn / xóa SP đang có đơn `pending` hoặc `confirmed`          | Đơn vẫn xử lý bình thường (snapshot); SP chỉ biến mất khỏi danh sách công khai          |
 | Seller bị ban khi đang có đơn `confirmed` chưa giao                | Đơn giữ nguyên; Admin quyết định xử lý (hủy + hoàn tiền hoặc tự cập nhật trạng thái)   |
 | Seller cố mở lại SP đã bị Admin block                              | Cập nhật `isActive` được nhưng SP vẫn không hiển thị (vì `isBlocked`); thấy lý do block |
@@ -219,5 +220,6 @@
 | User sửa query `/checkout/result?status=success`                   | FE **không tin** query; gọi `GET /checkouts/:checkoutCode` lấy trạng thái thật             |
 | Admin muốn hủy Order `pending`                                     | Không cho phép (BR-STT-007) — chờ hệ thống hủy khi thanh toán lỗi / hết hạn                |
 | User đóng trang kết quả sau khi thanh toán                         | Xem lại ở "Lịch sử đơn mua", hoặc mở lại `/checkout/result?checkoutCode=...` (API yêu cầu đăng nhập + đúng chủ) |
-| Guest bấm "Thêm giỏ" / "Đặt hàng"                                  | FE chuyển sang trang đăng nhập (BR-AUTH-012); không có giỏ localStorage                     |
+| Guest bấm "Thêm giỏ"                                               | Lưu vào giỏ localStorage (BR-CART-001)                                                      |
+| Guest bấm "Đặt hàng"                                               | FE chuyển sang trang đăng nhập (BR-AUTH-012), sau đó merge giỏ rồi quay lại giỏ hàng        |
 | Admin gọi thêm giỏ / `POST /orders` / `POST /products`             | 403 (BR-AUTH-011)                                                                           |

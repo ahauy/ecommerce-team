@@ -47,7 +47,9 @@
 | **shipping / delivered** | Seller (hoặc Admin) đang giao / đã giao                                                                                          | Seller bấm tay                                                        |
 | **cancelled / refunded** | Đơn bị hủy (hoàn stock đúng 1 lần) / Admin đã hoàn tiền thủ công                                                                 | `refunded` chỉ khi `paymentStatus = paid`                             |
 | **late success**         | VNPay báo thành công **sau** khi Checkout đã `expired`                                                                           | Ghi `payments.note`, Admin hoàn tiền thủ công                         |
-| **Guest**                | Khách chưa đăng nhập: chỉ xem SP / shop / category                                                                               | Không có Guest checkout, không có giỏ localStorage                    |
+| **Guest**                | Khách chưa đăng nhập: xem SP / shop / category, có giỏ localStorage                                                              | Không có Guest checkout; merge giỏ khi đăng nhập (BR-CART-002)        |
+| **cart merge**           | `POST /cart/merge` ngay sau đăng nhập: đổ giỏ localStorage vào cart DB rồi xóa localStorage                                      | Cộng dồn, cap ở stock, bỏ qua SP không hợp lệ (BR-CART-008)           |
+| **cart item status**     | Trạng thái item tính lúc `GET /cart`: `available` / `exceeds_stock` / `out_of_stock` / `unavailable`                             | Chỉ `available` mua được và tính tiền (BR-CART-003, BR-CART-004)      |
 | **Admin**                | Tài khoản chỉ kiểm duyệt: block SP, ban user, hoàn tiền thủ công                                                                 | Không mua, không bán; tạo bằng seed script (BR-AUTH-004, BR-AUTH-011) |
 | **transaction**          | MongoDB multi-document transaction (`session.withTransaction`) bao quanh: trừ stock + tạo Checkout/Order; hủy Order + hoàn stock | Cần replica set (Atlas có sẵn) — BR-CHK-010                           |
 

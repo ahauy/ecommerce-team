@@ -87,23 +87,24 @@ payments       (raw log callback VNPay)
 
 ### `carts`
 
-> Chỉ tồn tại cho user đăng nhập. Guest dùng localStorage.
+> Chỉ tồn tại cho user đăng nhập. Guest dùng localStorage, merge vào đây khi đăng nhập (BR-CART-002).
 
 ```js
 {
   _id: ObjectId,
   userId: ObjectId,       // ref: 'users', unique (1 user 1 cart)
-  items: [
+  items: [                // tối đa 100 phần tử, mỗi productId xuất hiện 1 lần; item không có _id
     {
       productId: ObjectId,  // ref: 'products'
-      quantity: Number,     // >= 1
-      price: Number,         // snapshot giá tại thời điểm thêm vào giỏ (chỉ để hiển thị)
-      isOutOfStock:  boolean
+      quantity: Number      // integer >= 1
     }
   ],
+  createdAt: Date,
   updatedAt: Date
 }
 ```
+
+> **Không lưu** `price` / trạng thái hết hàng: giá, tồn kho và trạng thái item (`available` / `exceeds_stock` / `out_of_stock` / `unavailable`) được tính từ `products` mỗi lần `GET /cart` (BR-CART-003, BR-CART-004, BR-CART-007).
 
 > `sellerId` **không** lưu trong cart — lấy từ product khi `GET /cart` để nhóm theo người bán.
 
