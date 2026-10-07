@@ -97,7 +97,8 @@ payments       (raw log callback VNPay)
     {
       productId: ObjectId,  // ref: 'products'
       quantity: Number,     // >= 1
-      price: Number         // snapshot giá tại thời điểm thêm vào giỏ (chỉ để hiển thị)
+      price: Number,         // snapshot giá tại thời điểm thêm vào giỏ (chỉ để hiển thị)
+      isOutOfStock:  boolean
     }
   ],
   updatedAt: Date
