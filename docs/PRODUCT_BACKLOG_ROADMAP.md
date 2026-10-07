@@ -256,7 +256,7 @@ schema-version: "1.3"
 
 ---
 
-- [ ] **US-PRD-001**: Đăng bán & quản lý Product (Seller sở hữu / Admin) + Upload ảnh Cloudinary
+- [x] **US-PRD-001**: Đăng bán & quản lý Product (Seller sở hữu / Admin) + Upload ảnh Cloudinary
   - **Slug:** `product-management`
   - **Effort:** L
   - **Context-budget:** multi-session
@@ -265,19 +265,19 @@ schema-version: "1.3"
   - **Blocks:** `US-PRD-002`, `US-CART-001`
   - **Mô tả:** User đã thiết lập gian hàng đăng bán sản phẩm (giá, stock, ảnh Cloudinary, category) và chỉ quản lý được SP **của mình**. Admin thao tác được trên mọi SP.
   - **Acceptance Criteria (AC):**
-    - [ ] `POST /api/v1/products` (✅ Login) → tạo SP; `sellerId` gán từ token (bỏ qua `sellerId` trong body).
-    - [ ] `POST /products` khi chưa thiết lập gian hàng → 403 "Vui lòng thiết lập thông tin gian hàng trước khi đăng bán".
-    - [ ] `name` tối đa 120 ký tự; tối đa 5 ảnh / SP — vượt quá → 400.
-    - [ ] `POST /api/v1/upload/image` (✅ Login) → upload Cloudinary, trả URL; chỉ jpg/png/webp, ≤5MB.
-    - [ ] `GET /api/v1/products/my` → danh sách SP của mình, gồm cả ẩn / bị block (kèm `blockReason`).
-    - [ ] `PATCH /api/v1/products/:id` bởi chủ SP → 200; bởi user khác → 403; bởi Admin → 200.
-    - [ ] `DELETE /api/v1/products/:id` → soft delete (`isActive = false`), cùng quy tắc quyền như PATCH.
-    - [ ] Seller tắt `isActive` thì SP biến khỏi danh sách công khai; bật lại được **trừ khi** `isBlocked = true`.
-    - [ ] `stock` không thể lưu giá trị âm — validation ở DTO level; `sellerId` không đổi được sau khi tạo.
-    - [ ] FE Seller: `MyProductsPage`, `ProductFormPage` với preview ảnh, chọn category từ dropdown, nút "Lưu & Hiển thị".
+    - [x] `POST /api/v1/products` (✅ Login) → tạo SP; `sellerId` gán từ token (bỏ qua `sellerId` trong body).
+    - [x] `POST /products` khi chưa thiết lập gian hàng → 403 "Vui lòng thiết lập thông tin gian hàng trước khi đăng bán".
+    - [x] `name` tối đa 120 ký tự; tối đa 5 ảnh / SP — vượt quá → 400.
+    - [x] `POST /api/v1/upload/image` (✅ Login) → upload Cloudinary, trả URL; chỉ jpg/png/webp, ≤5MB.
+    - [x] `GET /api/v1/products/my` → danh sách SP của mình, gồm cả ẩn / bị block (kèm `blockReason`).
+    - [x] `PATCH /api/v1/products/:id` bởi chủ SP → 200; bởi user khác → 403; bởi Admin → 200.
+    - [x] `DELETE /api/v1/products/:id` → soft delete (`isActive = false`), cùng quy tắc quyền như PATCH.
+    - [x] Seller tắt `isActive` thì SP biến khỏi danh sách công khai; bật lại được **trừ khi** `isBlocked = true`.
+    - [x] `stock` không thể lưu giá trị âm — validation ở DTO level; `sellerId` không đổi được sau khi tạo.
+    - [x] FE Seller: `MyProductsPage`, `ProductFormPage` với preview ảnh, chọn category từ dropdown, nút "Lưu & Hiển thị".
   - **Tasks:**
-    - [ ] **Backend:** `Product schema (sellerId, name, slug, description, price, stock, images[], categoryId, isActive, isBlocked, blockReason)` · `Indexes (text, sellerId, categoryId, price)` · `Upload service (Cloudinary SDK)` · `CRUD endpoints + assertOwnerOrAdmin`
-    - [ ] **Frontend:** `Seller: MyProductsPage, ProductFormPage (image uploader)` · `Cloudinary upload helper`
+    - [x] **Backend:** `Product schema (sellerId, name, slug, description, price, stock, images[], categoryId, isActive, isBlocked, blockReason)` · `Indexes (text, sellerId, categoryId, price)` · `Upload service (Cloudinary SDK)` · `CRUD endpoints + assertOwnerOrAdmin`
+    - [x] **Frontend:** `Seller: MyProductsPage, ProductFormPage (image uploader)` · `Cloudinary upload helper`
   - **Stitch Screens (`projects/6249429078653284294`):**
     - `projects/6249429078653284294/screens/83cc94525dd147f7940b903c7d0c2c0e` ("Sản phẩm Seller #1")
     - `projects/6249429078653284294/screens/5d142b4a1b0b4fa4a44dec4eb8a0f663` ("Sản phẩm Seller #2")
