@@ -84,7 +84,7 @@ const PublicShopPage: React.FC = () => {
       className="w-full min-h-screen bg-[#fbfbf5] py-8 md:py-12 px-4 sm:px-6 lg:px-8"
       style={{ fontFeatureSettings: '"ss03"' }}
     >
-      <div className="max-w-6xl mx-auto space-y-10">
+      <div className="w-full space-y-10">
         {/* Back Link */}
         <div>
           <Link

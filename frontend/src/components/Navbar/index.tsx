@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ShoppingBag, ChevronDown, User as UserIcon, Store, ShieldCheck, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import Sidebar from "../Sidebar";
@@ -10,9 +10,6 @@ import { userService } from "@/services/user.service";
 import useLogout from "@/hooks/useLogout";
 import BaseUrl from "@/consts/baseUrl";
 
-const pillLink =
-  "hidden sm:inline-flex items-center justify-center rounded-full border border-black/20 px-3.5 py-1 text-xs font-medium text-foreground hover:bg-accent transition-colors";
-
 export default function Navbar() {
   const status = useAuthStore((s) => s.status);
   const user = useAuthStore((s) => s.user);
@@ -21,85 +18,151 @@ export default function Navbar() {
   const [openPopover, setPopover] = useState(false);
 
   const isCustomer = status === "authed" && user?.role === "customer";
-  // Chỉ cần profile để biết đã có gian hàng chưa (shopName không lưu trong auth store).
+  const isAdmin = status === "authed" && user?.role === "admin";
   const { data: profile } = userService.useGetProfile(isCustomer);
 
   const initial = user?.fullName?.charAt(0)?.toUpperCase() || "U";
 
   return (
-    <nav className="flex w-full items-center justify-between p-2 md:justify-end">
+    <nav className="flex items-center gap-3">
+      {/* Mobile Drawer Trigger */}
       <Popover open={isOpen} onOpenChange={toggle}>
         <PopoverTrigger asChild>
-          {isOpen ? (
-            <X className="hover:cursor-pointer md:hidden" aria-label="Đóng menu" />
-          ) : (
-            <Menu className="hover:cursor-pointer md:hidden" aria-label="Mở menu" />
-          )}
+          <button
+            type="button"
+            className="p-2 text-zinc-700 hover:text-black rounded-full hover:bg-zinc-100 md:hidden"
+            aria-label={isOpen ? "Đóng menu" : "Mở menu"}
+          >
+            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </PopoverTrigger>
         <PopoverContent className="mt-[10px] w-auto border-0 p-0">
           <Sidebar forMobile />
         </PopoverContent>
       </Popover>
 
-      <div className="flex items-center gap-3">
-        {status === "guest" && (
-          <>
-            <Link to={BaseUrl.Login} className={pillLink}>
-              Đăng nhập
-            </Link>
-            <Link to={BaseUrl.Register} className={pillLink}>
-              Đăng ký
-            </Link>
-          </>
-        )}
-
-        {isCustomer && profile && (
+      {/* Guest Links */}
+      {status === "guest" && (
+        <div className="flex items-center gap-2">
           <Link
-            to={profile.shop ? `/shops/${user?.id}` : BaseUrl.ShopSetup}
-            className={pillLink}
+            to={BaseUrl.Login}
+            className="hidden sm:inline-flex items-center justify-center h-10 px-5 rounded-full text-xs font-semibold text-zinc-700 hover:text-black border border-[#e4e4e7] bg-white hover:bg-zinc-50 transition-colors shadow-xs"
           >
-            {profile.shop ? "Gian hàng của tôi" : "Đăng bán"}
+            Đăng nhập
           </Link>
-        )}
+          <Link
+            to={BaseUrl.Register}
+            className="hidden sm:inline-flex items-center justify-center h-10 px-5 rounded-full text-xs font-semibold text-white bg-black hover:bg-zinc-800 transition-colors shadow-xs"
+          >
+            Đăng ký
+          </Link>
+        </div>
+      )}
 
-        {status === "authed" && user && (
-          <Popover open={openPopover} onOpenChange={setPopover}>
-            <PopoverTrigger asChild>
-              <button
-                type="button"
-                className="navbar__avatar flex items-center gap-2 rounded-md text-left hover:cursor-pointer"
-              >
-                <Avatar>
-                  <AvatarFallback>{initial}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="mb-1 text-sm font-medium leading-none">{user.fullName}</p>
-                  <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-                </div>
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="mr-2 mt-2 flex max-w-[200px] flex-col p-2">
+      {/* Seller Action Button */}
+      {isCustomer && (
+        <Link
+          to={profile?.shop ? BaseUrl.SellerProducts : BaseUrl.ShopSetup}
+          className="hidden lg:inline-flex items-center justify-center h-10 px-5 rounded-full text-xs font-semibold tracking-wider bg-white text-black border border-[#e4e4e7] hover:bg-zinc-50 transition-colors shadow-xs"
+        >
+          {profile?.shop ? "Kênh người bán" : "Đăng bán"}
+        </Link>
+      )}
+
+      {/* Cart Button with Mint Badge */}
+      <button
+        type="button"
+        aria-label="Giỏ hàng & Đơn đặt"
+        className="relative p-2.5 text-zinc-700 hover:text-black rounded-full hover:bg-zinc-100 transition-colors"
+      >
+        <ShoppingBag className="h-5 w-5" />
+        <span className="absolute top-1 right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-[#c1fbd4] text-black text-[11px] font-bold rounded-full leading-none">
+          0
+        </span>
+      </button>
+
+      {/* Vertical Hairline Separator */}
+      <div className="h-6 w-[1px] bg-[#e4e4e7] hidden sm:block" />
+
+      {/* Authed User Popover */}
+      {status === "authed" && user && (
+        <Popover open={openPopover} onOpenChange={setPopover}>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              className="navbar__avatar flex items-center gap-2 pl-1 rounded-full group hover:cursor-pointer focus:outline-none"
+              aria-label="Tài khoản cá nhân"
+            >
+              <Avatar className="h-9 w-9 ring-1 ring-[#e4e4e7] group-hover:ring-black transition-all">
+                <AvatarFallback className="bg-zinc-100 text-black text-xs font-semibold">
+                  {initial}
+                </AvatarFallback>
+              </Avatar>
+              <div className="hidden sm:flex flex-col text-left">
+                <p className="text-xs font-semibold text-black leading-tight truncate max-w-[120px]">
+                  {user.fullName}
+                </p>
+                <p className="text-[10px] text-zinc-400 leading-tight truncate max-w-[120px]">
+                  {user.role === "admin" ? "Quản trị viên" : user.email}
+                </p>
+              </div>
+              <ChevronDown className="h-4 w-4 text-zinc-400 group-hover:text-black hidden sm:block transition-colors" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="mr-2 mt-2 w-56 rounded-xl border border-[#e4e4e7] bg-white p-2 shadow-lg">
+            <div className="px-3 py-2 border-b border-[#e4e4e7] mb-1">
+              <p className="text-xs font-semibold text-black truncate">{user.fullName}</p>
+              <p className="text-[11px] text-zinc-400 truncate">{user.email}</p>
+            </div>
+
+            <Link
+              to={isAdmin ? BaseUrl.AdminProfile : BaseUrl.AccountProfile}
+              className="navbar__each__menu flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-[#fbfbf5] hover:text-black transition-colors"
+              onClick={() => setPopover(false)}
+            >
+              <UserIcon className="h-4 w-4 text-zinc-500" />
+              <span>Hồ sơ cá nhân</span>
+            </Link>
+
+            {isCustomer && (
               <Link
-                to={BaseUrl.Profile}
-                className="navbar__each__menu is-hover p-1 px-2 text-sm"
+                to={profile?.shop ? BaseUrl.SellerProducts : BaseUrl.ShopSetup}
+                className="navbar__each__menu flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-[#fbfbf5] hover:text-black transition-colors"
                 onClick={() => setPopover(false)}
               >
-                Hồ sơ cá nhân
+                <Store className="h-4 w-4 text-zinc-500" />
+                <span>{profile?.shop ? "Kênh người bán" : "Đăng bán sản phẩm"}</span>
               </Link>
-              <button
-                type="button"
-                className="navbar__each__menu is-hover p-1 px-2 text-left text-sm"
-                onClick={() => {
-                  setPopover(false);
-                  void logout();
-                }}
+            )}
+
+            {isAdmin && (
+              <Link
+                to={BaseUrl.AdminCategories}
+                className="navbar__each__menu flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-[#fbfbf5] hover:text-black transition-colors"
+                onClick={() => setPopover(false)}
               >
-                Đăng xuất
-              </button>
-            </PopoverContent>
-          </Popover>
-        )}
-      </div>
+                <ShieldCheck className="h-4 w-4 text-zinc-500" />
+                <span>Trang quản trị</span>
+              </Link>
+            )}
+
+            <div className="my-1 border-t border-[#e4e4e7]" />
+
+            <button
+              type="button"
+              className="navbar__each__menu flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
+              onClick={() => {
+                setPopover(false);
+                void logout();
+              }}
+            >
+              <LogOut className="h-4 w-4 text-red-500" />
+              <span>Đăng xuất</span>
+            </button>
+          </PopoverContent>
+        </Popover>
+      )}
     </nav>
   );
 }
+

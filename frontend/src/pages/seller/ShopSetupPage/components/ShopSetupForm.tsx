@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/components/ui/use-toast';
+import { showSuccess, showError } from '@/helpers/toast';
 import { userService, SetupShopDto } from '@/services/user.service';
 import BaseUrl from '@/consts/baseUrl';
 import { ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
@@ -21,7 +21,6 @@ export interface ShopSetupFormProps {
 }
 
 export const ShopSetupForm: React.FC<ShopSetupFormProps> = ({ initialValues, onSuccess }) => {
-  const { toast } = useToast();
   const navigate = useNavigate();
   const setupShopMutation = userService.useSetupShop();
 
@@ -33,16 +32,12 @@ export const ShopSetupForm: React.FC<ShopSetupFormProps> = ({ initialValues, onS
         phone: values.phone.trim(),
       });
 
-      toast({
-        title: 'Thiết lập gian hàng thành công',
-        description: 'Gian hàng của bạn đã sẵn sàng bắt đầu bán sản phẩm.',
-        variant: 'default',
-      });
+      showSuccess('Gian hàng của bạn đã sẵn sàng bắt đầu bán sản phẩm.');
 
       if (onSuccess) {
         onSuccess();
       } else {
-        navigate(BaseUrl.Profile);
+        navigate(BaseUrl.SellerProducts);
       }
     } catch (err: unknown) {
       const errResponse = err as { response?: { data?: { message?: string | string[] } } };
@@ -51,11 +46,7 @@ export const ShopSetupForm: React.FC<ShopSetupFormProps> = ({ initialValues, onS
         (Array.isArray(rawMessage) ? rawMessage.join(', ') : rawMessage) ||
         'Có lỗi xảy ra khi thiết lập gian hàng. Vui lòng thử lại.';
 
-      toast({
-        title: 'Thiết lập gian hàng thất bại',
-        description: message,
-        variant: 'destructive',
-      });
+      showError(message);
     }
   };
 
@@ -214,7 +205,7 @@ export const ShopSetupForm: React.FC<ShopSetupFormProps> = ({ initialValues, onS
             {/* Actions */}
             <div className="pt-4 flex items-center justify-between gap-4 border-t border-[#e4e4e7]">
               <Link
-                to={BaseUrl.Homepage}
+                to={BaseUrl.SellerProducts}
                 className="text-sm text-zinc-500 hover:text-zinc-900 transition-colors underline-offset-4 hover:underline"
               >
                 Để sau

@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import type { ReactNode } from 'react';
 
 const { logoutMock } = vi.hoisted(() => ({ logoutMock: vi.fn() }));
@@ -8,7 +8,7 @@ vi.mock('@/services/auth.service', () => ({
   default: { logout: logoutMock },
 }));
 
-import useLogout from '../useLogout';
+import useLogout, { getLoginPathFor } from '../useLogout';
 import { useAuthStore } from '@/stores/auth.store';
 import { queryClient } from '@/lib/queryClient';
 
@@ -45,5 +45,34 @@ describe('useLogout', () => {
     });
 
     expect(useAuthStore.getState().status).toBe('guest');
+  });
+
+  describe('getLoginPathFor', () => {
+    it('maps each area to its own login portal', () => {
+      expect(getLoginPathFor('/admin/categories')).toBe('/admin/login');
+      expect(getLoginPathFor('/admin')).toBe('/admin/login');
+      expect(getLoginPathFor('/seller/products/new')).toBe('/seller/login');
+      expect(getLoginPathFor('/account/profile')).toBe('/login');
+      expect(getLoginPathFor('/')).toBe('/login');
+    });
+  });
+
+  it('navigates to the admin portal after logging out from /admin/*', async () => {
+    logoutMock.mockResolvedValue(undefined);
+    const LocationProbe = () => <div data-testid="loc">{useLocation().pathname}</div>;
+    const adminWrapper = ({ children }: { children: ReactNode }) => (
+      <MemoryRouter initialEntries={['/admin/categories']}>
+        <Routes>
+          <Route path="*" element={<>{children}<LocationProbe /></>} />
+        </Routes>
+      </MemoryRouter>
+    );
+    const { result } = renderHook(() => useLogout(), { wrapper: adminWrapper });
+
+    await act(async () => {
+      await result.current();
+    });
+
+    expect(document.querySelector('[data-testid="loc"]')?.textContent).toBe('/admin/login');
   });
 });

@@ -2,7 +2,7 @@ import { Formik, Form, Field } from 'formik';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/components/ui/use-toast';
+import { showSuccess, showError } from '@/helpers/toast';
 import { userService, UpdateProfileDto } from '@/services/user.service';
 import { profileValidationSchema } from '../../schemas/profile.schema';
 
@@ -15,7 +15,6 @@ export interface ProfileFormProps {
 }
 
 const ProfileForm = ({ initialValues }: ProfileFormProps) => {
-  const { toast } = useToast();
   const updateProfileMutation = userService.useUpdateProfile();
 
   const handleSubmit = async (values: UpdateProfileDto) => {
@@ -25,17 +24,9 @@ const ProfileForm = ({ initialValues }: ProfileFormProps) => {
         phone: values.phone && values.phone.trim() ? values.phone.trim() : undefined,
         address: values.address && values.address.trim() ? values.address.trim() : undefined,
       });
-      toast({
-        title: 'Cập nhật thành công',
-        description: 'Thông tin hồ sơ đã được cập nhật',
-        variant: 'default',
-      });
+      showSuccess('Thông tin hồ sơ đã được cập nhật');
     } catch {
-      toast({
-        title: 'Cập nhật thất bại',
-        description: 'Có lỗi xảy ra khi cập nhật thông tin',
-        variant: 'destructive',
-      });
+      showError('Có lỗi xảy ra khi cập nhật thông tin');
     }
   };
 

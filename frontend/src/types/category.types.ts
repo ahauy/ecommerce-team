@@ -16,6 +16,7 @@ export interface CategoryItem {
 
 /** Item trả về từ public `GET /categories` (chỉ category đang active) */
 export interface PublicCategoryItem {
+  _id: any;
   id: string;
   name: string;
   slug: string;

@@ -114,6 +114,16 @@ const LoginPage: React.FC = () => {
                   Đăng ký
                 </Link>
               </div>
+
+              <div className="border-t border-zinc-200 pt-4 text-center text-[13px] text-zinc-500">
+                Bạn là người bán?{' '}
+                <Link
+                  to={BaseUrl.SellerLogin}
+                  className="font-medium text-black underline underline-offset-4 hover:opacity-70"
+                >
+                  Vào Kênh người bán
+                </Link>
+              </div>
             </Form>
           )}
         </Formik>

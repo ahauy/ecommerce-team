@@ -9,7 +9,7 @@ const ShopSetupPage: React.FC = () => {
   return (
     <div
       data-testid="shop-setup-page"
-      className="w-full min-h-[calc(100vh-4rem)] flex items-center justify-center bg-[#fbfbf5] px-4 py-12 md:py-20"
+      className="w-full flex items-start justify-center py-4 md:py-8"
       style={{ fontFeatureSettings: '"ss03"' }}
     >
       <div className="w-full max-w-[640px] bg-white rounded-2xl p-6 sm:p-10 shadow-card border border-[#e4e4e7] space-y-8">

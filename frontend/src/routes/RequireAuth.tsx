@@ -6,9 +6,13 @@ import { useAuthStore, type AuthRole } from '@/stores/auth.store';
 interface RequireAuthProps {
   /** Chỉ cho phép role này (vd. "admin"). Bỏ trống = chỉ cần đăng nhập. */
   role?: AuthRole;
+  /** Đường dẫn trang đăng nhập cho phân quyền này (vd. /admin/login, /seller/login) */
+  loginPath?: string;
+  /** Đường dẫn khi bị từ chối quyền (vd. /admin/login hoặc /) */
+  forbiddenPath?: string;
 }
 
-const RequireAuth = ({ role }: RequireAuthProps) => {
+const RequireAuth = ({ role, loginPath, forbiddenPath }: RequireAuthProps) => {
   const status = useAuthStore((s) => s.status);
   const user = useAuthStore((s) => s.user);
   const location = useLocation();
@@ -22,12 +26,14 @@ const RequireAuth = ({ role }: RequireAuthProps) => {
     );
   }
 
+  const targetLogin = loginPath || BaseUrl.Login;
+
   if (status === 'guest') {
-    return <Navigate to={BaseUrl.Login} replace state={{ from: location }} />;
+    return <Navigate to={targetLogin} replace state={{ from: location }} />;
   }
 
   if (role && user?.role !== role) {
-    return <Navigate to={BaseUrl.Homepage} replace />;
+    return <Navigate to={forbiddenPath || BaseUrl.Homepage} replace />;
   }
 
   return <Outlet />;

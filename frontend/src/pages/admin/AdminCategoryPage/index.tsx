@@ -82,10 +82,10 @@ export const AdminCategoryPage: React.FC = () => {
   return (
     <div
       data-testid="admin-category-page"
-      className="w-full min-h-screen bg-[#fbfbf5] p-6 lg:p-10"
+      className="w-full bg-[#fbfbf5]"
       style={{ fontFeatureSettings: '"ss03"' }}
     >
-      <div className="max-w-[1440px] mx-auto space-y-8">
+      <div className="w-full space-y-8">
         {/* Header Action Bar */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-1">
