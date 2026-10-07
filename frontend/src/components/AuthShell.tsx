@@ -11,7 +11,7 @@ const AuthShell: React.FC<AuthShellProps> = ({
   children,
 }) => {
   return (
-    <div className="flex min-h-screen flex-col bg-canvas-cream">
+    <div className="flex min-h-screen flex-col bg-canvas-cream text-zinc-900">
       <header className="flex h-14 items-center justify-between border-b border-zinc-200 px-5 sm:px-8 bg-white">
         <Link
           to={BaseUrl.Homepage}

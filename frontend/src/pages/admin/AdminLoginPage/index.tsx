@@ -69,7 +69,7 @@ const AdminLoginPage: React.FC = () => {
               if (res.data) {
                 // Kiểm tra phân quyền: Chỉ cho phép admin
                 if (res.data.user.role !== 'admin') {
-                  await authService.logout().catch(() => {});
+                  await authService.logout(res.data.accessToken).catch(() => {});
                   const msg = 'Tài khoản của bạn không có quyền truy cập vào Cổng Quản Trị.';
                   setStatus(msg);
                   toast.error(msg);
