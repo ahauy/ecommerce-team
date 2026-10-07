@@ -95,34 +95,16 @@ describe('ProductsService', () => {
       images: [CLOUD_URL],
     };
 
-    const shopReady = () =>
-      userModel.findById.mockReturnValue(
-        chain({ shop: { shopName: 'Shop A', pickupAddress: '123 Đường ABC' } }),
-      );
     const categoryReady = () =>
       categoryModel.findOne.mockReturnValue(chain({ _id: CATEGORY_ID }));
 
-    it('trả 403 khi chưa thiết lập gian hàng', async () => {
-      userModel.findById.mockReturnValue(chain({ shop: null }));
-
-      await expect(service.create(owner, dto)).rejects.toThrow(
-        new ForbiddenException(
-          'Vui lòng thiết lập thông tin gian hàng trước khi đăng bán',
-        ),
-      );
-      expect(productModel.create).not.toHaveBeenCalled();
-    });
-
     it('trả 400 khi ảnh không thuộc Cloudinary của hệ thống', async () => {
-      shopReady();
-
       await expect(
         service.create(owner, { ...dto, images: ['https://evil.com/a.jpg'] }),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('trả 400 khi danh mục không tồn tại hoặc bị ẩn', async () => {
-      shopReady();
       categoryModel.findOne.mockReturnValue(chain(null));
 
       await expect(service.create(owner, dto)).rejects.toThrow(
@@ -131,7 +113,6 @@ describe('ProductsService', () => {
     });
 
     it('gán sellerId từ token và sinh slug có hậu tố ngẫu nhiên', async () => {
-      shopReady();
       categoryReady();
       productModel.create.mockImplementation((data) =>
         Promise.resolve(makeProduct(data)),
@@ -146,7 +127,6 @@ describe('ProductsService', () => {
     });
 
     it('thử lại khi slug bị trùng (11000)', async () => {
-      shopReady();
       categoryReady();
       productModel.create
         .mockRejectedValueOnce({ code: 11000 })

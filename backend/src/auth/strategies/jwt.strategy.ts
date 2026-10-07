@@ -46,6 +46,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       email: user.email,
       role: user.role,
       isActive: user.isActive,
+      hasShop: Boolean(user.shop?.shopName && user.shop?.pickupAddress),
     };
   }
 }
