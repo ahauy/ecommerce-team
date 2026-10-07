@@ -12,6 +12,9 @@ export class ShopProfileDto {
   @ApiProperty({ example: '123 Nguyen Van Linh, District 7, HCMC' })
   pickupAddress: string;
 
+  @ApiProperty({ example: '0987654321' })
+  phone: string;
+
   @ApiProperty({ example: '2024-01-15T10:30:00.000Z' })
   joinedAt: Date;
 }

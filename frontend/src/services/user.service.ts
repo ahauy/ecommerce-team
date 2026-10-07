@@ -6,6 +6,7 @@ export interface ShopProfileDto {
   shopSlug: string;
   pickupAddress: string;
   joinedAt: string;
+  phone: string;
 }
 
 export interface GetProfileResponseDto {
@@ -16,7 +17,7 @@ export interface GetProfileResponseDto {
   address?: string | null;
   role: string;
   isActive: boolean;
-  version: number;
+  version?: number;
   shop: ShopProfileDto | null;
 }
 

@@ -258,7 +258,7 @@ const ProductFormPage: React.FC = () => {
                     >
                       <option value="">-- Chọn danh mục sản phẩm --</option>
                       {categories.map((cat) => (
-                        <option key={cat._id} value={cat._id}>
+                        <option key={cat._id} value={cat.id}>
                           {cat.name}
                         </option>
                       ))}

@@ -1,11 +1,27 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { vi } from 'vitest';
 import ProductFormPage from './index';
 import { categoryService } from '@/services/category.service';
-import { productFormService } from './services/product-form.service';
+
+// Mock the service with hoisted mocks
+const { mockCreateProduct, mockUpdateProduct, mockGetProductDetail } = vi.hoisted(() => ({
+  mockCreateProduct: vi.fn(),
+  mockUpdateProduct: vi.fn(),
+  mockGetProductDetail: vi.fn(),
+}));
+
+vi.mock('./services/product-form.service', () => ({
+  PRODUCT_DETAIL_QUERY_KEY: ['products', 'detail'],
+  productFormService: {
+    getProductDetail: mockGetProductDetail,
+    createProduct: mockCreateProduct,
+    updateProduct: mockUpdateProduct,
+  },
+}));
 
 vi.mock('@/services/category.service', () => ({
   categoryService: {
@@ -13,24 +29,11 @@ vi.mock('@/services/category.service', () => ({
   },
 }));
 
-vi.mock('./services/product-form.service', () => {
-  const mockService = {
-    getProductDetail: vi.fn(),
-    createProduct: vi.fn(),
-    updateProduct: vi.fn(),
-  };
-  return {
-    PRODUCT_DETAIL_QUERY_KEY: ['products', 'detail'],
-    productFormService: mockService,
-  };
-});
-
 const mockCategoryService = categoryService as any;
-const mockProductFormService = productFormService as any;
 
 const mockCategories = [
-  { _id: 'cat-1', name: 'Gia dụng', slug: 'gia-dung' },
-  { _id: 'cat-2', name: 'Nến thơm & Tinh dầu', slug: 'nen-thom' },
+  { _id: 'cat-1', id: 'cat-1', name: 'Gia dụng', slug: 'gia-dung', imageUrl: null },
+  { _id: 'cat-2', id: 'cat-2', name: 'Nến thơm & Tinh dầu', slug: 'nen-thom', imageUrl: null },
 ];
 
 const mockProductDetail = {
@@ -104,7 +107,9 @@ describe('ProductFormPage', () => {
     renderFormPage('/seller/products/new');
 
     const submitBtn = screen.getByRole('button', { name: /đăng bán sản phẩm/i });
-    fireEvent.click(submitBtn);
+    const user = userEvent.setup();
+
+    await user.click(submitBtn);
 
     await waitFor(() => {
       expect(
@@ -120,11 +125,11 @@ describe('ProductFormPage', () => {
       expect(screen.getByText('Tồn kho không được để trống')).toBeInTheDocument();
     });
 
-    expect(mockProductFormService.createProduct).not.toHaveBeenCalled();
+    expect(mockCreateProduct).not.toHaveBeenCalled();
   });
 
   it('prefills product details when in edit mode', async () => {
-    mockProductFormService.getProductDetail.mockResolvedValue(mockProductDetail);
+    mockGetProductDetail.mockResolvedValue(mockProductDetail);
 
     renderFormPage('/seller/products/prod-123/edit');
 
@@ -148,7 +153,7 @@ describe('ProductFormPage', () => {
   });
 
   it('renders BlockedProductAlert and disables public visibility switch if product is blocked', async () => {
-    mockProductFormService.getProductDetail.mockResolvedValue({
+    mockGetProductDetail.mockResolvedValue({
       ...mockProductDetail,
       isBlocked: true,
       blockReason: 'Nội dung hoặc hình ảnh vi phạm chính sách',
@@ -172,7 +177,7 @@ describe('ProductFormPage', () => {
   });
 
   it('successfully creates product on valid submit', async () => {
-    mockProductFormService.createProduct.mockResolvedValue({
+    mockCreateProduct.mockResolvedValue({
       ...mockProductDetail,
       id: 'new-id',
     });
@@ -185,17 +190,19 @@ describe('ProductFormPage', () => {
     const priceInput = screen.getByPlaceholderText('350000');
     const stockInput = screen.getByPlaceholderText('24');
 
-    fireEvent.change(nameInput, { target: { value: 'Bộ khay mộc' } });
-    fireEvent.change(categorySelect, { target: { value: 'cat-1' } });
-    fireEvent.change(descInput, { target: { value: 'Bộ khay gỗ sồi tự nhiên đẹp' } });
-    fireEvent.change(priceInput, { target: { value: '180000' } });
-    fireEvent.change(stockInput, { target: { value: '10' } });
+    const user = userEvent.setup();
+
+    await user.type(nameInput, 'Bộ khay mộc');
+    await user.selectOptions(categorySelect, 'cat-1');
+    await user.type(descInput, 'Bộ khay gỗ sồi tự nhiên đẹp');
+    await user.type(priceInput, '180000');
+    await user.type(stockInput, '10');
 
     const submitBtn = screen.getByRole('button', { name: /đăng bán sản phẩm/i });
-    fireEvent.click(submitBtn);
+    await user.click(submitBtn);
 
     await waitFor(() => {
-      expect(mockProductFormService.createProduct).toHaveBeenCalledWith({
+      expect(mockCreateProduct).toHaveBeenCalledWith({
         name: 'Bộ khay mộc',
         categoryId: 'cat-1',
         description: 'Bộ khay gỗ sồi tự nhiên đẹp',
@@ -207,8 +214,8 @@ describe('ProductFormPage', () => {
   });
 
   it('successfully updates product on valid edit submit', async () => {
-    mockProductFormService.getProductDetail.mockResolvedValue(mockProductDetail);
-    mockProductFormService.updateProduct.mockResolvedValue({
+    mockGetProductDetail.mockResolvedValue(mockProductDetail);
+    mockUpdateProduct.mockResolvedValue({
       ...mockProductDetail,
       price: 390000,
     });
@@ -220,13 +227,15 @@ describe('ProductFormPage', () => {
     });
 
     const priceInput = screen.getByDisplayValue('350000');
-    fireEvent.change(priceInput, { target: { value: '390000' } });
+    const user = userEvent.setup();
+    await user.clear(priceInput);
+    await user.type(priceInput, '390000');
 
     const saveBtn = screen.getByRole('button', { name: /lưu thay đổi/i });
-    fireEvent.click(saveBtn);
+    await user.click(saveBtn);
 
     await waitFor(() => {
-      expect(mockProductFormService.updateProduct).toHaveBeenCalledWith(
+      expect(mockUpdateProduct).toHaveBeenCalledWith(
         'prod-123',
         expect.objectContaining({
           price: 390000,

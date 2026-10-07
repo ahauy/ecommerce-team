@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Edit2, Trash2 } from 'lucide-react';
 import { OwnerProduct } from '../types';
-import BaseUrl from '@/consts/baseUrl';
 import { cn } from '@/lib/utils';
 
 interface ProductTableProps {

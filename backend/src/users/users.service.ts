@@ -196,6 +196,7 @@ export class UsersService {
         shopName: user.shop.shopName!,
         shopSlug: user.shop.shopSlug!,
         pickupAddress: user.shop.pickupAddress!,
+        phone: user.shop.phone!,
         joinedAt: user.shop.joinedAt!,
       } : null,
     };
