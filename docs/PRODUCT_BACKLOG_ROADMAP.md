@@ -383,7 +383,7 @@ schema-version: "1.3"
     - [ ] FE: Trang Checkout (form recipient) → "Thanh toán" → redirect sang trang thanh toán PayOS; trang kết quả `/checkout/result` liệt kê các đơn.
   - **Tasks:**
     - [ ] **Backend:** `Checkout schema + Order schema (checkoutId, sellerId, sellerShopName, userId, recipient, items snapshot, totalAmount, status, paymentStatus)` · `POST /orders: group by seller, atomic decrement, session.withTransaction (all-or-nothing), tạo payment link PayOS sau commit (lỗi → Checkout failed + restockAndCancel)` · `orderCode/checkoutCode generator` · `restockAndCancel() dùng chung`
-    - [ ] **Frontend:** `CheckoutPage (prefill recipient từ profile)` · `CheckoutResultPage (success/fail)`
+    - [x] **Frontend:** `CheckoutPage (prefill recipient từ profile)` · `CheckoutResultPage (success/fail)`
   - **Stitch Screens (`projects/6249429078653284294`):**
     - `projects/6249429078653284294/screens/a9f65d6cc9de44bbb27efeec4e04885e` ("Thanh toán #1")
     - `projects/6249429078653284294/screens/dcd5e43670f04767b433a747184b9d53` ("Thanh toán #2")
@@ -413,7 +413,7 @@ schema-version: "1.3"
     - [ ] Thanh toán thành công đến **sau** khi Checkout `expired` / `failed` → ghi `payments.note = late_success_after_expiry`, không mở lại đơn; Admin chuyển khoản hoàn tiền thủ công.
   - **Tasks:**
     - [ ] **Backend:** `PayOS service (tạo link, tra cứu, hủy link, verify signature) — SDK @payos/node hoặc REST` · `payosOrderCode generator` · `processPaymentResult() idempotent` · `POST /payments/payos/webhook` · `đồng bộ trong GET /checkouts/:checkoutCode` · `Payment schema` · `Scheduled job (@Cron) checkout expiry`
-    - [ ] **Frontend:** `CheckoutResultPage (chỉ đọc checkoutCode, bỏ qua query của PayOS; poll GET /checkouts/:checkoutCode khi còn pending)`
+    - [x] **Frontend:** `CheckoutResultPage (chỉ đọc checkoutCode, bỏ qua query của PayOS; poll GET /checkouts/:checkoutCode khi còn pending)`
   - **Stitch Screens (`projects/6249429078653284294`):**
     - `projects/6249429078653284294/screens/8ae6276570db4feab1d1900f086080a7` ("Đặt hàng thành công #1")
     - `projects/6249429078653284294/screens/e86a9d6dc00e46b08a2c1b0eb4c64195` ("Đặt hàng thành công #2")
