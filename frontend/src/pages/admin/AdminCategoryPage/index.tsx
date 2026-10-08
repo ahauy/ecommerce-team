@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Plus, Search, AlertCircle, RefreshCw } from 'lucide-react';
-import { AdminCategoryItem } from '@/types/category.types';
-import { categoryService } from '@/services/category.service';
+import type { AdminCategoryItem } from '@/types/category.types';
+import { adminCategoryService } from './services/admin-category.service';
 import AdminCategoryListTable from './components/AdminCategoryListTable';
 import CategoryFormDrawer from './components/CategoryFormDrawer';
 import DeleteWarningDialog from './dialogs/DeleteWarningDialog';
@@ -25,9 +25,9 @@ export const AdminCategoryPage: React.FC = () => {
     isError,
     error,
     refetch,
-  } = categoryService.useAdminCategories();
+  } = adminCategoryService.useAdminCategories();
 
-  const deleteMutation = categoryService.useDeleteCategory();
+  const deleteMutation = adminCategoryService.useDeleteCategory();
 
   // ── Filter & Search Logic ───────────────────────────────────────────────────
   const filteredCategories = useMemo(() => {

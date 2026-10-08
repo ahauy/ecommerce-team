@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import BaseUrl, { shopPath } from '@/consts/baseUrl';
-import { useMyOrderDetail } from '@/hooks/queries/useMyOrders';
+import { useMyOrderDetail } from './hooks/useMyOrderDetail';
 import { getHttpStatus } from '@/helpers/format';
 import { formatOrderDateTime, getOrderSteps } from '@/helpers/orderHistory';
 import OrderStatusBadge from '../components/OrderStatusBadge';

@@ -1,4 +1,11 @@
-import type { MyOrder, OrderCancelledBy, OrderPaymentStatus, OrderStatus } from '@/types/order-history.types';
+import type {
+  MyOrder,
+  OrderCancelledBy,
+  OrderLineItem,
+  OrderPaymentStatus,
+  OrderRecipientInfo,
+  OrderStatus,
+} from '@/types/order-history.types';
 
 /** Nhãn + màu badge cho từng trạng thái đơn (bám giao diện "Đơn mua"). */
 export const ORDER_STATUS_META: Record<OrderStatus, { label: string; badgeClass: string }> = {
@@ -155,3 +162,66 @@ export const getOrderSteps = (order: MyOrder): OrderStep[] => {
     };
   });
 };
+
+type RawRecord = Record<string, unknown>;
+
+const ORDER_STATUS_ENUMS: OrderStatus[] = ['pending', 'confirmed', 'shipping', 'delivered', 'cancelled', 'refunded'];
+const ORDER_PAYMENT_STATUS_ENUMS: OrderPaymentStatus[] = ['unpaid', 'paid', 'refunded'];
+const ORDER_CANCELLED_BY_ENUMS: OrderCancelledBy[] = ['system', 'seller', 'admin'];
+
+const asString = (v: unknown): string | null => (typeof v === 'string' && v ? v : null);
+const asNumber = (v: unknown, fallback = 0): number =>
+  typeof v === 'number' && Number.isFinite(v) ? v : fallback;
+const asRecord = (v: unknown): RawRecord | null =>
+  v && typeof v === 'object' && !Array.isArray(v) ? (v as RawRecord) : null;
+const asArray = (v: unknown): RawRecord[] =>
+  Array.isArray(v) ? v.map(asRecord).filter((r): r is RawRecord => r !== null) : [];
+const asEnum = <T extends string>(v: unknown, allowed: readonly T[], fallback: T): T =>
+  typeof v === 'string' && (allowed as readonly string[]).includes(v) ? (v as T) : fallback;
+
+const normalizeItem = (raw: RawRecord): OrderLineItem => ({
+  productId: asString(raw.productId) ?? asString(raw.id),
+  name: asString(raw.name) ?? '',
+  imageUrl: asString(raw.imageUrl),
+  price: asNumber(raw.price),
+  quantity: asNumber(raw.quantity, 1),
+});
+
+const normalizeRecipient = (value: unknown): OrderRecipientInfo | null => {
+  const raw = asRecord(value);
+  if (!raw) return null;
+  return {
+    fullName: asString(raw.fullName) ?? '',
+    phone: asString(raw.phone) ?? '',
+    email: asString(raw.email),
+    address: asString(raw.address) ?? '',
+  };
+};
+
+/** Chuẩn hoá 1 đơn mua. Chấp nhận `_id`, `seller` hoặc `sellerShopName` phẳng. */
+export const normalizeMyOrder = (raw: RawRecord): MyOrder => {
+  const seller = asRecord(raw.seller) ?? asRecord(raw.sellerId) ?? {};
+  const items = asArray(raw.items).map(normalizeItem);
+  const cancelledBy = asString(raw.cancelledBy);
+
+  return {
+    id: asString(raw.id) ?? asString(raw._id) ?? '',
+    orderCode: asString(raw.orderCode) ?? '',
+    checkoutCode: asString(raw.checkoutCode) ?? '',
+    seller: {
+      id: asString(seller.id) ?? asString(seller._id) ?? asString(raw.sellerId) ?? '',
+      shopName: asString(seller.shopName) ?? asString(raw.sellerShopName),
+    },
+    items,
+    totalAmount: asNumber(raw.totalAmount, items.reduce((sum, i) => sum + i.price * i.quantity, 0)),
+    status: asEnum(raw.status, ORDER_STATUS_ENUMS, 'pending'),
+    paymentStatus: asEnum(raw.paymentStatus, ORDER_PAYMENT_STATUS_ENUMS, 'unpaid'),
+    paymentMethod: asString(raw.paymentMethod),
+    recipient: normalizeRecipient(raw.recipient),
+    cancelReason: asString(raw.cancelReason),
+    cancelledBy: cancelledBy && (ORDER_CANCELLED_BY_ENUMS as string[]).includes(cancelledBy) ? (cancelledBy as OrderCancelledBy) : null,
+    createdAt: asString(raw.createdAt) ?? '',
+    updatedAt: asString(raw.updatedAt),
+  };
+};
+

@@ -4,6 +4,7 @@ import {
   formatOrderDate,
   getOrderSteps,
   groupOrdersByCheckout,
+  normalizeMyOrder,
   parsePageParam,
   parseTabParam,
 } from '../orderHistory';
@@ -87,6 +88,27 @@ describe('orderHistory helpers', () => {
     it('adds a refunded step for refunded orders', () => {
       const steps = getOrderSteps(order({ status: 'refunded', paymentStatus: 'refunded', cancelledBy: 'seller' }));
       expect(steps.map((s) => s.key)).toEqual(['confirmed', 'cancelled', 'refunded']);
+    });
+  });
+
+  describe('normalizeMyOrder', () => {
+    it('normalizes a raw order with fallbacks for missing/invalid fields', () => {
+      const o = normalizeMyOrder({
+        _id: 'abc',
+        orderCode: 'ORD-1',
+        sellerShopName: 'Shop A',
+        items: [{ name: 'SP', price: 100, quantity: 3 }],
+        status: 'weird',
+        paymentStatus: 'paid',
+        cancelledBy: 'robot',
+      });
+      expect(o.id).toBe('abc');
+      expect(o.seller.shopName).toBe('Shop A');
+      expect(o.totalAmount).toBe(300);
+      expect(o.status).toBe('pending');
+      expect(o.paymentStatus).toBe('paid');
+      expect(o.cancelledBy).toBeNull();
+      expect(o.recipient).toBeNull();
     });
   });
 });

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Pagination from '@/components/Pagination';
-import { useMyOrders } from '@/hooks/queries/useMyOrders';
+import { useMyOrders } from './hooks/useMyOrders';
 import {
   groupOrdersByCheckout,
   parsePageParam,

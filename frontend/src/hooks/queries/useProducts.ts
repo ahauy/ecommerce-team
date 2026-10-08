@@ -1,4 +1,4 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { productService } from '@/services/product.service';
 import type { ProductListParams } from '@/types/product.types';
 
@@ -22,24 +22,4 @@ export const useProducts = (params: ProductListParams, enabled = true) =>
     ...CATALOG_QUERY_OPTIONS,
   });
 
-export const useProductDetail = (id: string, viewerId: string, enabled = true) =>
-  useQuery({
-    queryKey: PRODUCT_KEYS.detail(id, viewerId),
-    queryFn: () => productService.getProductById(id),
-    enabled: enabled && !!id,
-    retry: false,
-    ...CATALOG_QUERY_OPTIONS,
-  });
-
-/** Chủ shop bật/tắt hiển thị sản phẩm ngay trên trang chi tiết. */
-export const useSetProductActive = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
-      productService.setActive(id, isActive),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: PRODUCT_KEYS.all });
-      queryClient.invalidateQueries({ queryKey: ['seller', 'products', 'mine'] });
-    },
-  });
-};
+export default useProducts;

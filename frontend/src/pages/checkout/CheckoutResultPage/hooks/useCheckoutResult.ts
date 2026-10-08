@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { checkoutResultService } from '@/services/checkout-result.service';
+import { checkoutResultService } from '../services/checkout-result.service';
 import { CART_KEYS } from '@/hooks/queries/useCart';
-import { MY_ORDER_KEYS } from '@/hooks/queries/useMyOrders';
 import { useAuthStore } from '@/stores/auth.store';
 import { getHttpStatus } from '@/helpers/format';
 import type { CheckoutResult } from '@/types/checkout-result.types';
@@ -42,8 +41,10 @@ export const useCheckoutResult = (checkoutCode: string) => {
   useEffect(() => {
     if (!status || status === 'pending') return;
     void queryClient.invalidateQueries({ queryKey: CART_KEYS.all });
-    void queryClient.invalidateQueries({ queryKey: MY_ORDER_KEYS.all });
+    void queryClient.invalidateQueries({ queryKey: ['my-orders'] });
   }, [status, queryClient]);
 
   return query;
 };
+
+export default useCheckoutResult;

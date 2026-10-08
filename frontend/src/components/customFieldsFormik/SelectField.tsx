@@ -193,7 +193,7 @@ const SelectField = (props: SelectFieldProps & AdditionalFormikProps) => {
     >
       {label && (
         <Label
-          className={twMerge("mb-1", required && "required", classNameLabel)}
+          className={twMerge("text-xs font-semibold text-black", required && "required", classNameLabel)}
         >
           {label}
         </Label>
@@ -214,7 +214,7 @@ const SelectField = (props: SelectFieldProps & AdditionalFormikProps) => {
             role="combobox"
             aria-expanded={open}
             className={twMerge(
-              "h-auto min-h-10 w-full justify-between text-sm font-normal",
+              "h-auto min-h-[44px] w-full justify-between rounded-lg border border-[#e4e4e7] bg-white text-sm font-normal text-black focus:border-black focus:ring-1 focus:ring-black",
               msgError && "border-red-500"
             )}
           >
@@ -304,7 +304,11 @@ const SelectField = (props: SelectFieldProps & AdditionalFormikProps) => {
         </PopoverContent>
       </Popover>
 
-      {isString(msgError) && <span className="invalid-text">{msgError}</span>}
+      {isString(msgError) && (
+        <p id={`${name}-error`} role="alert" className="text-xs text-red-500 font-medium">
+          {msgError}
+        </p>
+      )}
     </div>
   );
 };

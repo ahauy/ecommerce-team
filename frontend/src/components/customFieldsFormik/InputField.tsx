@@ -6,13 +6,16 @@ import { twMerge } from "tailwind-merge";
 import { get, isString } from "lodash";
 import CommonIcons from "../commonIcons";
 
-interface InputFieldProps extends InputProps {
+export interface InputFieldProps extends InputProps {
   label?: string | React.ReactNode;
   required?: boolean;
   classNameLabel?: string;
   classNameContainer?: string;
   helperText?: string | React.ReactNode;
   afterOnChange?: (e: ChangeEvent) => void;
+  as?: React.ElementType;
+  rows?: number;
+  endIcon?: React.ReactNode;
 }
 
 const InputField = (props: InputFieldProps & AdditionalFormikProps) => {
@@ -26,6 +29,9 @@ const InputField = (props: InputFieldProps & AdditionalFormikProps) => {
     required,
     type,
     helperText,
+    endIcon,
+    as: Component = Input,
+    children,
     ...restPropsInput
   } = props;
   const { name, onBlur, onChange, value } = field;
@@ -33,9 +39,9 @@ const InputField = (props: InputFieldProps & AdditionalFormikProps) => {
   const [seeText, setSeeText] = useState(false);
 
   const msgError = get(touched, name) && (get(errors, name) as string);
-  // console.log("msgError", msgError, name);
-
   const isPasswordType = type === "password";
+
+  const inputId = (restPropsInput.id as string) || name;
 
   const onHandleChange = (e: ChangeEvent) => {
     onChange(e);
@@ -43,55 +49,73 @@ const InputField = (props: InputFieldProps & AdditionalFormikProps) => {
   };
 
   return (
-    <div
-      className={twMerge(
-        "grid w-full items-center gap-1.5",
-        classNameContainer
-      )}
-    >
+    <div className={twMerge("grid w-full items-center gap-1.5", classNameContainer)}>
       {label && (
-        <div className="label">
-          <Label
-            htmlFor={name}
-            className={twMerge("mb-1", required && "required", classNameLabel)}
-          >
-            {label}
-          </Label>
-        </div>
+        <Label
+          htmlFor={inputId}
+          className={twMerge(
+            "text-xs font-semibold text-black",
+            required && "required",
+            classNameLabel
+          )}
+        >
+          {label}
+        </Label>
       )}
       <div className="relative">
-        <Input
+        <Component
           type={seeText ? "text" : type}
           name={name}
           onBlur={onBlur}
           onChange={onHandleChange}
-          value={value}
-          id={name}
-          className={twMerge(className, msgError && "border-red-500")}
+          value={value ?? ""}
+          id={inputId}
+          aria-invalid={!!msgError}
+          aria-describedby={msgError ? `${name}-error` : helperText ? `${name}-hint` : undefined}
+          className={twMerge(
+            "w-full rounded-lg border border-[#e4e4e7] bg-white text-sm text-black placeholder:text-zinc-400 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-colors",
+            className,
+            msgError && "border-red-500 focus:border-red-500 focus:ring-red-500"
+          )}
           {...restPropsInput}
-        />
+        >
+          {children}
+        </Component>
+
+        {endIcon && (
+          <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400">
+            {endIcon}
+          </div>
+        )}
 
         {isPasswordType && (
           <button
             type="button"
-            className="absolute right-1 top-1/2 inline-flex h-6 w-6 -translate-y-1/2 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+            aria-label={seeText ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+            className="absolute right-1 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-zinc-400 hover:text-black transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               setSeeText((prev) => !prev);
             }}
           >
             {seeText ? (
-              <CommonIcons.EyeIcon size={18} />
+              <CommonIcons.EyeIcon size={16} />
             ) : (
-              <CommonIcons.EyeOffIcon size={18} />
+              <CommonIcons.EyeOffIcon size={16} />
             )}
           </button>
         )}
       </div>
       {helperText && (
-        <span className="text-[13px] text-muted-foreground">{helperText}</span>
+        <span id={`${name}-hint`} className="text-xs text-zinc-500">
+          {helperText}
+        </span>
       )}
-      {isString(msgError) && <span className="invalid-text">{msgError}</span>}
+      {isString(msgError) && (
+        <p id={`${name}-error`} role="alert" className="text-xs text-red-500 font-medium">
+          {msgError}
+        </p>
+      )}
     </div>
   );
 };

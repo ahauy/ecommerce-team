@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { AlertCircle, ArrowRight, Info, RefreshCw, ShoppingBag } from 'lucide-react';
 import BaseUrl from '@/consts/baseUrl';
+import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const primaryBtn =
   'inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-black px-6 text-xs font-semibold text-white transition-colors hover:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black';
@@ -9,12 +11,12 @@ const outlineBtn =
   'inline-flex h-10 items-center justify-center gap-1.5 rounded-full border border-[#e4e4e7] bg-white px-5 text-xs font-semibold text-black transition-colors hover:border-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black';
 
 const Shell: React.FC<React.PropsWithChildren<{ testId: string }>> = ({ testId, children }) => (
-  <div
+  <Card
     data-testid={testId}
-    className="space-y-4 rounded-2xl border border-[#e4e4e7] bg-white px-6 py-14 text-center shadow-card"
+    className="space-y-4 px-6 py-14 text-center shadow-card"
   >
     {children}
-  </div>
+  </Card>
 );
 
 /** Shop chưa có đơn nào (Đơn bán #4) — kèm mẹo kích hoạt đơn đầu tiên. */
@@ -100,21 +102,21 @@ export const SellerOrdersError: React.FC<{ onRetry: () => void }> = ({ onRetry }
 export const SellerOrdersSkeleton: React.FC = () => (
   <div data-testid="seller-orders-skeleton" aria-busy="true" className="space-y-5">
     {[0, 1].map((i) => (
-      <div key={i} className="space-y-4 rounded-2xl border border-[#e4e4e7] bg-white p-6">
-        <div className="h-4 w-48 animate-pulse rounded bg-zinc-200" />
+      <Card key={i} className="space-y-4 p-6 shadow-card">
+        <Skeleton className="h-4 w-48" />
         <div className="grid gap-4 md:grid-cols-[2fr_3fr]">
           <div className="space-y-2">
-            <div className="h-4 w-40 animate-pulse rounded bg-zinc-200" />
-            <div className="h-3 w-56 animate-pulse rounded bg-zinc-100" />
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-3 w-56" />
           </div>
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 animate-pulse rounded-lg bg-zinc-200" />
-            <div className="h-4 flex-1 animate-pulse rounded bg-zinc-200" />
-            <div className="h-4 w-20 animate-pulse rounded bg-zinc-200" />
+            <Skeleton className="h-12 w-12 rounded-lg" />
+            <Skeleton className="h-4 flex-1" />
+            <Skeleton className="h-4 w-20" />
           </div>
         </div>
-        <div className="h-8 w-full animate-pulse rounded bg-zinc-100" />
-      </div>
+        <Skeleton className="h-8 w-full" />
+      </Card>
     ))}
   </div>
 );

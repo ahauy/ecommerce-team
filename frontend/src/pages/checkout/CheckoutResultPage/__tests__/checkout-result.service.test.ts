@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { get } = vi.hoisted(() => ({ get: vi.fn() }));
 vi.mock('@/services/apiClient', () => ({ apiClient: { get } }));
 
-import { checkoutResultService, normalizeCheckoutStatus } from '../checkout-result.service';
+import { checkoutResultService, normalizeCheckoutStatus } from '../services/checkout-result.service';
 
 describe('checkout-result.service', () => {
   beforeEach(() => vi.clearAllMocks());
