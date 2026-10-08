@@ -3,11 +3,10 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Cart } from '@/types/cart.types';
 
-const { mockUseCart, mockUpdate, mockRemove, mockToastInfo } = vi.hoisted(() => ({
+const { mockUseCart, mockUpdate, mockRemove } = vi.hoisted(() => ({
   mockUseCart: vi.fn(),
   mockUpdate: vi.fn(),
   mockRemove: vi.fn(),
-  mockToastInfo: vi.fn(),
 }));
 
 vi.mock('@/hooks/queries/useCart', () => ({
@@ -15,7 +14,7 @@ vi.mock('@/hooks/queries/useCart', () => ({
   useUpdateCartItem: () => ({ mutate: mockUpdate, isPending: false, variables: undefined }),
   useRemoveCartItem: () => ({ mutate: mockRemove, isPending: false, variables: undefined }),
 }));
-vi.mock('react-toastify', () => ({ toast: { info: mockToastInfo, success: vi.fn(), error: vi.fn() } }));
+vi.mock('react-toastify', () => ({ toast: { info: vi.fn(), success: vi.fn(), error: vi.fn() } }));
 
 import CartPage from '../index';
 
@@ -64,6 +63,7 @@ const renderPage = () =>
       <Routes>
         <Route path="/cart" element={<CartPage />} />
         <Route path="/login" element={<div data-testid="login-page" />} />
+        <Route path="/checkout" element={<div data-testid="checkout-route" />} />
       </Routes>
     </MemoryRouter>
   );
@@ -213,9 +213,9 @@ describe('CartPage', () => {
     expect(screen.getByTestId('login-page')).toBeInTheDocument();
   });
 
-  it('customer: checkout is not available yet (US-ORD-001) → informs the user', () => {
+  it('customer: checkout navigates to the checkout page', () => {
     renderPage();
     fireEvent.click(screen.getByRole('button', { name: /Tiến hành đặt hàng/ }));
-    expect(mockToastInfo).toHaveBeenCalled();
+    expect(screen.getByTestId('checkout-route')).toBeInTheDocument();
   });
 });

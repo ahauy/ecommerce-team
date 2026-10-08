@@ -6,6 +6,7 @@ const BaseUrl = {
   PublicShop: "/shops/:sellerId",
   ProductDetail: "/products/:id",
   Cart: "/cart",
+  Checkout: "/checkout",
   AccountProfile: "/account/profile",
 
   // ── Seller (Kênh người bán) ────────────────────────────────────────────────
