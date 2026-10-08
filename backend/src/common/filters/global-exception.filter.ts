@@ -18,7 +18,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Internal server error';
-    let errors: string[] | undefined;
+    let errors: unknown[] | undefined;
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
@@ -34,6 +34,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         if (Array.isArray(res.message)) {
           errors = res.message as string[];
           message = 'Validation failed';
+        } else if (Array.isArray(res.errors)) {
+          errors = res.errors as unknown[];
         }
       }
     } else {
