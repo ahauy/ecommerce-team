@@ -7,7 +7,10 @@ const BaseUrl = {
   ProductDetail: "/products/:id",
   Cart: "/cart",
   Checkout: "/checkout",
+  CheckoutResult: "/checkout/result",
   AccountProfile: "/account/profile",
+  AccountOrders: "/account/orders",
+  AccountOrderDetail: "/account/orders/:id",
 
   // ── Seller (Kênh người bán) ────────────────────────────────────────────────
   SellerLogin: "/seller/login",
@@ -17,6 +20,7 @@ const BaseUrl = {
   SellerProducts: "/seller/products",
   SellerProductCreate: "/seller/products/new",
   SellerProductEdit: "/seller/products/:id/edit",
+  SellerOrders: "/seller/orders",
 
   // ── Admin (Cổng quản trị) ──────────────────────────────────────────────────
   AdminLogin: "/admin/login",
@@ -35,6 +39,9 @@ export const productPath = (id: string): string => `/products/${id}`;
 
 /** Đường dẫn trang gian hàng công khai. */
 export const shopPath = (sellerId: string): string => `/shops/${sellerId}`;
+
+/** Đường dẫn trang chi tiết đơn mua. */
+export const accountOrderPath = (id: string): string => `/account/orders/${id}`;
 
 /** Đường dẫn trang sửa sản phẩm của người bán. */
 export const sellerProductEditPath = (id: string): string => `/seller/products/${id}/edit`;

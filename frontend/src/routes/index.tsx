@@ -6,6 +6,7 @@ import BaseUrl from '@/consts/baseUrl';
 import Loading from '@/components/ui/loading';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
 import AdminLayout from '@/layouts/AdminLayout';
+import AccountLayout from '@/layouts/AccountLayout';
 import SellerLayout from '@/layouts/SellerLayout';
 import RequireAuth from '@/routes/RequireAuth';
 
@@ -18,12 +19,16 @@ import PublicShopPage from '@/pages/shop/PublicShopPage';
 import ProductDetailPage from '@/pages/products/ProductDetailPage';
 import CartPage from '@/pages/cart/CartPage';
 import CheckoutPage from '@/pages/checkout/CheckoutPage';
+import CheckoutResultPage from '@/pages/checkout/CheckoutResultPage';
+import OrderHistoryPage from '@/pages/orders/OrderHistoryPage';
+import OrderDetailPage from '@/pages/orders/OrderDetailPage';
 import SellerLoginPage from '@/pages/seller/SellerLoginPage';
 import SellerRegisterPage from '@/pages/seller/SellerRegisterPage';
 import SellerProfilePage from '@/pages/seller/SellerProfilePage';
 import ShopSetupPage from '@/pages/seller/ShopSetupPage';
 import MyProductsPage from '@/pages/seller/MyProductsPage';
 import ProductFormPage from '@/pages/seller/ProductFormPage';
+import SellerOrdersPage from '@/pages/seller/SellerOrdersPage';
 import AdminLoginPage from '@/pages/admin/AdminLoginPage';
 import AdminProfilePage from '@/pages/admin/AdminProfilePage';
 import AdminCategoryPage from '@/pages/admin/AdminCategoryPage';
@@ -84,6 +89,7 @@ const AppRoutes = () => {
               }
             >
               <Route path={BaseUrl.Checkout} element={<CheckoutPage />} />
+              <Route path={BaseUrl.CheckoutResult} element={<CheckoutResultPage />} />
             </Route>
 
             {/* Hồ sơ người mua: chưa đăng nhập → /login; admin → hồ sơ admin */}
@@ -96,7 +102,11 @@ const AppRoutes = () => {
                 />
               }
             >
-              <Route path={BaseUrl.AccountProfile} element={<ProfilePage />} />
+              <Route element={<AccountLayout />}>
+                <Route path={BaseUrl.AccountProfile} element={<ProfilePage />} />
+                <Route path={BaseUrl.AccountOrders} element={<OrderHistoryPage />} />
+                <Route path={BaseUrl.AccountOrderDetail} element={<OrderDetailPage />} />
+              </Route>
             </Route>
           </Route>
 
@@ -114,6 +124,7 @@ const AppRoutes = () => {
               <Route path={BaseUrl.SellerProducts} element={<MyProductsPage />} />
               <Route path={BaseUrl.SellerProductCreate} element={<ProductFormPage />} />
               <Route path={BaseUrl.SellerProductEdit} element={<ProductFormPage />} />
+              <Route path={BaseUrl.SellerOrders} element={<SellerOrdersPage />} />
               <Route path={BaseUrl.SellerProfile} element={<SellerProfilePage />} />
               <Route path={BaseUrl.ShopSetup} element={<ShopSetupPage />} />
             </Route>

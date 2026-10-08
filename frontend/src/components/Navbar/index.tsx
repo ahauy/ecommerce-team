@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, ShoppingBag, ChevronDown, User as UserIcon, Store, ShieldCheck, LogOut } from "lucide-react";
+import { Menu, X, ShoppingBag, ChevronDown, User as UserIcon, Store, ShieldCheck, LogOut, Receipt } from "lucide-react";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import Sidebar from "../Sidebar";
@@ -133,6 +133,17 @@ export default function Navbar() {
               <UserIcon className="h-4 w-4 text-zinc-500" />
               <span>Hồ sơ cá nhân</span>
             </Link>
+
+            {isCustomer && (
+              <Link
+                to={BaseUrl.AccountOrders}
+                className="navbar__each__menu flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-[#fbfbf5] hover:text-black transition-colors"
+                onClick={() => setPopover(false)}
+              >
+                <Receipt className="h-4 w-4 text-zinc-500" />
+                <span>Đơn mua</span>
+              </Link>
+            )}
 
             {isCustomer && (
               <Link
