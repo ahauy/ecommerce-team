@@ -3,6 +3,15 @@ import { Link } from 'react-router-dom';
 import { Edit2, Trash2 } from 'lucide-react';
 import { OwnerProduct } from '../types';
 import { cn } from '@/lib/utils';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 
 interface ProductTableProps {
   products: OwnerProduct[];
@@ -24,20 +33,20 @@ export const ProductTable: React.FC<ProductTableProps> = ({
   isTogglingId,
 }) => {
   return (
-    <div className="bg-white border border-[#e4e4e7] rounded-xl overflow-hidden shadow-[0_8px_8px_rgba(0,0,0,0.03),0_4px_4px_rgba(0,0,0,0.02),0_2px_2px_rgba(0,0,0,0.02),0_0_0_1px_#e4e4e7]">
+    <div className="bg-white border border-[#e4e4e7] rounded-xl overflow-hidden shadow-card">
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[760px]">
-          <thead>
-            <tr className="bg-[#fbfbf5]/60 border-b border-[#e4e4e7] text-zinc-500 text-xs font-semibold uppercase tracking-wider">
-              <th className="py-3.5 px-5">Sản phẩm</th>
-              <th className="py-3.5 px-4">Danh mục</th>
-              <th className="py-3.5 px-4">Giá</th>
-              <th className="py-3.5 px-4">Tồn kho</th>
-              <th className="py-3.5 px-4">Trạng thái</th>
-              <th className="py-3.5 px-5 text-right">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody
+        <Table className="min-w-[760px]">
+          <TableHeader>
+            <TableRow className="bg-[#fbfbf5]/60 hover:bg-[#fbfbf5]/60 border-b border-[#e4e4e7] text-zinc-500 text-xs font-semibold uppercase tracking-wider">
+              <TableHead className="py-3.5 px-5">Sản phẩm</TableHead>
+              <TableHead className="py-3.5 px-4">Danh mục</TableHead>
+              <TableHead className="py-3.5 px-4">Giá</TableHead>
+              <TableHead className="py-3.5 px-4">Tồn kho</TableHead>
+              <TableHead className="py-3.5 px-4">Trạng thái</TableHead>
+              <TableHead className="py-3.5 px-5 text-right">Thao tác</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody
             id="productTableBody"
             className="divide-y divide-[#e4e4e7] text-xs text-zinc-900"
           >
@@ -52,13 +61,13 @@ export const ProductTable: React.FC<ProductTableProps> = ({
               const isToggling = isTogglingId === product.id;
 
               return (
-                <tr
+                <TableRow
                   key={product.id}
                   data-testid={`product-row-${product.id}`}
                   className="hover:bg-[#fbfbf5]/40 transition-colors"
                 >
                   {/* Name and Image */}
-                  <td className="py-4 px-5">
+                  <TableCell className="py-4 px-5">
                     <div className="flex items-start gap-3">
                       <img
                         src={firstImage}
@@ -82,56 +91,68 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                         )}
                       </div>
                     </div>
-                  </td>
+                  </TableCell>
 
                   {/* Category */}
-                  <td className="py-4 px-4 text-zinc-600 whitespace-nowrap">
+                  <TableCell className="py-4 px-4 text-zinc-600 whitespace-nowrap">
                     {categoryName}
-                  </td>
+                  </TableCell>
 
                   {/* Price */}
-                  <td className="py-4 px-4 font-semibold text-black whitespace-nowrap">
+                  <TableCell className="py-4 px-4 font-semibold text-black whitespace-nowrap">
                     {formatVND(product.price)}
-                  </td>
+                  </TableCell>
 
                   {/* Stock */}
-                  <td className="py-4 px-4 whitespace-nowrap">
+                  <TableCell className="py-4 px-4 whitespace-nowrap">
                     {product.stock > 0 ? (
                       <span>{product.stock}</span>
                     ) : (
                       <span className="inline-flex items-center gap-1.5">
                         <span>0</span>
-                        <span className="bg-[#fbfbf5] text-zinc-600 text-[11px] px-2 py-0.5 rounded-full font-medium border border-[#e4e4e7]">
+                        <Badge
+                          variant="secondary"
+                          className="bg-[#fbfbf5] text-zinc-600 text-[11px] px-2 py-0.5 font-medium border border-[#e4e4e7]"
+                        >
                           Hết hàng
-                        </span>
+                        </Badge>
                       </span>
                     )}
-                  </td>
+                  </TableCell>
 
                   {/* Status */}
-                  <td className="py-4 px-4 whitespace-nowrap">
+                  <TableCell className="py-4 px-4 whitespace-nowrap">
                     {product.isBlocked ? (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold border border-red-500 text-red-600 bg-red-50">
+                      <Badge
+                        variant="destructive"
+                        className="px-3 py-1 text-[11px] font-semibold border-red-500 text-red-600 bg-red-50"
+                      >
                         Bị khóa
-                      </span>
+                      </Badge>
                     ) : product.isActive ? (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-[#c1fbd4] text-black">
+                      <Badge
+                        variant="aloe"
+                        className="px-3 py-1 text-[11px] font-semibold bg-[#c1fbd4] text-black"
+                      >
                         Đang bán
-                      </span>
+                      </Badge>
                     ) : (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-medium bg-[#e4e4e7] text-zinc-700">
+                      <Badge
+                        variant="muted"
+                        className="px-3 py-1 text-[11px] font-medium bg-[#e4e4e7] text-zinc-700"
+                      >
                         Đã ẩn
-                      </span>
+                      </Badge>
                     )}
-                  </td>
+                  </TableCell>
 
                   {/* Actions */}
-                  <td className="py-4 px-5 whitespace-nowrap text-right">
+                  <TableCell className="py-4 px-5 whitespace-nowrap text-right">
                     <div className="inline-flex items-center justify-end gap-2.5">
                       {/* Edit Button */}
                       <Link
                         to={`/seller/products/${product.id}/edit`}
-                        className="inline-flex items-center gap-1 text-zinc-600 hover:text-black font-medium text-xs px-2 py-1 rounded-full hover:bg-zinc-100 transition-colors"
+                        className="inline-flex items-center gap-1 text-zinc-600 hover:text-black font-medium text-xs px-2.5 py-1 rounded-full hover:bg-zinc-100 transition-colors"
                         title="Chỉnh sửa sản phẩm"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
@@ -188,17 +209,17 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                         type="button"
                         onClick={() => onDeleteClick(product)}
                         title="Ẩn sản phẩm"
-                        className="text-zinc-400 hover:text-red-600 p-1 rounded-full hover:bg-zinc-100 transition-colors"
+                        className="text-zinc-400 hover:text-red-600 p-1.5 rounded-full hover:bg-zinc-100 transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               );
             })}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

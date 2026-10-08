@@ -5,7 +5,7 @@ import type { MyOrder } from '@/types/order-history.types';
 
 const { mockUseDetail } = vi.hoisted(() => ({ mockUseDetail: vi.fn() }));
 
-vi.mock('@/hooks/queries/useMyOrders', () => ({ useMyOrderDetail: mockUseDetail }));
+vi.mock('../hooks/useMyOrderDetail', () => ({ useMyOrderDetail: mockUseDetail }));
 
 import OrderDetailPage from '../index';
 

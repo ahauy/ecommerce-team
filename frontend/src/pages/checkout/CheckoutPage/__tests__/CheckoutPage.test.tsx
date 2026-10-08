@@ -13,7 +13,7 @@ const { mockUseCart, mockMutate, mockProfile, mockShowError, mockRedirect, mutat
 }));
 
 vi.mock('@/hooks/queries/useCart', () => ({ useCart: mockUseCart }));
-vi.mock('@/hooks/queries/useOrders', () => ({
+vi.mock('../hooks/useCreateCheckout', () => ({
   useCreateCheckout: () => ({ mutate: mockMutate, ...mutationState }),
 }));
 vi.mock('@/services/user.service', () => ({

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { normalizeCheckoutResult } from '../order.service';
+import { normalizeCheckoutResult } from '../services/order.service';
 
 describe('order.service › normalizeCheckoutResult', () => {
   it('reads `paymentUrl` from the POST /orders contract', () => {

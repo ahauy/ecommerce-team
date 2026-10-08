@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import BaseUrl from '@/consts/baseUrl';
 import { useCart } from '@/hooks/queries/useCart';
-import { useCreateCheckout } from '@/hooks/queries/useOrders';
-import { extractStockShortages } from '@/services/order.service';
+import { useCreateCheckout } from './hooks/useCreateCheckout';
+import { extractStockShortages } from './services/order.service';
 import { userService } from '@/services/user.service';
 import { getCartStats } from '@/helpers/cart';
 import {

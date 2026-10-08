@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useCheckoutResult } from '@/hooks/queries/useCheckoutResult';
+import { useCheckoutResult } from './hooks/useCheckoutResult';
 import { getHttpStatus } from '@/helpers/format';
 import { FailedView, PendingView, SuccessView } from './components/ResultViews';
 import { ResultLoadError, ResultNotFound, ResultSkeleton } from './components/ResultStates';

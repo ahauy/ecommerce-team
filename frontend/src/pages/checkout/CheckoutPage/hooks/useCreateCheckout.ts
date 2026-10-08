@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { orderService } from '@/services/order.service';
+import { orderService } from '../services/order.service';
 import { CART_KEYS } from '@/hooks/queries/useCart';
 import type { CreateCheckoutPayload } from '@/types/order.types';
 
@@ -17,3 +17,5 @@ export const useCreateCheckout = () => {
     },
   });
 };
+
+export default useCreateCheckout;

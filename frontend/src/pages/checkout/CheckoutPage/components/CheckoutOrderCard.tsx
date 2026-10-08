@@ -6,6 +6,8 @@ import BaseUrl, { productPath } from '@/consts/baseUrl';
 import { formatVnd } from '@/helpers/format';
 import type { CheckoutIssue } from '@/helpers/checkout';
 import type { Cart } from '@/types/cart.types';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
 interface CheckoutOrderCardProps {
   cart: Cart;
@@ -18,12 +20,12 @@ const CheckoutOrderCard: React.FC<CheckoutOrderCardProps> = ({ cart, productCoun
   const issueById = new Map(issues.map((i) => [i.productId, i]));
 
   return (
-    <section
+    <Card
       data-testid="checkout-items"
       aria-label="Đơn hàng của bạn"
-      className="rounded-2xl border border-[#e4e4e7] bg-white p-5 shadow-sm sm:p-6"
+      className="p-5 sm:p-6 shadow-card"
     >
-      <header className="mb-5 flex items-center justify-between gap-3">
+      <CardHeader className="p-0 mb-5 flex flex-row items-center justify-between gap-3 space-y-0">
         <h2 className="flex items-center gap-3 text-sm font-semibold text-black">
           <span className="flex h-5 w-5 items-center justify-center rounded-full bg-black text-[10px] font-bold text-white">
             2
@@ -31,20 +33,21 @@ const CheckoutOrderCard: React.FC<CheckoutOrderCardProps> = ({ cart, productCoun
           Đơn hàng của bạn
         </h2>
         <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">{productCount} sản phẩm</span>
-      </header>
+      </CardHeader>
 
-      <div className="space-y-6">
+      <CardContent className="p-0 space-y-6">
         {cart.groups.map((group) => {
           const shopName = group.seller.shopName ?? 'Gian hàng khác';
 
           return (
             <div key={group.seller.id} data-testid="checkout-group">
-              <div className="flex items-center gap-2 border-b border-[#f0f0f2] pb-3">
+              <div className="flex items-center gap-2 pb-3">
                 <Store className="h-3.5 w-3.5 shrink-0 text-black" aria-hidden="true" />
                 <h3 className="truncate text-xs font-semibold text-black">{shopName}</h3>
               </div>
+              <Separator />
 
-              <ul className="divide-y divide-[#f0f0f2]">
+              <ul className="divide-y divide-[#e4e4e7]">
                 {group.items.map((item) => {
                   const issue = issueById.get(item.product.id);
                   const hasIssue = !!issue || item.status !== 'available';
@@ -126,7 +129,8 @@ const CheckoutOrderCard: React.FC<CheckoutOrderCardProps> = ({ cart, productCoun
                 })}
               </ul>
 
-              <div className="flex items-center justify-end gap-2 border-t border-[#f0f0f2] pt-3 text-[11px] text-zinc-500">
+              <Separator />
+              <div className="flex items-center justify-end gap-2 pt-3 text-[11px] text-zinc-500">
                 <Package className="h-3 w-3" aria-hidden="true" />
                 <span>
                   Tạm tính ({shopName}):{' '}
@@ -138,8 +142,8 @@ const CheckoutOrderCard: React.FC<CheckoutOrderCardProps> = ({ cart, productCoun
             </div>
           );
         })}
-      </div>
-    </section>
+      </CardContent>
+    </Card>
   );
 };
 

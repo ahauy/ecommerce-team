@@ -1,10 +1,10 @@
 import React from 'react';
-import { Formik, Form, Field } from 'formik';
-import { Link, useNavigate } from 'react-router-dom';
+import { Formik, Form } from 'formik';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import FormikField from '@/components/customFieldsFormik/FormikField';
+import InputField from '@/components/customFieldsFormik/InputField';
 import { showSuccess, showError } from '@/helpers/toast';
 import { userService, SetupShopDto } from '@/services/user.service';
 import BaseUrl from '@/consts/baseUrl';
@@ -77,14 +77,11 @@ export const ShopSetupForm: React.FC<ShopSetupFormProps> = ({ initialValues, onS
             </div>
 
             {/* Shop Name */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label
-                  htmlFor="shopName"
-                  className="text-sm font-semibold text-zinc-900"
-                >
+                <span className="text-xs font-semibold text-black">
                   Tên gian hàng <span className="text-red-500">*</span>
-                </Label>
+                </span>
                 <span
                   className={`text-xs ${
                     values.shopName.length > 0 ? 'text-zinc-600' : 'text-zinc-400'
@@ -93,114 +90,56 @@ export const ShopSetupForm: React.FC<ShopSetupFormProps> = ({ initialValues, onS
                   {values.shopName.length}/50
                 </span>
               </div>
-              <Field
-                as={Input}
-                id="shopName"
+              <FormikField
                 name="shopName"
+                component={InputField}
                 type="text"
                 maxLength={50}
                 placeholder="Nhập tên gian hàng của bạn"
-                className={`h-12 px-4 rounded-lg bg-white border text-sm text-zinc-900 transition-all ${
-                  touched.shopName && errors.shopName
-                    ? 'border-red-500 focus-visible:ring-red-500'
-                    : 'border-[#e4e4e7] focus-visible:ring-black focus-visible:border-black'
-                }`}
-                aria-invalid={touched.shopName && !!errors.shopName}
-                aria-describedby={
-                  touched.shopName && errors.shopName
-                    ? 'shopName-error'
-                    : 'shopName-hint'
+                helperText={
+                  <span className="flex items-center justify-between text-xs w-full">
+                    <span id="shopName-hint" className="text-zinc-500">
+                      Từ 3 đến 50 ký tự
+                    </span>
+                    {isShopNameValid && (
+                      <Badge variant="aloe" className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 bg-aloe text-black">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        Hợp lệ
+                      </Badge>
+                    )}
+                  </span>
                 }
               />
-              <div className="flex items-center justify-between text-xs">
-                <p id="shopName-hint" className="text-zinc-500">
-                  Từ 3 đến 50 ký tự
-                </p>
-                {isShopNameValid && (
-                  <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 rounded-full bg-aloe text-black">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    Hợp lệ
-                  </span>
-                )}
-              </div>
-              {touched.shopName && errors.shopName && (
-                <p id="shopName-error" className="text-xs text-red-500 font-medium" role="alert">
-                  {errors.shopName}
-                </p>
-              )}
             </div>
 
             {/* Phone Number */}
-            <div className="space-y-2">
-              <Label
-                htmlFor="phone"
-                className="text-sm font-semibold text-zinc-900"
-              >
-                Số điện thoại liên hệ <span className="text-red-500">*</span>
-              </Label>
-              <Field
-                as={Input}
-                id="phone"
-                name="phone"
-                type="tel"
-                placeholder="09xxxxxxxx hoặc +84xxxxxxxxx"
-                className={`h-12 px-4 rounded-lg bg-white border text-sm text-zinc-900 transition-all ${
-                  touched.phone && errors.phone
-                    ? 'border-red-500 focus-visible:ring-red-500'
-                    : 'border-[#e4e4e7] focus-visible:ring-black focus-visible:border-black'
-                }`}
-                aria-invalid={touched.phone && !!errors.phone}
-                aria-describedby={
-                  touched.phone && errors.phone
-                    ? 'phone-error'
-                    : 'phone-hint'
-                }
-              />
-              <p id="phone-hint" className="text-xs text-zinc-500">
-                Định dạng: 09xxxxxxxx hoặc +84xxxxxxxxx
-              </p>
-              {touched.phone && errors.phone && (
-                <p id="phone-error" className="text-xs text-red-500 font-medium" role="alert">
-                  {errors.phone}
-                </p>
-              )}
-            </div>
+            <FormikField
+              name="phone"
+              component={InputField}
+              type="tel"
+              label={
+                <>
+                  Số điện thoại liên hệ <span className="text-red-500">*</span>
+                </>
+              }
+              placeholder="09xxxxxxxx hoặc +84xxxxxxxxx"
+              helperText="Định dạng: 09xxxxxxxx hoặc +84xxxxxxxxx"
+            />
 
             {/* Pickup Address */}
-            <div className="space-y-2">
-              <Label
-                htmlFor="pickupAddress"
-                className="text-sm font-semibold text-zinc-900"
-              >
-                Địa chỉ lấy hàng <span className="text-red-500">*</span>
-              </Label>
-              <Field
-                as={Textarea}
-                id="pickupAddress"
-                name="pickupAddress"
-                rows={4}
-                placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành"
-                className={`p-4 rounded-lg bg-white border text-sm text-zinc-900 leading-relaxed resize-none transition-all ${
-                  touched.pickupAddress && errors.pickupAddress
-                    ? 'border-red-500 focus-visible:ring-red-500'
-                    : 'border-[#e4e4e7] focus-visible:ring-black focus-visible:border-black'
-                }`}
-                aria-invalid={touched.pickupAddress && !!errors.pickupAddress}
-                aria-describedby={
-                  touched.pickupAddress && errors.pickupAddress
-                    ? 'pickupAddress-error'
-                    : 'pickupAddress-hint'
-                }
-              />
-              <p id="pickupAddress-hint" className="text-xs text-zinc-500">
-                Tối thiểu 10 ký tự để đơn vị vận chuyển có thể đến lấy hàng
-              </p>
-              {touched.pickupAddress && errors.pickupAddress && (
-                <p id="pickupAddress-error" className="text-xs text-red-500 font-medium" role="alert">
-                  {errors.pickupAddress}
-                </p>
-              )}
-            </div>
+            <FormikField
+              name="pickupAddress"
+              component={InputField}
+              as="textarea"
+              rows={4}
+              label={
+                <>
+                  Địa chỉ lấy hàng <span className="text-red-500">*</span>
+                </>
+              }
+              placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành"
+              helperText="Tối thiểu 10 ký tự để đơn vị vận chuyển có thể đến lấy hàng"
+            />
 
             {/* Actions */}
             <div className="pt-4 flex items-center justify-end gap-4 border-t border-[#e4e4e7]">

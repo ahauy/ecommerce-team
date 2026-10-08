@@ -1,5 +1,5 @@
 import { apiClient } from '@/services/apiClient';
-import { normalizeMyOrder } from '@/services/order-history.service';
+import { normalizeMyOrder } from '@/helpers/orderHistory';
 import type { SellerOrder, SellerOrdersParams, SellerOrdersResult, UpdateOrderStatusPayload } from '../types';
 
 type Raw = Record<string, unknown>;

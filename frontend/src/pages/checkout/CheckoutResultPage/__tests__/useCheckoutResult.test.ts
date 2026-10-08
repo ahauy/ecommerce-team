@@ -4,14 +4,14 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { getCheckout } = vi.hoisted(() => ({ getCheckout: vi.fn() }));
-vi.mock('@/services/checkout-result.service', () => ({ checkoutResultService: { getCheckout } }));
+vi.mock('../services/checkout-result.service', () => ({ checkoutResultService: { getCheckout } }));
 
 import { useAuthStore } from '@/stores/auth.store';
 import {
   CHECKOUT_POLL_INTERVAL_MS,
   getCheckoutPollInterval,
   useCheckoutResult,
-} from '../useCheckoutResult';
+} from '../hooks/useCheckoutResult';
 import type { CheckoutResult } from '@/types/checkout-result.types';
 
 const result = (status: CheckoutResult['status']): CheckoutResult => ({

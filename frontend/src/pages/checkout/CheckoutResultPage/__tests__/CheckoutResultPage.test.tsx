@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CheckoutResult } from '@/types/checkout-result.types';
 
 const { mockUseResult } = vi.hoisted(() => ({ mockUseResult: vi.fn() }));
-vi.mock('@/hooks/queries/useCheckoutResult', () => ({ useCheckoutResult: mockUseResult }));
+vi.mock('../hooks/useCheckoutResult', () => ({ useCheckoutResult: mockUseResult }));
 
 import CheckoutResultPage from '../index';
 

@@ -2,17 +2,19 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { AlertCircle, ShoppingBag } from 'lucide-react';
 import BaseUrl from '@/consts/baseUrl';
+import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const primaryLink =
   'inline-flex h-10 items-center justify-center rounded-full bg-black px-6 text-xs font-semibold text-white transition-colors hover:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black';
 
 const Shell: React.FC<React.PropsWithChildren<{ testId: string }>> = ({ testId, children }) => (
-  <div
+  <Card
     data-testid={testId}
-    className="space-y-4 rounded-2xl border border-[#e4e4e7] bg-white px-6 py-14 text-center shadow-card"
+    className="space-y-4 px-6 py-14 text-center shadow-card"
   >
     {children}
-  </div>
+  </Card>
 );
 
 /** Chưa có đơn nào (Đơn mua #2). Khi đang lọc theo trạng thái thì gợi ý quay lại "Tất cả". */
@@ -67,15 +69,15 @@ export const OrderHistoryError: React.FC<{ onRetry: () => void }> = ({ onRetry }
 export const OrderHistorySkeleton: React.FC = () => (
   <div data-testid="orders-skeleton" aria-busy="true" className="space-y-5">
     {[0, 1].map((i) => (
-      <div key={i} className="space-y-4 rounded-2xl border border-[#e4e4e7] bg-white p-6">
-        <div className="h-4 w-40 animate-pulse rounded bg-zinc-200" />
+      <Card key={i} className="space-y-4 p-6 shadow-card">
+        <Skeleton className="h-4 w-40" />
         <div className="flex items-center gap-3">
-          <div className="h-12 w-12 animate-pulse rounded-lg bg-zinc-200" />
-          <div className="h-4 flex-1 animate-pulse rounded bg-zinc-200" />
-          <div className="h-4 w-20 animate-pulse rounded bg-zinc-200" />
+          <Skeleton className="h-12 w-12 rounded-lg" />
+          <Skeleton className="h-4 flex-1" />
+          <Skeleton className="h-4 w-20" />
         </div>
-        <div className="h-8 w-full animate-pulse rounded bg-zinc-100" />
-      </div>
+        <Skeleton className="h-8 w-full" />
+      </Card>
     ))}
   </div>
 );
