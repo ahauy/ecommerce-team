@@ -14,14 +14,9 @@ interface ProductFilterDrawerProps {
 
 /**
  * Drawer bộ lọc cho mobile (< 1024px): chọn trong bản nháp,
- * chỉ áp dụng khi bấm "Áp dụng (Xem kết quả)".
+ * chỉ áp dụng khi bấm "Xem kết quả".
  */
-const ProductFilterDrawer: React.FC<ProductFilterDrawerProps> = ({
-  open,
-  onOpenChange,
-  value,
-  onApply,
-}) => {
+const ProductFilterDrawer: React.FC<ProductFilterDrawerProps> = ({ open, onOpenChange, value, onApply }) => {
   const [draft, setDraft] = useState<FilterValues>(value);
 
   // Mỗi lần mở lại, bắt đầu từ bộ lọc đang áp dụng.
@@ -42,16 +37,22 @@ const ProductFilterDrawer: React.FC<ProductFilterDrawerProps> = ({
         data-testid="product-filter-drawer"
         className="flex w-[88vw] max-w-sm flex-col gap-0 bg-[#fbfbf5] p-0"
       >
-        <div className="border-b border-[#e4e4e7] bg-white px-5 py-4">
-          <SheetTitle className="text-base font-semibold text-black">Bộ lọc</SheetTitle>
+        <div className="flex items-center justify-between border-b border-[#e4e4e7] bg-white px-5 py-4 pr-12">
+          <SheetTitle className="text-base font-semibold text-black">Bộ lọc tìm kiếm</SheetTitle>
+          <button
+            type="button"
+            onClick={() => setDraft(EMPTY_FILTER_VALUES)}
+            className="text-xs text-zinc-500 hover:text-black"
+          >
+            Thiết lập lại
+          </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5 py-5">
+        <div className="flex-1 overflow-y-auto bg-white px-5 py-5">
           <ProductFilterPanel
             instantPrice
             value={draft}
             onChange={(patch) => setDraft((prev) => ({ ...prev, ...patch }))}
-            onClear={() => setDraft(EMPTY_FILTER_VALUES)}
           />
         </div>
 
@@ -61,7 +62,7 @@ const ProductFilterDrawer: React.FC<ProductFilterDrawerProps> = ({
             onClick={handleApply}
             className="h-11 w-full rounded-full bg-black text-sm font-semibold text-white transition-colors hover:bg-zinc-800"
           >
-            Áp dụng (Xem kết quả)
+            Xem kết quả
           </button>
         </div>
       </SheetContent>

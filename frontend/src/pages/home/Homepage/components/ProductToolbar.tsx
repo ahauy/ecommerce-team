@@ -7,8 +7,8 @@ interface ProductToolbarProps {
   sort: SortOption;
   onSortChange: (sort: SortOption) => void;
   onOpenFilters: () => void;
-  /** Tổng số kết quả — chỉ hiển thị khi đã có dữ liệu thật từ API. */
-  resultCount?: number;
+  /** Khoảng đang hiển thị, vd. { from: 1, to: 12, total: 312 } — ẩn khi chưa có dữ liệu. */
+  range?: { from: number; to: number; total: number };
 }
 
 const ProductToolbar: React.FC<ProductToolbarProps> = ({
@@ -16,9 +16,9 @@ const ProductToolbar: React.FC<ProductToolbarProps> = ({
   sort,
   onSortChange,
   onOpenFilters,
-  resultCount,
+  range,
 }) => (
-  <div className="flex flex-wrap items-center justify-between gap-3">
+  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e4e4e7] pb-4">
     <div className="flex items-center gap-3">
       {/* Mobile: nút mở Drawer */}
       <button
@@ -30,13 +30,16 @@ const ProductToolbar: React.FC<ProductToolbarProps> = ({
         <span>{activeFilterCount > 0 ? `Bộ lọc (${activeFilterCount})` : 'Bộ lọc'}</span>
       </button>
 
-      {resultCount !== undefined && (
-        <p className="text-sm text-zinc-600">Hiển thị {resultCount} sản phẩm</p>
+      {range && range.total > 0 && (
+        <p data-testid="product-range" className="text-sm text-zinc-600">
+          Hiển thị <strong className="font-semibold text-black">{range.from}-{range.to}</strong> /{' '}
+          <strong className="font-semibold text-black">{range.total}</strong> sản phẩm
+        </p>
       )}
     </div>
 
     <label className="flex items-center gap-2 text-xs text-zinc-500">
-      <span className="hidden sm:inline">Sắp xếp:</span>
+      <span className="hidden sm:inline">Sắp xếp theo:</span>
       <select
         aria-label="Sắp xếp sản phẩm"
         value={sort}

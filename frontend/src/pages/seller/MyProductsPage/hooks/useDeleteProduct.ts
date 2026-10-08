@@ -11,6 +11,7 @@ export const useDeleteProduct = () => {
     mutationFn: (id: string) => myProductsService.deleteProduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MY_PRODUCTS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
     },
   });
 };

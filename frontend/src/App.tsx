@@ -7,12 +7,16 @@ import AppRoutes from "@/routes";
 import SidebarProvider from "./providers/SidebarProvider";
 import { queryClient } from "@/lib/queryClient";
 import { bootstrapSession } from "@/services/session";
+import useCartMergeOnLogin from "@/hooks/useCartMergeOnLogin";
 
 const App = () => {
   // Khôi phục phiên từ refresh-cookie khi mở app.
   useEffect(() => {
     void bootstrapSession();
   }, []);
+
+  // Đăng nhập xong → gộp giỏ localStorage vào giỏ DB (BR-CART-002).
+  useCartMergeOnLogin();
 
   return (
     <QueryClientProvider client={queryClient}>

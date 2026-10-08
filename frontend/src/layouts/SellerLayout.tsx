@@ -47,7 +47,7 @@ const SellerLayout: React.FC = () => {
       subtitle={profile?.shop?.shopName || undefined}
       roleLabel="Người bán"
       navItems={SELLER_MENU}
-      homeHref={BaseUrl.SellerProducts}
+      homeHref={BaseUrl.Homepage}
       profileHref={BaseUrl.SellerProfile}
       breadcrumbRoot="Kênh người bán"
       getBreadcrumbs={getBreadcrumbs}

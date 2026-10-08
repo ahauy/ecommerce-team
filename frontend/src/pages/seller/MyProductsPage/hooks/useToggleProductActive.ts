@@ -17,6 +17,7 @@ export const useToggleProductActive = () => {
       myProductsService.toggleActive(id, isActive),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MY_PRODUCTS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
     },
   });
 };

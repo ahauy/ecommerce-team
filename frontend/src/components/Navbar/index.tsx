@@ -9,6 +9,7 @@ import { useAuthStore } from "@/stores/auth.store";
 import { userService } from "@/services/user.service";
 import useLogout from "@/hooks/useLogout";
 import BaseUrl from "@/consts/baseUrl";
+import { useCartCount } from "@/hooks/queries/useCart";
 
 export default function Navbar() {
   const status = useAuthStore((s) => s.status);
@@ -20,6 +21,8 @@ export default function Navbar() {
   const isCustomer = status === "authed" && user?.role === "customer";
   const isAdmin = status === "authed" && user?.role === "admin";
   const { data: profile } = userService.useGetProfile(isCustomer);
+
+  const cartCount = useCartCount();
 
   const initial = user?.fullName?.charAt(0)?.toUpperCase() || "U";
 
@@ -69,17 +72,24 @@ export default function Navbar() {
         </Link>
       )}
 
-      {/* Cart Button with Mint Badge */}
-      <button
-        type="button"
-        aria-label="Giỏ hàng & Đơn đặt"
-        className="relative p-2.5 text-zinc-700 hover:text-black rounded-full hover:bg-zinc-100 transition-colors"
-      >
-        <ShoppingBag className="h-5 w-5" />
-        <span className="absolute top-1 right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-[#c1fbd4] text-black text-[11px] font-bold rounded-full leading-none">
-          0
-        </span>
-      </button>
+      {/* Cart Button with Mint Badge (Admin không mua hàng nên không có giỏ) */}
+      {!isAdmin && (
+        <Link
+          to={BaseUrl.Cart}
+          aria-label={cartCount > 0 ? `Giỏ hàng (${cartCount} sản phẩm)` : "Giỏ hàng"}
+          className="relative p-2.5 text-zinc-700 hover:text-black rounded-full hover:bg-zinc-100 transition-colors"
+        >
+          <ShoppingBag className="h-5 w-5" />
+          {cartCount > 0 && (
+            <span
+              data-testid="cart-badge"
+              className="absolute top-1 right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-[#c1fbd4] text-black text-[11px] font-bold rounded-full leading-none"
+            >
+              {cartCount > 99 ? "99+" : cartCount}
+            </span>
+          )}
+        </Link>
+      )}
 
       {/* Vertical Hairline Separator */}
       <div className="h-6 w-[1px] bg-[#e4e4e7] hidden sm:block" />

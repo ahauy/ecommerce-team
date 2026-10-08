@@ -1,57 +1,101 @@
 import React from 'react';
-import { Package } from 'lucide-react';
-
-export interface CatalogProduct {
-  id: string;
-  name: string;
-  price: number;
-  imageUrl?: string | null;
-}
+import { AlertCircle, Package } from 'lucide-react';
+import ProductCard, { ProductCardSkeleton } from '@/components/ProductCard';
+import type { ProductSummary } from '@/types/product.types';
+import { PAGE_SIZE } from '../hooks/useCatalogFilters';
 
 interface ProductGridProps {
-  products: CatalogProduct[];
+  products: ProductSummary[];
+  isLoading?: boolean;
+  isError?: boolean;
+  onRetry?: () => void;
+  /** Có từ khoá / bộ lọc đang áp dụng → gợi ý xoá để xem thêm. */
+  hasCriteria?: boolean;
+  onClearCriteria?: () => void;
 }
 
-const formatVnd = (value: number) =>
-  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+const gridClass = 'grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4';
 
-/** Lưới sản phẩm responsive, lấp đầy phần còn lại bên phải cột lọc. */
-const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
+const StateBox: React.FC<{
+  testId: string;
+  icon: React.ReactNode;
+  title: string;
+  hint?: string;
+  action?: { label: string; onClick: () => void };
+}> = ({ testId, icon, title, hint, action }) => (
+  <div
+    data-testid={testId}
+    className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-[#e4e4e7] bg-white p-12 text-center shadow-sm"
+  >
+    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 text-zinc-400">{icon}</div>
+    <p className="text-sm font-semibold text-black">{title}</p>
+    {hint && <p className="max-w-sm text-xs text-zinc-500">{hint}</p>}
+    {action && (
+      <button
+        type="button"
+        onClick={action.onClick}
+        className="mt-1 h-10 rounded-full bg-black px-6 text-xs font-semibold text-white transition-colors hover:bg-zinc-800"
+      >
+        {action.label}
+      </button>
+    )}
+  </div>
+);
+
+/** Lưới sản phẩm responsive: đủ 4 trạng thái — đang tải, lỗi, rỗng, có dữ liệu. */
+const ProductGrid: React.FC<ProductGridProps> = ({
+  products,
+  isLoading,
+  isError,
+  onRetry,
+  hasCriteria,
+  onClearCriteria,
+}) => {
+  if (isLoading) {
+    return (
+      <ul data-testid="product-grid-loading" aria-busy="true" className={gridClass}>
+        {Array.from({ length: PAGE_SIZE }, (_, i) => (
+          <li key={i}>
+            <ProductCardSkeleton />
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  if (isError) {
+    return (
+      <StateBox
+        testId="product-grid-error"
+        icon={<AlertCircle className="h-6 w-6" />}
+        title="Không thể tải danh sách sản phẩm"
+        hint="Đã có lỗi khi kết nối tới máy chủ. Vui lòng thử lại."
+        action={onRetry ? { label: 'Thử lại', onClick: onRetry } : undefined}
+      />
+    );
+  }
+
   if (products.length === 0) {
     return (
-      <div
-        data-testid="product-grid-empty"
-        className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-[#e4e4e7] bg-white p-12 text-center shadow-sm"
-      >
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 text-zinc-400">
-          <Package className="h-6 w-6" />
-        </div>
-        <p className="max-w-sm text-sm text-zinc-500">
-          Danh sách sản phẩm sẽ hiển thị tại đây (US-PRD-002).
-        </p>
-      </div>
+      <StateBox
+        testId="product-grid-empty"
+        icon={<Package className="h-6 w-6" />}
+        title={hasCriteria ? 'Không tìm thấy sản phẩm phù hợp' : 'Chưa có sản phẩm nào'}
+        hint={
+          hasCriteria
+            ? 'Thử đổi từ khoá, nới khoảng giá hoặc chọn danh mục khác.'
+            : 'Các gian hàng chưa đăng bán sản phẩm nào. Vui lòng quay lại sau.'
+        }
+        action={hasCriteria && onClearCriteria ? { label: 'Xóa bộ lọc', onClick: onClearCriteria } : undefined}
+      />
     );
   }
 
   return (
-    <ul
-      data-testid="product-grid"
-      className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 xl:grid-cols-4 2xl:grid-cols-5"
-    >
+    <ul data-testid="product-grid" className={gridClass}>
       {products.map((p) => (
-        <li
-          key={p.id}
-          className="overflow-hidden rounded-2xl border border-[#e4e4e7] bg-white shadow-sm"
-        >
-          <div className="aspect-square w-full bg-zinc-100">
-            {p.imageUrl && (
-              <img src={p.imageUrl} alt={p.name} className="h-full w-full object-cover" />
-            )}
-          </div>
-          <div className="space-y-1 p-3">
-            <p className="line-clamp-2 text-sm font-medium text-black">{p.name}</p>
-            <p className="text-sm font-semibold text-black">{formatVnd(p.price)}</p>
-          </div>
+        <li key={p.id}>
+          <ProductCard product={p} />
         </li>
       ))}
     </ul>

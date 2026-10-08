@@ -21,6 +21,8 @@ export interface PublicCategoryItem {
   name: string;
   slug: string;
   imageUrl: string | null;
+  /** Số SP đang hiển thị — chỉ có khi API trả về; UI tự ẩn nếu thiếu. */
+  productCount?: number;
 }
 
 export interface AdminCategoryItem extends CategoryItem {

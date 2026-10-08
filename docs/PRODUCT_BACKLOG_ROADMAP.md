@@ -292,7 +292,7 @@ schema-version: "1.3"
 
 ---
 
-- [ ] **US-PRD-002**: Xem & Tìm kiếm sản phẩm (Public)
+- [x] **US-PRD-002**: Xem & Tìm kiếm sản phẩm (Public)
   - **Slug:** `product-catalog-search`
   - **Effort:** M
   - **Context-budget:** single-session
@@ -301,18 +301,18 @@ schema-version: "1.3"
   - **Blocks:** `US-CART-001`
   - **Mô tả:** Người dùng (Guest & Customer) có thể xem danh sách sản phẩm, tìm kiếm theo tên, lọc theo danh mục và khoảng giá.
   - **Acceptance Criteria (AC):**
-    - [ ] `GET /api/v1/products` → danh sách phân trang (page, limit) chỉ hiện sản phẩm `isActive = true` **và** `isBlocked = false`.
-    - [ ] Query param `?search=iphone` → lọc theo tên (text search MongoDB).
-    - [ ] Query param `?categoryId=xxx` → lọc theo danh mục.
-    - [ ] Query param `?sellerId=xxx` → lọc theo người bán (trang shop).
-    - [ ] Query param `?minPrice=100000&maxPrice=5000000` → lọc theo khoảng giá.
-    - [ ] Query param `?sortBy=price&order=asc` → sắp xếp đúng.
-    - [ ] Sản phẩm `stock = 0` hiển thị badge "Hết hàng" — không thể thêm vào giỏ.
-    - [ ] `GET /api/v1/products/:id` → chi tiết sản phẩm (ảnh, giá, mô tả, stock, category name, `seller.shopName`); SP ẩn/bị block → 404 trừ Owner/Admin.
-    - [ ] FE: Trang danh sách SP (ProductGrid) + trang chi tiết SP (ProductDetail).
+    - [x] `GET /api/v1/products` → danh sách phân trang (page, limit) chỉ hiện sản phẩm `isActive = true` **và** `isBlocked = false`.
+    - [x] Query param `?search=iphone` → lọc theo tên (text search MongoDB).
+    - [x] Query param `?categoryId=xxx` → lọc theo danh mục.
+    - [x] Query param `?sellerId=xxx` → lọc theo người bán (trang shop).
+    - [x] Query param `?minPrice=100000&maxPrice=5000000` → lọc theo khoảng giá.
+    - [x] Query param `?sortBy=price&order=asc` → sắp xếp đúng.
+    - [x] Sản phẩm `stock = 0` hiển thị badge "Hết hàng" — không thể thêm vào giỏ.
+    - [x] `GET /api/v1/products/:id` → chi tiết sản phẩm (ảnh, giá, mô tả, stock, category name, `seller.shopName`); SP ẩn/bị block → 404 trừ Owner/Admin.
+    - [x] FE: Trang danh sách SP (ProductGrid) + trang chi tiết SP (ProductDetail).
   - **Tasks:**
-    - [ ] **Backend:** `GET /products với query builder (search, filter, sort, paginate, sellerId)` · `GET /products/:id populate category + seller (OptionalJwtAuthGuard)`
-    - [ ] **Frontend:** `ProductGrid, ProductCard, ProductDetail components` · `FilterSidebar, SearchBar` · `Pagination component`
+    - [x] **Backend:** `GET /products với query builder (search, filter, sort, paginate, sellerId)` · `GET /products/:id populate category + seller (OptionalJwtAuthGuard)`
+    - [x] **Frontend:** `ProductGrid, ProductCard, ProductDetail components` · `FilterSidebar, SearchBar` · `Pagination component`
   - **Stitch Screens (`projects/6249429078653284294`):**
     - `projects/6249429078653284294/screens/afed4199f8c8486ea1a1904e7a12d153` ("Trang chủ & Danh mục Sản phẩm")
     - `projects/6249429078653284294/screens/8413ebf43e9d47b494683ca906fa588b` ("Trang chi tiết sản phẩm - còn hàng - chưa đăng nhập")

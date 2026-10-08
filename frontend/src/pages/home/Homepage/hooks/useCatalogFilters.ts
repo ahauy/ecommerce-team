@@ -1,16 +1,25 @@
 import { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import type { ProductSortBy, ProductSortOrder } from '@/types/product.types';
 
-export type SortOption = 'newest' | 'price_asc' | 'price_desc' | 'best_selling';
+export type SortOption = 'newest' | 'price_asc' | 'price_desc' | 'name_asc';
 
 export const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'newest', label: 'Mới nhất' },
   { value: 'price_asc', label: 'Giá tăng dần' },
   { value: 'price_desc', label: 'Giá giảm dần' },
-  { value: 'best_selling', label: 'Bán chạy' },
+  { value: 'name_asc', label: 'Tên A → Z' },
 ];
 
-export const RATING_OPTIONS = [4, 3] as const;
+/** Ánh xạ lựa chọn sắp xếp của UI sang `sortBy` / `order` của API. */
+export const SORT_PARAMS: Record<SortOption, { sortBy: ProductSortBy; order: ProductSortOrder }> = {
+  newest: { sortBy: 'createdAt', order: 'desc' },
+  price_asc: { sortBy: 'price', order: 'asc' },
+  price_desc: { sortBy: 'price', order: 'desc' },
+  name_asc: { sortBy: 'name', order: 'asc' },
+};
+
+export const PAGE_SIZE = 12;
 
 export interface CatalogFilters {
   q: string;
@@ -18,57 +27,66 @@ export interface CatalogFilters {
   category: string;
   minPrice: string;
   maxPrice: string;
-  /** 4 | 3 | null */
-  minRating: number | null;
   sort: SortOption;
+  /** Trang hiện tại, bắt đầu từ 1. */
+  page: number;
 }
 
-/** Phần bộ lọc (không gồm từ khoá tìm kiếm và sắp xếp) — dùng chung cho Sidebar và Drawer. */
-export type FilterValues = Pick<CatalogFilters, 'category' | 'minPrice' | 'maxPrice' | 'minRating'>;
+/** Phần bộ lọc (không gồm từ khoá, sắp xếp, trang) — dùng chung cho Sidebar và Drawer. */
+export type FilterValues = Pick<CatalogFilters, 'category' | 'minPrice' | 'maxPrice'>;
 
 export const EMPTY_FILTER_VALUES: FilterValues = {
   category: '',
   minPrice: '',
   maxPrice: '',
-  minRating: null,
 };
 
 const digitsOnly = (value: string | null): string => (value && /^\d+$/.test(value) ? value : '');
 
-/** Số lượng nhóm bộ lọc đang bật (khoảng giá tính là 1). */
+const parsePage = (value: string | null): number => {
+  const n = Number(value);
+  return Number.isInteger(n) && n >= 1 ? n : 1;
+};
+
+/** Số nhóm bộ lọc đang bật (khoảng giá tính là 1). */
 export const countActiveFilters = (f: FilterValues): number =>
-  (f.category ? 1 : 0) + (f.minPrice || f.maxPrice ? 1 : 0) + (f.minRating ? 1 : 0);
+  (f.category ? 1 : 0) + (f.minPrice || f.maxPrice ? 1 : 0);
 
 /**
- * Trạng thái bộ lọc catalog được lưu trên URL (?q=&category=&minPrice=&maxPrice=&rating=&sort=)
- * → chia sẻ/reload/back-forward đều giữ nguyên bộ lọc, và khớp với ô tìm kiếm ở Header.
+ * Trạng thái bộ lọc catalog lưu trên URL (?q=&category=&minPrice=&maxPrice=&sort=&page=)
+ * → chia sẻ / reload / back-forward đều giữ nguyên, và khớp với ô tìm kiếm ở Header.
+ * Đổi bất kỳ bộ lọc nào ngoài `page` sẽ đưa người dùng về trang 1.
  */
 export const useCatalogFilters = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const filters = useMemo<CatalogFilters>(() => {
-    const rawRating = Number(searchParams.get('rating'));
     const rawSort = searchParams.get('sort') as SortOption | null;
     return {
       q: searchParams.get('q') || '',
       category: searchParams.get('category') || '',
       minPrice: digitsOnly(searchParams.get('minPrice')),
       maxPrice: digitsOnly(searchParams.get('maxPrice')),
-      minRating: rawRating === 3 || rawRating === 4 ? rawRating : null,
       sort: SORT_OPTIONS.some((o) => o.value === rawSort) ? (rawSort as SortOption) : 'newest',
+      page: parsePage(searchParams.get('page')),
     };
   }, [searchParams]);
 
   const setFilters = useCallback(
     (patch: Partial<CatalogFilters>) => {
-      const next = { ...filters, ...patch };
+      const next: CatalogFilters = {
+        ...filters,
+        // Chỉ đổi trang thì giữ nguyên; đổi bộ lọc/sắp xếp thì về trang 1.
+        page: 1,
+        ...patch,
+      };
       const params = new URLSearchParams();
       if (next.q) params.set('q', next.q);
       if (next.category) params.set('category', next.category);
       if (next.minPrice) params.set('minPrice', next.minPrice);
       if (next.maxPrice) params.set('maxPrice', next.maxPrice);
-      if (next.minRating) params.set('rating', String(next.minRating));
       if (next.sort !== 'newest') params.set('sort', next.sort);
+      if (next.page > 1) params.set('page', String(next.page));
       setSearchParams(params, { replace: true });
     },
     [filters, setSearchParams]
