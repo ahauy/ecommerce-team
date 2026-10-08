@@ -57,14 +57,14 @@ CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 
-# ── VNPay ────────────────────────────────────────
-VNPAY_TMN_CODE=your_tmn_code
-VNPAY_HASH_SECRET=your_hash_secret
-VNPAY_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-VNPAY_RETURN_URL=http://localhost:3000/api/v1/payments/vnpay/return
-VNPAY_IPN_URL=http://localhost:3000/api/v1/payments/vnpay/ipn
-# IPN là request GET từ server VNPay → localhost KHÔNG nhận được.
-# Dùng ngrok/cloudflared để test IPN, hoặc dựa vào Return URL (xử lý chung, idempotent).
+# ── PayOS ────────────────────────────────────────
+PAYOS_CLIENT_ID=your_client_id
+PAYOS_API_KEY=your_api_key
+PAYOS_CHECKSUM_KEY=your_checksum_key
+# Return URL / Cancel URL = FRONTEND_URL/checkout/result?checkoutCode=... (backend tự ghép, không cần biến riêng).
+# Webhook URL khai báo trong trang quản lý PayOS, không nằm trong .env:
+#   https://<backend-public>/api/v1/payments/payos/webhook
+# localhost KHÔNG nhận được webhook → dùng ngrok/cloudflared, hoặc dựa vào đồng bộ chủ động (BR-PAY-006).
 
 # ── Checkout ─────────────────────────────────────
 CHECKOUT_EXPIRE_MINUTES=30
@@ -75,7 +75,7 @@ ADMIN_PASSWORD=change_me_please
 
 # Khi deploy (Vercel + Render) — xem 10-deployment.md:
 #   FRONTEND_URL = URL Vercel của frontend (không có dấu / ở cuối)
-#   Return URL và VNPAY_IPN_URL = URL public của backend trên Render
+#   Webhook URL của PayOS = URL public của backend trên Render (khai báo trong trang quản lý PayOS)
 
 # ── Frontend URL (CORS + redirect sau thanh toán) ─
 # Return URL redirect về: ${FRONTEND_URL}/checkout/result?checkoutCode=...&status=success|failed
@@ -100,17 +100,14 @@ FRONTEND_URL=http://localhost:5173
 2. Dashboard → Copy: `Cloud Name`, `API Key`, `API Secret`
 3. Dán vào `.env`
 
-### VNPay Sandbox
+### PayOS
 
-1. Đăng ký tại [https://sandbox.vnpayment.vn/devreg/](https://sandbox.vnpayment.vn/devreg/)
-2. Lấy `TmnCode` và `SecretKey`
-3. Trong cấu hình merchant sandbox, khai báo **IPN URL** (cần URL public, ví dụ từ ngrok) nếu muốn test IPN thật
-   - Mỗi **Checkout** = một giao dịch: `vnp_TxnRef = checkoutCode`, `vnp_Amount = totalAmount × 100`
-4. Dùng thẻ test: [https://sandbox.vnpayment.vn/apis/vnpay-demo/](https://sandbox.vnpayment.vn/apis/vnpay-demo/)
-   - Ngân hàng: NCB
-   - Số thẻ: `9704198526191432198`
-   - Tên: `NGUYEN VAN A`
-   - Ngày: `07/15`, OTP: `123456`
+1. Đăng ký tại [https://my.payos.vn](https://my.payos.vn) — cần CCCD và **tài khoản ngân hàng thật** đứng tên người đăng ký.
+2. Tạo **kênh thanh toán** liên kết tài khoản ngân hàng nhận tiền → lấy `Client ID`, `Api Key`, `Checksum Key` → dán vào `.env`.
+3. Khai báo **Webhook URL** cho kênh (cần URL public HTTPS: ngrok/cloudflared khi dev, URL Render khi deploy). PayOS gửi một request thử khi lưu → backend phải đang chạy và trả 200.
+4. **PayOS không có sandbox.** Test bằng giao dịch thật với số tiền nhỏ (vd tạo SP giá vài nghìn đồng), thanh toán bằng chuyển khoản / quét VietQR từ app ngân hàng. Tiền về chính tài khoản đã liên kết.
+   - Mỗi **Checkout** = một payment link: `orderCode = payosOrderCode` (số nguyên), `amount = totalAmount` (VNĐ, không nhân 100).
+   - Chạy localhost không có webhook: mở trang kết quả `/checkout/result` để backend tự tra cứu trạng thái từ PayOS.
 
 ---
 

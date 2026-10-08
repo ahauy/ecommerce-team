@@ -5,7 +5,7 @@
 ```
 Trình duyệt ──► Vercel (frontend, static) ──► Render (backend NestJS) ──► MongoDB Atlas
                                                   ▲        └──► Cloudinary
-                          VNPay sandbox (Return / IPN) ────────┘
+                          PayOS (webhook) ─────────────────────┘
 ```
 
 Thứ tự làm: **Atlas → Render (BE) → Vercel (FE) → cập nhật URL chéo → seed → smoke test**.
@@ -32,7 +32,7 @@ Thứ tự làm: **Atlas → Render (BE) → Vercel (FE) → cập nhật URL ch
 - `--include=dev`: nếu đặt `NODE_ENV=production` thì `npm install` bỏ qua devDependencies và `nest build` sẽ lỗi.
 - Nest phải nghe đúng cổng Render cấp: `await app.listen(process.env.PORT ?? 3000, '0.0.0.0')`.
 - CORS: `app.enableCors({ origin: process.env.FRONTEND_URL })`.
-- *Environment*: copy toàn bộ biến trong `.env` theo `09`, đổi: `NODE_ENV=production`, `MONGODB_URI` (Atlas), `FRONTEND_URL` (điền ở bước 4), Return URL / `VNPAY_IPN_URL` (bước 4), `ADMIN_EMAIL` / `ADMIN_PASSWORD` (mật khẩu mạnh).
+- *Environment*: copy toàn bộ biến trong `.env` theo `09`, đổi: `NODE_ENV=production`, `MONGODB_URI` (Atlas), `FRONTEND_URL` (điền ở bước 4), `PAYOS_CLIENT_ID` / `PAYOS_API_KEY` / `PAYOS_CHECKSUM_KEY`, `ADMIN_EMAIL` / `ADMIN_PASSWORD` (mật khẩu mạnh).
 - Sau khi deploy xong ghi lại URL dạng `https://<tên-service>.onrender.com`.
 
 ## 3. Frontend trên Vercel
@@ -57,8 +57,8 @@ Thứ tự làm: **Atlas → Render (BE) → Vercel (FE) → cập nhật URL ch
 ## 4. Cập nhật URL chéo
 
 1. Render → `FRONTEND_URL` = URL Vercel (không có dấu `/` cuối) → redeploy BE.
-2. Return URL và `VNPAY_IPN_URL` = URL backend trên Render (`.../api/v1/payments/vnpay/return` và `.../ipn`).
-3. Đăng ký IPN URL trong trang quản trị merchant sandbox của VNPay (cùng tài khoản đã nhận email sandbox). Deploy xong là IPN gọi được thật; Return URL vẫn cập nhật đơn như dự phòng (xem `06`).
+2. Webhook URL của PayOS = `https://<tên-service>.onrender.com/api/v1/payments/payos/webhook` — khai báo trong trang quản lý PayOS (kênh thanh toán → Webhook). PayOS gửi request thử khi lưu → BE phải đang chạy và trả 200.
+3. Return / Cancel URL do backend tự ghép từ `FRONTEND_URL` (`/checkout/result?checkoutCode=...`) → chỉ cần `FRONTEND_URL` đúng. Webhook là kênh chính; đồng bộ khi mở trang kết quả + cron hết hạn là dự phòng (xem `06`).
 
 ## 5. Seed dữ liệu demo
 
@@ -75,9 +75,9 @@ Ghi tài khoản demo (Admin, 2 seller, 1 buyer) vào `README.md`.
 
 - [ ] Mở FE, đăng nhập Admin / seller / buyer được (CORS ổn).
 - [ ] Seller đăng SP có ảnh (Cloudinary).
-- [ ] Buyer thêm giỏ 2 shop → Checkout → thanh toán VNPay sandbox → về trang kết quả đúng trạng thái.
+- [ ] Buyer thêm giỏ 2 shop → Checkout → thanh toán PayOS (giao dịch thật, số tiền nhỏ) → về trang kết quả đúng trạng thái.
 - [ ] Mở thẳng `/checkout/result?checkoutCode=...` (F5) không 404.
-- [ ] Thanh toán thất bại / hết hạn → stock được hoàn lại.
+- [ ] Hủy trên trang PayOS / để hết hạn → stock được hoàn lại.
 
 ---
 

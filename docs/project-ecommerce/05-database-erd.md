@@ -9,10 +9,10 @@ users          (vừa là người mua, vừa là người bán — có thông t
 categories
 products       (mỗi SP thuộc 1 người bán: sellerId)
 carts          (chỉ cho user đã đăng nhập)
-checkouts      (1 lần bấm "Đặt hàng" = 1 checkout = 1 giao dịch VNPay)
+checkouts      (1 lần bấm "Đặt hàng" = 1 checkout = 1 payment link PayOS)
 orders         (mỗi người bán 1 order trong 1 checkout)
 order_items    (embedded trong orders)
-payments       (raw log callback VNPay)
+payments       (raw log webhook / tra cứu PayOS)
 ```
 
 ---
@@ -115,7 +115,7 @@ payments       (raw log callback VNPay)
 ```js
 {
   _id: ObjectId,
-  checkoutCode: String,    // unique, tự generate (e.g. "CHK-20261002-7F3K9QX2AB", đuôi ≥10 ký tự ngẫu nhiên) — dùng làm vnp_TxnRef
+  checkoutCode: String,    // unique, tự generate (e.g. "CHK-20261002-7F3K9QX2AB", đuôi ≥10 ký tự ngẫu nhiên) — hiển thị cho người dùng; mã gửi PayOS là payosOrderCode
   userId: ObjectId,        // ref: 'users', required — người mua (không có Guest checkout)
 
   recipient: {             // snapshot người nhận, dùng chung cho mọi order con
@@ -131,7 +131,10 @@ payments       (raw log callback VNPay)
   status: String,          // enum: ['pending','paid','failed','expired'], default 'pending'
   expiresAt: Date,         // createdAt + 30 phút (CHECKOUT_EXPIRE_MINUTES)
   paidAt: Date,            // set khi paid
-  vnpayTransactionId: String, // vnp_TransactionNo từ callback
+  payosOrderCode: Number,  // unique, số nguyên dương ≤ 9007199254740991 — `orderCode` gửi PayOS (BR-PAY-007)
+  paymentLinkId: String,   // id payment link PayOS trả về khi tạo link
+  checkoutUrl: String,     // trang thanh toán PayOS (FE redirect tới)
+  payosReference: String,  // mã giao dịch ngân hàng (`data.reference` trong webhook)
 
   createdAt: Date,
   updatedAt: Date
@@ -175,7 +178,7 @@ payments       (raw log callback VNPay)
   status: String,          // enum: ['pending','confirmed','shipping','delivered','cancelled','refunded']
 
   // Payment
-  paymentMethod: String,   // 'vnpay'
+  paymentMethod: String,   // 'payos'
   paymentStatus: String,   // enum: ['unpaid', 'paid', 'refunded']
 
   // Hủy đơn
@@ -189,14 +192,14 @@ payments       (raw log callback VNPay)
 
 ### `payments`
 
-> Lưu raw data từ VNPay để audit/debug. Ghi **cả** callback không hợp lệ.
+> Lưu raw data từ PayOS để audit/debug. Ghi **cả** webhook sai chữ ký và mọi lần đồng bộ chủ động (BR-PAY-008).
 
 ```js
 {
   _id: ObjectId,
-  checkoutId: ObjectId,    // ref: 'checkouts' (null nếu không tìm thấy TxnRef)
-  source: String,          // enum: ['ipn', 'return']
-  vnpayData: Object,       // toàn bộ query params từ VNPay
+  checkoutId: ObjectId,    // ref: 'checkouts' (null nếu không tìm thấy orderCode)
+  source: String,          // enum: ['webhook', 'sync'] — sync = tra cứu chủ động GET payment-requests
+  payosData: Object,       // body webhook hoặc response tra cứu từ PayOS
   isValidSignature: Boolean,
   isSuccess: Boolean,
   note: String,            // vd: "late_success_after_expiry" để Admin hoàn tiền thủ công
@@ -213,7 +216,7 @@ users ────────────────────────�
   │
   ├── (1 — n) products        via products.sellerId   ← người bán sở hữu SP
   │
-  ├── (1 — n) checkouts       via checkouts.userId    ← người mua (null = Guest)
+  ├── (1 — n) checkouts       via checkouts.userId    ← người mua (luôn có — không có Guest checkout)
   │
   ├── (1 — n) orders          via orders.userId       ← người mua
   │
@@ -230,7 +233,7 @@ products ·····> orders.items            (snapshot, không ref thuần túy)
 
 - Một `users` document đóng **hai vai**: người mua (`orders.userId`) và người bán (`products.sellerId`, `orders.sellerId`).
 - `orders.items` chứa **snapshot** (tên, giá, ảnh tại thời điểm đặt) — tránh bị ảnh hưởng khi seller sửa SP sau.
-- `checkouts.userId = null` và `orders.userId = null` khi là Guest checkout.
+- Không có Guest checkout → `checkouts.userId` và `orders.userId` luôn có giá trị.
 - `carts` chỉ tồn tại cho user đăng nhập — Guest không có document trong collection này.
 - Thanh toán gắn ở cấp **checkout**; trạng thái giao hàng gắn ở cấp **order**.
 
@@ -256,6 +259,7 @@ products.{isActive, isBlocked}: compound index  // lọc SP hiển thị
 
 // checkouts
 checkouts.checkoutCode: unique index
+checkouts.payosOrderCode: unique index
 checkouts.userId: index
 checkouts.{status, expiresAt}: compound index   // job hủy checkout quá hạn
 
@@ -291,10 +295,10 @@ Order.findOneAndUpdate(
 ### Chuyển trạng thái Checkout — cũng phải nguyên tử
 
 ```js
-// Dùng chung cho IPN, Return URL và cron hết hạn (BR-PAY-011) — chạy trong cùng transaction với cập nhật Order con (BR-CHK-010)
+// Dùng chung cho webhook, đồng bộ chủ động và cron hết hạn (BR-PAY-011) — chạy trong cùng transaction với cập nhật Order con (BR-CHK-010)
 const checkout = await Checkout.findOneAndUpdate(
   { _id, status: 'pending' },
-  { status: 'paid', paidAt: new Date(), vnpayTransactionId },
+  { status: 'paid', paidAt: new Date(), payosReference },
   { new: true, session },
 ); // null → đã có bên khác xử lý (hoặc đã expired) → KHÔNG cập nhật Order / hoàn stock lần nữa
 ```
@@ -333,10 +337,10 @@ try {
 } finally {
   await session.endSession();
 }
-// Tạo URL VNPay SAU khi transaction commit
+// Gọi PayOS tạo payment link SAU khi transaction commit; lỗi → Checkout failed + restockAndCancel (BR-CHK-010)
 ```
 
 - Mọi thao tác DB trong transaction đều truyền `{ session }`.
-- Callback của `withTransaction` có thể bị chạy lại khi gặp lỗi tạm thời → chỉ chứa thao tác DB, **không** gọi VNPay / Cloudinary / gửi mail bên trong.
+- Callback của `withTransaction` có thể bị chạy lại khi gặp lỗi tạm thời → chỉ chứa thao tác DB, **không** gọi PayOS / Cloudinary / gửi mail bên trong.
 - `restockAndCancel`: `Order.findOneAndUpdate({ _id, status: <trạng thái hợp lệ> }, { status: 'cancelled' }, { session })` + `$inc` stock từng item trong **cùng** transaction → hoặc cả hai cùng xảy ra, hoặc không gì thay đổi.
-- IPN / Return: cập nhật Checkout có điều kiện (BR-PAY-011) + Order → `confirmed` + xóa item giỏ (BR-CHK-007) trong cùng 1 transaction.
+- Webhook / đồng bộ chủ động: cập nhật Checkout có điều kiện (BR-PAY-011) + Order → `confirmed` + xóa item giỏ (BR-CHK-007) trong cùng 1 transaction.

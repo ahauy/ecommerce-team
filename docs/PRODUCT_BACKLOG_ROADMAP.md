@@ -5,7 +5,7 @@ tech-stack:
   backend: "NestJS + Mongoose ODM"
   frontend: "React 18 + Vite + TypeScript + Tailwind CSS + shadcn/ui + Zustand + TanStack Query + React Router v6 + Axios + Formik/Yup"
   database: "MongoDB"
-  infra: "Local dev (MongoDB local / Atlas) + Cloudinary + VNPay Sandbox"
+  infra: "Local dev (MongoDB local / Atlas) + Cloudinary + PayOS"
   test: "Jest (unit) + Playwright (E2E)"
 git-mode: "team"
 schema-version: "1.3"
@@ -13,7 +13,7 @@ schema-version: "1.3"
 
 # 🗺️ Product Backlog & Execution Roadmap
 
-> **Sản phẩm:** `Ecommerce Team Project` — Sàn thương mại điện tử **nhiều người bán** (kiểu Shopee thu gọn): user vừa **đăng bán** vừa **mua** SP vật lý. Luồng: đăng bán SP → xem SP → giỏ hàng → checkout (tách đơn theo người bán) → thanh toán VNPay → người bán xử lý đơn.  
+> **Sản phẩm:** `Ecommerce Team Project` — Sàn thương mại điện tử **nhiều người bán** (kiểu Shopee thu gọn): user vừa **đăng bán** vừa **mua** SP vật lý. Luồng: đăng bán SP → xem SP → giỏ hàng → checkout (tách đơn theo người bán) → thanh toán PayOS → người bán xử lý đơn.  
 > **Cập nhật lần cuối:** `2026-10-06`  
 > **Trạng thái tài liệu:** Living Document — Quản lý tiến độ và đồng bộ với `/command-continue-project` (hoặc `/command-continue-frontend` cho Frontend)
 >
@@ -58,7 +58,7 @@ schema-version: "1.3"
 - **NO** Duyệt SP trước khi hiển thị — Admin kiểm duyệt sau bằng block.
 - **NO** Biến thể SP (màu/size), thương hiệu, video SP.
 - **NO** Tính phí / chọn đơn vị vận chuyển.
-- **NO** Chia tiền / đối soát / rút tiền cho người bán — tiền về tài khoản VNPay của sàn, hoàn tiền Admin làm thủ công.
+- **NO** Chia tiền / đối soát / rút tiền cho người bán — tiền về tài khoản ngân hàng của sàn (qua PayOS), hoàn tiền Admin chuyển khoản thủ công.
 - **NO** Người mua tự hủy đơn / bấm "Đã nhận hàng"; **NO** chat người mua – người bán.
 - **NO** Realtime notification (Socket.io / WebSocket).
 - **NO** Email transactional (order confirmation email gửi tự động).
@@ -77,8 +77,8 @@ schema-version: "1.3"
 | **EPIC-01** | Auth & User (Đăng ký / Đăng nhập / JWT)                                   |  **Must Have**   |    9.5     | **P0 (Critical)** |      Sprint 1      |
 | **EPIC-02** | Category (Admin) & Product (Seller đăng bán + Search/Filter + Upload)     |  **Must Have**   |    9.0     | **P0 (Core USP)** |      Sprint 1      |
 | **EPIC-03** | Cart (Guest localStorage + Customer DB + Merge)                           |  **Must Have**   |    8.5     | **P0 (Core USP)** |      Sprint 1      |
-| **EPIC-04** | Order & Checkout (Guest + Customer · tách đơn theo người bán · Inventory) |  **Must Have**   |    8.5     | **P0 (Critical)** |      Sprint 2      |
-| **EPIC-05** | Payment VNPay theo Checkout (IPN + Return + Rollback)                     |  **Must Have**   |    8.0     | **P0 (Critical)** |      Sprint 2      |
+| **EPIC-04** | Order & Checkout (Customer · tách đơn theo người bán · Inventory)        |  **Must Have**   |    8.5     | **P0 (Critical)** |      Sprint 2      |
+| **EPIC-05** | Payment PayOS theo Checkout (Webhook + đồng bộ + Rollback)                     |  **Must Have**   |    8.0     | **P0 (Critical)** |      Sprint 2      |
 | **EPIC-06** | Admin Dashboard (User · Category · Product block · Order)                 |  **Must Have**   |    7.5     |   **P1 (High)**   |      Sprint 2      |
 | **EPIC-07** | Go-Live & Production Hardening                                            |  **Must Have**   |    7.0     | **P0 (Blocker)**  |      Sprint 3      |
 | **EPIC-08** | Seller (Gian hàng · Đăng bán · Xử lý đơn bán)                             |  **Must Have**   |    9.0     | **P0 (Core USP)** |    Sprint 1 + 2    |
@@ -91,7 +91,7 @@ schema-version: "1.3"
 [ Sprint 0 - Setup & Architecture ] ──► [ DONE ✅ ]
   ├── SETUP-001: Khởi tạo repo, cấu hình NestJS project + Mongoose
   ├── SETUP-002: Cấu hình global pipes, filters, interceptors (response wrapper)
-  └── SETUP-003: Viết .env.example + hướng dẫn setup Cloudinary / MongoDB / VNPay
+  └── SETUP-003: Viết .env.example + hướng dẫn setup Cloudinary / MongoDB / PayOS
 
 [ Sprint 1 - Core Foundation (MVP Base) ] ──► [ IN PROGRESS 🔧 ]
   ├── [x] US-AUTH-001: Đăng ký & Đăng nhập
@@ -104,7 +104,7 @@ schema-version: "1.3"
 
 [ Sprint 2 - Commerce Core ] ──► [ TO DO 📋 ]
   ├── US-ORD-001:  Tạo Checkout & đơn hàng (tách đơn theo người bán)
-  ├── US-PAY-001:  Tích hợp VNPay theo Checkout + IPN/Return + Rollback stock
+  ├── US-PAY-001:  Tích hợp PayOS theo Checkout + Webhook/đồng bộ + Rollback stock
   ├── US-ORD-002:  Lịch sử đơn mua (Customer) · Xem mọi đơn (Admin)
   ├── US-SELL-002: Đơn bán — Seller xử lý đơn của mình (Seller + Admin cập nhật trạng thái)
   └── US-ADM-001:  Admin Dashboard (User ban/unban + block SP · Product block)
@@ -358,7 +358,7 @@ schema-version: "1.3"
 
 ## 🛒 Sprint 2: Commerce Core — Order, Payment & Admin
 
-> **Mục tiêu Sprint:** Luồng mua – bán hoàn chỉnh: checkout nhiều shop → thanh toán VNPay một lần → người bán xử lý đơn của mình → admin giám sát.
+> **Mục tiêu Sprint:** Luồng mua – bán hoàn chỉnh: checkout nhiều shop → thanh toán PayOS một lần → người bán xử lý đơn của mình → admin giám sát.
 
 ---
 
@@ -369,7 +369,7 @@ schema-version: "1.3"
   - **Priority:** Must-Have (P0)
   - **Depends-on:** `US-CART-001`
   - **Blocks:** `US-PAY-001`, `US-ORD-002`, `US-SELL-002`
-  - **Mô tả:** Người mua đã đăng nhập (Customer; Admin không mua) tạo đơn từ giỏ hàng. Hệ thống nhóm item theo người bán, tạo **1 Checkout + N Order** (mỗi shop 1 Order), thanh toán một lần qua VNPay.
+  - **Mô tả:** Người mua đã đăng nhập (Customer; Admin không mua) tạo đơn từ giỏ hàng. Hệ thống nhóm item theo người bán, tạo **1 Checkout + N Order** (mỗi shop 1 Order), thanh toán một lần qua PayOS (1 payment link).
   - **Acceptance Criteria (AC):**
     - [ ] `POST /api/v1/orders` (🔒 yêu cầu đăng nhập — không có Guest checkout; Admin → 403) → tạo Checkout + các Order, trừ stock ngay.
     - [ ] Giỏ có SP của 2 shop → tạo đúng 2 Order, mỗi Order có `sellerId` và `totalAmount` riêng; `Checkout.totalAmount` = tổng.
@@ -379,11 +379,11 @@ schema-version: "1.3"
     - [ ] Customer mua SP của chính mình → 400.
     - [ ] Trừ stock nguyên tử (`stock >= qty`); 2 người mua SP cuối cùng cùng lúc → chỉ 1 người thành công.
     - [ ] Tạo Checkout (trừ stock + Checkout + N Order) chạy trong **1 MongoDB transaction** (`session.withTransaction`, BR-CHK-010); lỗi giữa chừng → không còn stock bị giữ mà không có Order.
-    - [ ] Response trả `checkoutId`, `checkoutCode`, `totalAmount`, `expiresAt`, `orders[]`, `vnpayUrl`. Mọi Order mặc định `pending`.
-    - [ ] FE: Trang Checkout (form recipient) → "Thanh toán" → redirect VNPay; trang kết quả `/checkout/result` liệt kê các đơn.
+    - [ ] Response trả `checkoutId`, `checkoutCode`, `totalAmount`, `expiresAt`, `orders[]`, `paymentUrl` (trang thanh toán PayOS). Mọi Order mặc định `pending`.
+    - [ ] FE: Trang Checkout (form recipient) → "Thanh toán" → redirect sang trang thanh toán PayOS; trang kết quả `/checkout/result` liệt kê các đơn.
   - **Tasks:**
-    - [ ] **Backend:** `Checkout schema + Order schema (checkoutId, sellerId, sellerShopName, userId, recipient, items snapshot, totalAmount, status, paymentStatus)` · `POST /orders: group by seller, atomic decrement, session.withTransaction (all-or-nothing), generate VNPay URL` · `orderCode/checkoutCode generator` · `restockAndCancel() dùng chung`
-    - [ ] **Frontend:** `CheckoutPage (Guest form / Customer prefill)` · `CheckoutResultPage (success/fail)`
+    - [ ] **Backend:** `Checkout schema + Order schema (checkoutId, sellerId, sellerShopName, userId, recipient, items snapshot, totalAmount, status, paymentStatus)` · `POST /orders: group by seller, atomic decrement, session.withTransaction (all-or-nothing), tạo payment link PayOS sau commit (lỗi → Checkout failed + restockAndCancel)` · `orderCode/checkoutCode generator` · `restockAndCancel() dùng chung`
+    - [ ] **Frontend:** `CheckoutPage (prefill recipient từ profile)` · `CheckoutResultPage (success/fail)`
   - **Stitch Screens (`projects/6249429078653284294`):**
     - `projects/6249429078653284294/screens/a9f65d6cc9de44bbb27efeec4e04885e` ("Thanh toán #1")
     - `projects/6249429078653284294/screens/dcd5e43670f04767b433a747184b9d53` ("Thanh toán #2")
@@ -393,35 +393,35 @@ schema-version: "1.3"
 
 ---
 
-- [ ] **US-PAY-001**: Tích hợp VNPay theo Checkout — IPN/Return + Rollback Stock
-  - **Slug:** `payment-vnpay`
+- [ ] **US-PAY-001**: Tích hợp PayOS theo Checkout — Webhook + đồng bộ trạng thái + Rollback Stock
+  - **Slug:** `payment-payos`
   - **Effort:** L
   - **Context-budget:** multi-session
   - **Priority:** Must-Have (P0)
   - **Depends-on:** `US-ORD-001`
   - **Blocks:** `US-ORD-002`, `US-SELL-002`
-  - **Mô tả:** Một giao dịch VNPay cho cả Checkout. Thành công → mọi Order con `confirmed`; thất bại / hết hạn → mọi Order con `cancelled` và rollback stock.
+  - **Mô tả:** Một payment link PayOS cho cả Checkout. Thành công → mọi Order con `confirmed`; người mua hủy / hết hạn → mọi Order con `cancelled` và rollback stock.
   - **Acceptance Criteria (AC):**
-    - [ ] `vnp_TxnRef = checkoutCode`, `vnp_Amount = totalAmount × 100`.
-    - [ ] `GET /api/v1/payments/vnpay/ipn` (VNPay gọi bằng GET) → verify HMAC-SHA512 + số tiền, trả `RspCode`/`Message` đúng (00, 01, 02, 04, 97, 99).
+    - [ ] Tạo payment link sau khi commit: `orderCode = payosOrderCode` (số nguyên unique), `amount = totalAmount`, `description` ≤ 9 ký tự, `returnUrl` / `cancelUrl` = `FRONTEND_URL/checkout/result?checkoutCode=...`, `expiredAt = expiresAt`, `signature` HMAC-SHA256 đúng. Tạo link lỗi → Checkout `failed`, hoàn stock, trả 502.
+    - [ ] `POST /api/v1/payments/payos/webhook` → verify `signature` (HMAC-SHA256 trên `data`) + `orderCode` + số tiền; sai chữ ký → 400, còn lại luôn 200.
     - [ ] Thanh toán thành công → Checkout `paid`; **tất cả** Order con `pending → confirmed`, `paymentStatus = paid`.
-    - [ ] Thanh toán thất bại → Checkout `failed`; **tất cả** Order con `cancelled` (`cancelledBy = system`), rollback stock từng item.
-    - [ ] `GET /api/v1/payments/vnpay/return` → verify, gọi **cùng hàm xử lý idempotent** với IPN, rồi redirect FE `/checkout/result?checkoutCode=...&status=...`.
-    - [ ] IPN/Return đến trùng hoặc cùng lúc → chỉ xử lý 1 lần (idempotency theo trạng thái Checkout).
-    - [ ] Mọi callback (kể cả sai chữ ký) lưu vào collection `payments`.
-    - [ ] `@Cron` mỗi phút: Checkout `pending` quá `expiresAt` (30 phút) → `expired`, hủy Order `pending`, rollback stock.
-    - [ ] Thanh toán thành công đến **sau** khi Checkout `expired` → ghi `payments.note = late_success_after_expiry`, trả `02`.
+    - [ ] Người mua hủy trên trang PayOS (link `CANCELLED`) → Checkout `failed`; **tất cả** Order con `cancelled` (`cancelledBy = system`), rollback stock từng item.
+    - [ ] `GET /api/v1/checkouts/:checkoutCode` khi Checkout còn `pending` → tra cứu PayOS và gọi **cùng hàm xử lý idempotent** với webhook (chạy được trên localhost không cần webhook).
+    - [ ] Webhook / đồng bộ / cron đến trùng hoặc cùng lúc → chỉ xử lý 1 lần (idempotency theo trạng thái Checkout).
+    - [ ] Mọi webhook (kể cả sai chữ ký) và mọi lần đồng bộ lưu vào collection `payments`.
+    - [ ] `@Cron` mỗi phút: Checkout `pending` quá `expiresAt` (30 phút) → tra cứu PayOS; chưa trả → hủy link PayOS → `expired`, hủy Order `pending`, rollback stock.
+    - [ ] Thanh toán thành công đến **sau** khi Checkout `expired` / `failed` → ghi `payments.note = late_success_after_expiry`, không mở lại đơn; Admin chuyển khoản hoàn tiền thủ công.
   - **Tasks:**
-    - [ ] **Backend:** `VNPay service (tạo URL, verify checksum)` · `processPaymentResult() idempotent` · `GET /payments/vnpay/ipn` · `GET /payments/vnpay/return` · `Payment schema` · `Scheduled job (@Cron) checkout expiry`
-    - [ ] **Frontend:** `CheckoutResultPage (đọc checkoutCode từ query param)`
+    - [ ] **Backend:** `PayOS service (tạo link, tra cứu, hủy link, verify signature) — SDK @payos/node hoặc REST` · `payosOrderCode generator` · `processPaymentResult() idempotent` · `POST /payments/payos/webhook` · `đồng bộ trong GET /checkouts/:checkoutCode` · `Payment schema` · `Scheduled job (@Cron) checkout expiry`
+    - [ ] **Frontend:** `CheckoutResultPage (chỉ đọc checkoutCode, bỏ qua query của PayOS; poll GET /checkouts/:checkoutCode khi còn pending)`
   - **Stitch Screens (`projects/6249429078653284294`):**
     - `projects/6249429078653284294/screens/8ae6276570db4feab1d1900f086080a7` ("Đặt hàng thành công #1")
     - `projects/6249429078653284294/screens/e86a9d6dc00e46b08a2c1b0eb4c64195` ("Đặt hàng thành công #2")
     - `projects/6249429078653284294/screens/77f9ff7b7697478f87b763edda743499` ("Đặt hàng thành công #3")
     - `projects/6249429078653284294/screens/a752f82e0965438d80e3d2d0b2e5952f` ("Đặt hàng thành công #4")
   - **Deliverables khi [x]:**
-    - `.specify/features/payment-vnpay/baseline.md` (SIGNED-OFF)
-    - `docs/features/payment-vnpay/README.md`
+    - `.specify/features/payment-payos/baseline.md` (SIGNED-OFF)
+    - `docs/features/payment-payos/README.md`
 
 ---
 
@@ -468,7 +468,7 @@ schema-version: "1.3"
     - [ ] `PATCH /api/v1/orders/:id/status` bởi Seller của đơn: `confirmed→shipping`, `shipping→delivered`, `confirmed→cancelled` (kèm `reason` bắt buộc) → 200.
     - [ ] Seller không phải chủ đơn → 403; Seller đặt `refunded` → 403.
     - [ ] Admin: ngoài các chuyển trên còn `cancelled→refunded` (chỉ khi `paymentStatus = paid`).
-    - [ ] Không ai đặt tay `confirmed` / `pending` qua API → 400 (`confirmed` chỉ do VNPay).
+    - [ ] Không ai đặt tay `confirmed` / `pending` qua API → 400 (`confirmed` chỉ do PayOS).
     - [ ] Chuyển sai chiều (vd `delivered→shipping`) → 400 với thông báo rõ ràng.
     - [ ] Hủy đơn → hoàn stock đúng 1 lần; gọi hủy 2 lần không hoàn trùng.
     - [ ] Hai đơn con của cùng Checkout có trạng thái độc lập.
@@ -566,13 +566,13 @@ Một User Story chỉ được chuyển từ `[/]` sang `[x]` khi:
 - [ ] **SEC-01**: Không có credentials / secrets hardcoded trong code; toàn bộ qua `.env`.
 - [ ] **SEC-02**: JWT Secrets sinh bằng `openssl rand -hex 64` (không dùng `"secret"` mặc định).
 - [ ] **SEC-03**: CORS whitelist chỉ cho phép đúng domain Frontend (`FRONTEND_URL`) — không dùng `*` trên production.
-- [ ] **SEC-04**: VNPay checksum verify bắt buộc trước khi xử lý mọi callback.
+- [ ] **SEC-04**: Verify `signature` webhook PayOS (HMAC-SHA256) bắt buộc trước khi xử lý; không bao giờ cập nhật đơn từ query của Return / Cancel URL.
 
 #### 🟡 Important — Hoàn thành trước khi demo
 
 - [ ] **DB-01**: MongoDB Atlas cluster sẵn sàng; connection string dùng `?authSource=admin&ssl=true`.
 - [ ] **API-01**: Backend `npm run build` thành công, không có TypeScript error.
-- [ ] **TEST-01**: Chạy Playwright smoke test: đăng ký 2 user → user A thiết lập shop & đăng bán → user B thêm giỏ → checkout → VNPay sandbox → A giao hàng.
+- [ ] **TEST-01**: Chạy Playwright smoke test: đăng ký 2 user → user A thiết lập shop & đăng bán → user B thêm giỏ → checkout → tới trang thanh toán PayOS (bước trả tiền thật làm tay, số tiền nhỏ — PayOS không có sandbox) → A giao hàng.
 
 #### 🟢 Nice-to-have
 
@@ -595,11 +595,10 @@ CLOUDINARY_CLOUD_NAME="<your_cloud_name>"
 CLOUDINARY_API_KEY="<your_api_key>"
 CLOUDINARY_API_SECRET="<your_api_secret>"
 
-VNPAY_TMN_CODE="<your_tmn_code>"
-VNPAY_HASH_SECRET="<your_hash_secret>"
-VNPAY_URL="https://pay.vnpay.vn/vpcpay.html"   # Production URL
-VNPAY_RETURN_URL="https://<your-domain>/api/v1/payments/vnpay/return"
-VNPAY_IPN_URL="https://<your-domain>/api/v1/payments/vnpay/ipn"
+PAYOS_CLIENT_ID="<your_client_id>"
+PAYOS_API_KEY="<your_api_key>"
+PAYOS_CHECKSUM_KEY="<your_checksum_key>"
+# Webhook URL khai báo trong trang quản lý PayOS: https://<your-domain>/api/v1/payments/payos/webhook
 CHECKOUT_EXPIRE_MINUTES="30"
 
 FRONTEND_URL="https://<your-frontend-domain>"

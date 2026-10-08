@@ -412,11 +412,11 @@ Authorization: Bearer <access_token>
 
 ## Order & Checkout — `/api/v1/orders`
 
-> Một lần checkout có thể chứa SP của nhiều người bán → hệ thống tạo **1 Checkout + N Order** (mỗi người bán một Order), thanh toán **một lần** qua VNPay.
+> Một lần checkout có thể chứa SP của nhiều người bán → hệ thống tạo **1 Checkout + N Order** (mỗi người bán một Order), thanh toán **một lần** qua PayOS (1 payment link).
 
 | Method | Endpoint                  | Auth                       | Mô tả                                                      |
 | ------ | ------------------------- | -------------------------- | ---------------------------------------------------------- |
-| POST   | `/orders`                 | ⚪ Optional (Guest + Customer) | Tạo checkout + các order, trừ stock, khởi tạo VNPay    |
+| POST   | `/orders`                 | ✅ Login (Customer; Admin → 403) | Tạo checkout + các order, trừ stock, tạo payment link PayOS |
 | GET    | `/orders/my`              | ✅ Login                   | Lịch sử đơn **đã mua** của mình                            |
 | GET    | `/orders/my/:id`          | ✅ Login                   | Chi tiết 1 đơn mua của mình                                |
 | GET    | `/orders/selling`         | ✅ Login                   | Đơn hàng khách đặt mua SP **của mình** (đơn bán)           |
@@ -431,7 +431,7 @@ Authorization: Bearer <access_token>
 #### POST `/orders` — Tạo checkout
 
 ```json
-// Request Body — Guest: recipient bắt buộc. Customer: có thể bỏ trống để dùng profile
+// Request Body — chỉ Customer đã đăng nhập (không có Guest checkout). recipient có thể bỏ trống để dùng profile (BR-CHK-008)
 {
   "recipient": {
     "fullName": "Nguyễn Văn A",
@@ -468,7 +468,7 @@ Authorization: Bearer <access_token>
         "totalAmount": 29990000
       }
     ],
-    "vnpayUrl": "https://sandbox.vnpayment.vn/paymentv2/..."
+    "paymentUrl": "https://pay.payos.vn/web/..."   // checkoutUrl của PayOS — FE redirect tới
   }
 }
 ```
@@ -485,6 +485,9 @@ Lỗi thường gặp:
 
 // 400 — mua SP của chính mình (BR-SELL-002)
 { "success": false, "message": "Bạn không thể mua sản phẩm của chính mình" }
+
+// 502 — PayOS lỗi khi tạo payment link: Checkout chuyển failed, mọi Order con cancelled + hoàn stock (BR-CHK-010)
+{ "success": false, "message": "Không tạo được liên kết thanh toán, vui lòng thử lại" }
 ```
 
 #### GET `/checkouts/:checkoutCode` — trang kết quả thanh toán
@@ -502,7 +505,9 @@ Lỗi thường gặp:
     ]
   }
 }
-// 404 nếu không tồn tại hoặc không phải checkout của mình. FE dùng endpoint này thay vì tin query ?status=... trên URL redirect.
+// 404 nếu không tồn tại hoặc không phải checkout của mình. FE dùng endpoint này thay vì tin query trên URL redirect của PayOS.
+// Checkout còn pending → backend tra cứu PayOS (GET /v2/payment-requests/{payosOrderCode}) và xử lý idempotent trước khi trả (BR-PAY-006).
+// Nhờ vậy trạng thái vẫn đúng khi chạy localhost (webhook không gọi tới được). FE poll endpoint này vài giây/lần khi còn pending.
 ```
 
 #### GET `/orders/my` — mỗi phần tử
@@ -534,7 +539,7 @@ Lỗi thường gặp:
 | Tình huống                                   | Response |
 | -------------------------------------------- | -------- |
 | Chuyển sai chiều (vd `delivered → shipping`) | 400      |
-| `status = pending` / `confirmed` từ API      | 400 (`confirmed` chỉ do hệ thống qua VNPay) |
+| `status = pending` / `confirmed` từ API      | 400 (`confirmed` chỉ do hệ thống qua PayOS) |
 | Thiếu `reason` khi `cancelled`               | 400      |
 | Seller không phải chủ đơn                    | 403      |
 | Seller đặt `refunded`                        | 403      |
@@ -543,36 +548,63 @@ Lỗi thường gặp:
 
 ## Payment — `/api/v1/payments`
 
-| Method | Endpoint                 | Auth | Mô tả                                              |
-| ------ | ------------------------ | ---- | -------------------------------------------------- |
-| GET    | `/payments/vnpay/return` | ❌   | VNPay redirect user về sau thanh toán              |
-| GET    | `/payments/vnpay/ipn`    | ❌   | VNPay IPN (server-to-server, **method GET**)       |
+| Method | Endpoint                  | Auth                       | Mô tả                                           |
+| ------ | ------------------------- | -------------------------- | ----------------------------------------------- |
+| POST   | `/payments/payos/webhook` | ❌ (xác thực bằng chữ ký)  | PayOS gọi server-to-server khi nhận được tiền   |
 
-> **Thanh toán theo Checkout:** `vnp_TxnRef = checkoutCode`, `vnp_Amount = totalAmount × 100`, `vnp_CreateDate` theo giờ Việt Nam (GMT+7).
->
-> `vnpay/return` và `vnpay/ipn` đều: verify checksum HMAC-SHA512 → gọi **chung** hàm xử lý idempotent (BR-PAY-006) → khác nhau ở phần response:
-> - `return`: redirect trình duyệt về FE `FRONTEND_URL/checkout/result?checkoutCode=...&status=success|failed`.
-> - `ipn`: trả JSON cho VNPay.
-> - FE **không tin** `status` trên URL redirect — gọi `GET /checkouts/:checkoutCode` để lấy trạng thái thật.
-> - Tạo URL VNPay kèm `vnp_ExpireDate = expiresAt` (BR-PAY-010).
-> - Khi deploy (Render): Return URL và IPN URL trỏ về backend public → IPN gọi được thật; vẫn giữ Return URL cập nhật đơn như dự phòng (xem `10-deployment.md`).
->
-> Lý do dùng chung: khi chạy `localhost`, VNPay **không gọi được IPN** (trừ khi dùng ngrok/cloudflared), nên Return URL phải đủ sức cập nhật đơn.
+### Tạo payment link (bên trong `POST /orders`, sau khi commit transaction)
 
-#### IPN response cho VNPay
+Gọi PayOS `POST https://api-merchant.payos.vn/v2/payment-requests`, header `x-client-id`, `x-api-key`:
 
 ```json
-{ "RspCode": "00", "Message": "Confirm Success" }
+{
+  "orderCode": 1791277078123,        // payosOrderCode — số nguyên (BR-PAY-007)
+  "amount": 59980000,                // = totalAmount, VNĐ, không nhân 100
+  "description": "7F3K9QX2A",        // ≤ 9 ký tự: 9 ký tự cuối của checkoutCode
+  "returnUrl": "<FRONTEND_URL>/checkout/result?checkoutCode=CHK-20261002-7F3K9QX2AB",
+  "cancelUrl": "<FRONTEND_URL>/checkout/result?checkoutCode=CHK-20261002-7F3K9QX2AB",
+  "expiredAt": 1791278878,           // = expiresAt, Unix timestamp (giây) — BR-PAY-010
+  "signature": "..."
+}
 ```
 
-| RspCode | Khi nào                                                      |
-| ------- | ------------------------------------------------------------ |
-| `00`    | Xử lý thành công (kể cả thanh toán thất bại đã ghi nhận)     |
-| `01`    | Không tìm thấy `vnp_TxnRef`                                  |
-| `02`    | Checkout đã xử lý trước đó (idempotent)                      |
-| `04`    | Số tiền không khớp                                           |
-| `97`    | Sai chữ ký                                                   |
-| `99`    | Lỗi không xác định                                           |
+> - `signature` = HMAC-SHA256 của `amount=$amount&cancelUrl=$cancelUrl&description=$description&orderCode=$orderCode&returnUrl=$returnUrl` (key theo alphabet) với `PAYOS_CHECKSUM_KEY`.
+> - Lưu `paymentLinkId`, `checkoutUrl` vào Checkout; trả `checkoutUrl` cho FE dưới tên `paymentUrl`.
+> - Có thể dùng SDK chính thức `@payos/node` thay cho tự ký và gọi REST.
+> - **Return URL / Cancel URL trỏ thẳng về FE.** PayOS gắn thêm query `code`, `id`, `cancel`, `status`, `orderCode` nhưng **không có chữ ký** → FE bỏ qua, chỉ đọc `checkoutCode` rồi gọi `GET /checkouts/:checkoutCode` (BR-PAY-006).
+
+### POST `/payments/payos/webhook`
+
+```json
+// Request từ PayOS
+{
+  "code": "00",
+  "desc": "success",
+  "success": true,
+  "data": {
+    "orderCode": 1791277078123,
+    "amount": 59980000,
+    "description": "7F3K9QX2A",
+    "accountNumber": "...",
+    "reference": "FT26275...",
+    "transactionDateTime": "2026-10-02 10:05:12",
+    "currency": "VND",
+    "paymentLinkId": "2e4acf1083304877bf1a8c108b30cccd",
+    "code": "00",
+    "desc": "success"
+  },
+  "signature": "..."
+}
+```
+
+Xử lý: verify `signature` trên `data` (BR-PAY-003) → ghi `payments` → tìm Checkout theo `payosOrderCode` → kiểm tra `amount` → gọi hàm xử lý idempotent dùng chung (BR-PAY-006, BR-PAY-011).
+
+| HTTP                      | Khi nào |
+| ------------------------- | ------- |
+| 200 `{ "success": true }` | Chữ ký hợp lệ — kể cả không tìm thấy `orderCode` (vd request thử khi đăng ký webhook), đã xử lý trước đó, sai số tiền, thanh toán muộn (chỉ ghi `payments`) |
+| 400                       | Sai chữ ký — không xử lý gì, chỉ ghi `payments` |
+
+> Webhook cần URL public HTTPS. Khi chạy `localhost`: dùng ngrok/cloudflared, hoặc dựa vào đồng bộ chủ động qua `GET /checkouts/:checkoutCode` và cron hết hạn (BR-PAY-006, BR-PAY-009). Khi deploy: khai báo `https://<backend>/api/v1/payments/payos/webhook` trong trang quản lý PayOS (xem `10-deployment.md`).
 
 ---
 

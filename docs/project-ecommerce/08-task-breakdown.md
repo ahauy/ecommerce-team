@@ -26,7 +26,7 @@ Danh sách dưới đây là gợi ý — team tự phân công feature cụ th�
     │         │
     │         └──► [5] Order & Checkout (cần Cart + Product; tách Order theo seller)
     │                   │
-    │                   ├──► [6] Payment VNPay (cần Checkout)
+    │                   ├──► [6] Payment PayOS (cần Checkout)
     │                   │
     │                   └──► [8] Seller Center — đơn bán (cần Order; xác nhận lại sau Payment)
     │
@@ -122,7 +122,7 @@ Danh sách dưới đây là gợi ý — team tự phân công feature cụ th�
 | #   | Task                                                                                                  | Loại | Độ ưu tiên  |
 | --- | ----------------------------------------------------------------------------------------------------- | ---- | ----------- |
 | 5.1 | Schemas: `Checkout` + `Order` (`checkoutId`, `sellerId`, `sellerShopName`, `cancelReason`, `cancelledBy`) | BE | 🔴 Critical |
-| 5.2 | `POST /orders`: nhóm theo seller → trừ stock nguyên tử (all-or-nothing) → tạo N Order + 1 Checkout → tạo VNPay URL | BE | 🔴 Critical |
+| 5.2 | `POST /orders`: nhóm theo seller → trừ stock nguyên tử (all-or-nothing) → tạo N Order + 1 Checkout → commit → gọi PayOS tạo payment link (lỗi → hủy + hoàn stock) | BE | 🔴 Critical |
 | 5.3 | Chặn mua SP của chính mình; tính giá từ DB (không tin client)                                         | BE   | 🔴 Critical |
 | 5.4 | Service `restockAndCancel(order)` dùng chung (cập nhật có điều kiện, hoàn stock đúng 1 lần)           | BE   | 🔴 Critical |
 | 5.5 | `GET /orders/my` + `GET /orders/my/:id`                                                               | BE   | 🟡 High     |
@@ -135,25 +135,25 @@ Danh sách dưới đây là gợi ý — team tự phân công feature cụ th�
 
 ---
 
-### Module 6: Payment — VNPay
+### Module 6: Payment — PayOS
 
 **Người thực hiện:** `_______________`
 
 > Phụ thuộc: Module 5 (checkout)
 
-| #   | Task                                                                                           | Loại | Độ ưu tiên  |
-| --- | ---------------------------------------------------------------------------------------------- | ---- | ----------- |
-| 6.1 | Tích hợp VNPay SDK / manual HMAC signing (`vnp_TxnRef = checkoutCode`, amount × 100)           | BE   | 🔴 Critical |
-| 6.2 | Hàm xử lý kết quả **idempotent**: verify checksum + số tiền → cập nhật Checkout & mọi Order con | BE   | 🔴 Critical |
-| 6.3 | `GET /payments/vnpay/return` — gọi hàm 6.2 rồi redirect FE                                     | BE   | 🔴 Critical |
-| 6.4 | `GET /payments/vnpay/ipn` — gọi hàm 6.2, trả `RspCode`                                         | BE   | 🔴 Critical |
-| 6.5 | Logic: success → mọi Order `confirmed` + `paid`; fail → mọi Order `cancelled` + hoàn stock     | BE   | 🔴 Critical |
-| 6.6 | `@Cron` mỗi phút: Checkout `pending` quá `expiresAt` → `expired` + hủy Order + hoàn stock      | BE   | 🟡 High     |
-| 6.7 | Payment schema (lưu raw VNPay data, kể cả callback sai chữ ký / thanh toán muộn)               | BE   | 🟢 Normal   |
-| 6.8 | FE: Trang redirect sau VNPay (success/fail UI)                                                 | FE   | 🟡 High     |
-| 6.9 | Khi Checkout `paid`: xóa item đã mua khỏi cart DB (BR-CHK-007); Checkout `failed`/`expired` giữ giỏ                             | BE   | 🟡 High     |
-| 6.10 | Deploy BE lên Render (làm sớm, ~cuối Ngày 4, để IPN VNPay gọi được URL public) — theo `10-deployment.md` | BE   | 🟡 High     |
-| 6.11 | Deploy FE lên Vercel (+ `vercel.json` rewrite SPA), cập nhật `FRONTEND_URL` / Return URL / IPN URL, smoke test luồng mua trên URL thật | FE   | 🟡 High     |
+| #    | Task                                                                                                                           | Loại | Độ ưu tiên  |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------ | ---- | ----------- |
+| 6.1  | PayOS service: tạo payment link (ký HMAC-SHA256), tra cứu, hủy link, verify chữ ký webhook — SDK `@payos/node` hoặc REST; sinh `payosOrderCode` (số nguyên unique) | BE   | 🔴 Critical |
+| 6.2  | Hàm xử lý kết quả **idempotent**: nhận trạng thái đã xác thực (webhook / tra cứu PayOS) + kiểm tra số tiền → cập nhật Checkout & mọi Order con | BE   | 🔴 Critical |
+| 6.3  | `GET /checkouts/:checkoutCode`: Checkout còn `pending` → tra cứu PayOS rồi gọi hàm 6.2                                          | BE   | 🔴 Critical |
+| 6.4  | `POST /payments/payos/webhook` — verify chữ ký, gọi hàm 6.2, trả 200 (chữ ký đúng) / 400 (sai chữ ký)                           | BE   | 🔴 Critical |
+| 6.5  | Logic: `PAID` → mọi Order `confirmed` + `paid`; `CANCELLED` → mọi Order `cancelled` + hoàn stock                               | BE   | 🔴 Critical |
+| 6.6  | `@Cron` mỗi phút: Checkout `pending` quá `expiresAt` → tra cứu PayOS; chưa trả → hủy link PayOS → `expired` + hủy Order + hoàn stock | BE   | 🟡 High     |
+| 6.7  | Payment schema (lưu raw dữ liệu PayOS: webhook kể cả sai chữ ký, mọi lần tra cứu, thanh toán muộn)                              | BE   | 🟢 Normal   |
+| 6.8  | FE: Trang kết quả sau PayOS (`/checkout/result`): chỉ đọc `checkoutCode`, poll `GET /checkouts/:checkoutCode` khi còn `pending`, UI thành công / thất bại | FE   | 🟡 High     |
+| 6.9  | Khi Checkout `paid`: xóa item đã mua khỏi cart DB (BR-CHK-007); Checkout `failed`/`expired` giữ giỏ                             | BE   | 🟡 High     |
+| 6.10 | Deploy BE lên Render (làm sớm, ~cuối Ngày 4) và khai báo webhook URL trên trang quản lý PayOS — theo `10-deployment.md`          | BE   | 🟡 High     |
+| 6.11 | Deploy FE lên Vercel (+ `vercel.json` rewrite SPA), cập nhật `FRONTEND_URL`, smoke test luồng mua trên URL thật (giao dịch PayOS thật, số tiền nhỏ) | FE   | 🟡 High     |
 
 ---
 
@@ -193,18 +193,18 @@ Danh sách dưới đây là gợi ý — team tự phân công feature cụ th�
 
 | Ngày       | Mục tiêu                                                                                        |
 | ---------- | ----------------------------------------------------------------------------------------------- |
-| **Ngày 0** | (trước khi code) Đăng ký VNPay sandbox (có thể chờ email), Cloudinary, MongoDB Atlas · chốt phân công 2 người · tạo `main`/`dev` + bảo vệ branch · cả hai pair 2–3 giờ dựng nền: global pipes/filters/interceptor, **toàn bộ Mongoose schema**, guards |
+| **Ngày 0** | (trước khi code) Đăng ký PayOS (cần CCCD + tài khoản ngân hàng thật, có thể mất thời gian xác minh), Cloudinary, MongoDB Atlas · chốt phân công 2 người · tạo `main`/`dev` + bảo vệ branch · cả hai pair 2–3 giờ dựng nền: global pipes/filters/interceptor, **toàn bộ Mongoose schema**, guards |
 | **Ngày 1** | Setup project · Module 1 BE hoàn tất (gồm `/users/me`, shop setup) · Module 2 & 3 BE bắt đầu     |
 | **Ngày 2** | Module 2 & 3 BE hoàn tất (ownership) · Module 4 BE · FE Auth xong                               |
 | **Ngày 3** | Module 4 & 5 BE (tách đơn theo seller) · FE Product + Seller form + Cart                        |
-| **Ngày 4** | Module 6 (VNPay theo Checkout) · Module 8 BE · FE Checkout                                      |
+| **Ngày 4** | Module 6 (PayOS theo Checkout) · Module 8 BE · FE Checkout                                      |
 | **Ngày 5** | Module 7 Admin · Module 8 FE · FE Order history · Integration test                              |
 | **Ngày 6** | Bug fix · Polish UI · Test E2E luồng chính (mua nhiều shop + bán + xử lý đơn) trên bản đã deploy (Vercel + Render) |
 | **Ngày 7** | Buffer — fix critical bugs · Demo chuẩn bị                                                      |
 
-> **Điểm quyết định cuối Ngày 3:** nếu `POST /orders` (5.2) + `restockAndCancel` (5.4) chưa chạy ổn → cắt ngay các mục trong "Đường cắt" bên dưới, đừng chờ tới Ngày 5. VNPay (Module 6) là rủi ro lớn nhất (phụ thuộc bên ngoài) — nên làm spike URL + verify chữ ký từ Ngày 2.
+> **Điểm quyết định cuối Ngày 3:** nếu `POST /orders` (5.2) + `restockAndCancel` (5.4) chưa chạy ổn → cắt ngay các mục trong "Đường cắt" bên dưới, đừng chờ tới Ngày 5. PayOS (Module 6) là rủi ro lớn nhất (phụ thuộc bên ngoài, **không có sandbox** — test bằng giao dịch thật số tiền nhỏ) — nên làm spike tạo payment link + verify chữ ký webhook từ Ngày 2.
 
-> **Deploy (đã chốt: chỉ cần Vercel + Render, đơn giản):** deploy BE sớm (~cuối Ngày 4) rồi dùng URL đó để test IPN VNPay và CORS; không cần CI/CD, Docker, domain riêng. Chi tiết: `10-deployment.md`.
+> **Deploy (đã chốt: chỉ cần Vercel + Render, đơn giản):** deploy BE sớm (~cuối Ngày 4) rồi dùng URL đó để test webhook PayOS và CORS; không cần CI/CD, Docker, domain riêng. Chi tiết: `10-deployment.md`.
 
 ### ✂️ Đường cắt (nếu trễ tiến độ — cắt từ dưới lên)
 
@@ -215,7 +215,7 @@ Danh sách dưới đây là gợi ý — team tự phân công feature cụ th�
 | 3          | Admin block SP (7.2, phần UI của 7.6)              | Mất kiểm duyệt SP, vẫn ban user được |
 | 4          | Seller hủy đơn (8.3) — chỉ giữ Giao hàng / Đã giao | Hủy đơn chỉ do Admin                 |
 
-> **Không được cắt:** tách đơn theo seller (5.2), ownership check (3.3), `restockAndCancel` (5.4), xử lý idempotent VNPay (6.2) — đây là lõi của yêu cầu "User đăng bán và mua".
+> **Không được cắt:** tách đơn theo seller (5.2), ownership check (3.3), `restockAndCancel` (5.4), xử lý idempotent PayOS (6.2) — đây là lõi của yêu cầu "User đăng bán và mua".
 
 ---
 

@@ -2,7 +2,7 @@
 
 > **Một tài khoản, hai vai:** mọi user đã đăng nhập đều có thể **mua** (Flow 2) và **bán** (Flow 3). Hai luồng này dùng chung một tài khoản.
 
-## Flow 1: Guest — Xem & Mua hàng
+## Flow 1: Guest — Xem & thêm giỏ hàng
 
 ```
 [Vào trang chủ]
@@ -29,12 +29,13 @@
   - Hiển thị tổng tiền (VNĐ)
       │
       ▼
-[Checkout — Guest]
-  Điền thông tin bắt buộc:
-  ✦ Họ tên  ✦ Số điện thoại  ✦ Email  ✦ Địa chỉ giao hàng
+[Bấm "Đặt hàng"] — không có Guest checkout
       │
       ▼
-[Xác nhận đơn hàng] → (xem Flow 4: Checkout nhiều shop)
+[Chuyển sang Đăng nhập / Đăng ký] → merge giỏ localStorage vào giỏ DB
+      │
+      ▼
+[Quay lại giỏ hàng] → tiếp tục như Customer (xem Flow 2, Flow 4)
 ```
 
 ---
@@ -61,7 +62,7 @@
   - Cho phép sửa địa chỉ giao hàng
       │
       ▼
-[Thanh toán VNPay] → (xem Flow 4)
+[Thanh toán PayOS] → (xem Flow 4)
       │
       ▼
 [Xem lịch sử đơn hàng đã mua]
@@ -110,7 +111,7 @@
   - Lọc theo trạng thái
       │
       ▼
-[Đơn mới: status = confirmed]  ← đã thanh toán VNPay
+[Đơn mới: status = confirmed]  ← đã thanh toán qua PayOS
       │
       ├── [Bấm "Giao hàng"]    confirmed → shipping
       │         │
@@ -136,20 +137,20 @@
       │     └─ Có SP không đủ hàng → hoàn các SP đã trừ → 400 (không tạo gì)
       ├─ Tạo Order(A: A1,A2) · Order(B: B1) — đều `pending`
       ├─ Tạo Checkout (gom 2 order, tổng tiền, hết hạn sau 30 phút)
-      └─ Sinh vnpayUrl (vnp_TxnRef = checkoutCode, 1 giao dịch cho tổng tiền)
+      └─ Commit → gọi PayOS tạo payment link (orderCode = payosOrderCode, 1 link cho tổng tiền)
       │
       ▼
-[Redirect → VNPay]
+[Redirect → trang thanh toán PayOS (chuyển khoản / quét VietQR)]
       │
       ├─── [Thanh toán THÀNH CÔNG]
       │         │
       │         ▼
-      │    Return/IPN → Checkout: paid
+      │    Webhook (hoặc đồng bộ khi mở trang kết quả) → Checkout: paid
       │    → Order A: pending → confirmed   ┐ cùng lúc,
       │    → Order B: pending → confirmed   ┘ paymentStatus = paid
       │    → Redirect "Đặt hàng thành công" (liệt kê 2 đơn)
       │
-      └─── [Thanh toán THẤT BẠI / HỦY / HẾT HẠN 30 PHÚT]
+      └─── [NGƯỜI MUA HỦY TRÊN PAYOS / HẾT HẠN 30 PHÚT]
                 │
                 ▼
            Checkout: failed | expired
@@ -201,10 +202,10 @@
 | Sản phẩm hết hàng khi user đang ở trang checkout                   | Báo lỗi kèm danh sách SP thiếu, yêu cầu xem lại giỏ hàng; không tạo đơn nào             |
 | Nhiều user cùng mua sản phẩm cuối cùng (race condition)            | Trừ stock bằng cập nhật nguyên tử `stock >= qty`; ai không trừ được thì nhận lỗi hết hàng |
 | Giỏ có SP của 3 shop, shop thứ 3 hết hàng                          | Hoàn stock 2 shop đã trừ, **không tạo** checkout/order nào (all-or-nothing)            |
-| VNPay timeout (không nhận callback)                                | Checkout `pending` quá 30 phút → `expired`; mọi order con `cancelled` + hoàn stock     |
-| VNPay báo thành công **sau** khi checkout đã `expired`             | Ghi `payments` với `note = late_success_after_expiry`, trả `02`; Admin hoàn tiền thủ công |
-| IPN và Return URL đến gần như cùng lúc                             | Xử lý idempotent theo trạng thái checkout — chỉ lần đến trước có hiệu lực              |
-| Chạy `localhost`, VNPay không gọi được IPN                         | Return URL cũng cập nhật đơn (BR-PAY-006); hoặc dùng ngrok cho IPN                     |
+| Không nhận được webhook PayOS                                      | Mở trang kết quả / cron tra cứu PayOS; quá 30 phút chưa trả → hủy link, `expired`; mọi order con `cancelled` + hoàn stock |
+| PayOS báo đã nhận tiền **sau** khi checkout đã `expired`           | Ghi `payments` với `note = late_success_after_expiry`, webhook vẫn trả 200; Admin chuyển khoản hoàn tiền thủ công |
+| Webhook và đồng bộ chủ động đến gần như cùng lúc                   | Xử lý idempotent theo trạng thái checkout — chỉ lần đến trước có hiệu lực              |
+| Chạy `localhost`, PayOS không gọi được webhook                     | Mở trang kết quả sẽ tra cứu PayOS và cập nhật đơn (BR-PAY-006); hoặc dùng ngrok cho webhook |
 | Refresh Token hết hạn                                              | Redirect về trang đăng nhập                                                            |
 | Guest bấm "Đăng nhập" khi đang có hàng trong giỏ                   | Sau đăng nhập, FE gọi `POST /cart/merge` rồi xóa localStorage (BR-CART-002, BR-CART-008) |
 | Seller tự mua SP của mình                                          | Chặn ở thêm giỏ, merge cart (tự lọc) và `POST /orders` (400)                           |

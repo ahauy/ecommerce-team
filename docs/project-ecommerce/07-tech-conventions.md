@@ -247,7 +247,7 @@ export enum PaymentStatus {
   REFUNDED = "refunded",
 }
 
-// Checkout Status (cấp Checkout — 1 giao dịch VNPay)
+// Checkout Status (cấp Checkout — 1 payment link PayOS)
 export enum CheckoutStatus {
   PENDING = "pending",
   PAID = "paid",
@@ -286,7 +286,7 @@ main          ← production-ready (chỉ merge từ dev sau review)
         ├── feature/seller-shop
         ├── feature/cart
         ├── feature/order-checkout
-        ├── feature/payment-vnpay
+        ├── feature/payment-payos
         └── feature/admin-dashboard
 ```
 
@@ -338,7 +338,7 @@ Ví dụ:
 
 - `ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true })` toàn cục — chặn mass assignment (`role`, `isActive`, `sellerId`, `isBlocked`... không bao giờ nhận từ body).
 - `helmet()` + `@nestjs/throttler` cho nhóm `/auth/*` (vd 10 req/phút/IP) để chống dò mật khẩu.
-- Không log password / token / `vnp_SecureHash` / secret; `.env` không commit.
+- Không log password / token / `PAYOS_API_KEY` / `PAYOS_CHECKSUM_KEY` / `signature` / secret; `.env` không commit.
 - Mọi endpoint `/orders/selling*`, `/products/my`, `PATCH /orders/:id/status`, `PATCH|DELETE /products/:id` phải có test **sai chủ → 403/404** (đã nằm trong DoD).
 - Phân trang: `limit` tối đa 100 ở mọi endpoint danh sách.
 
