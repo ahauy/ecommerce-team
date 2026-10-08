@@ -1,6 +1,6 @@
 # 📚 Tài liệu Dự án Ecommerce
 
-> **Stack:** NestJS · MongoDB · Frontend Template · VNPay · Cloudinary  
+> **Stack:** NestJS · MongoDB · Frontend Template · PayOS · Cloudinary  
 > **Team:** 2 người · **Deadline:** 1 tuần
 
 ---
@@ -27,7 +27,7 @@
 
 | Role         | Quyền chính                                      |
 | ------------ | ------------------------------------------------ |
-| **Guest**    | Xem SP · Tìm kiếm · Checkout không cần tài khoản |
+| **Guest**    | Xem SP · Tìm kiếm · Giỏ localStorage (đặt hàng phải đăng nhập) |
 | **Customer** | Mọi quyền Guest · Cart DB · Lịch sử đơn mua · **Đăng bán SP** · **Xử lý đơn bán** |
 | **Admin**    | Quản lý User · Category · Product (block) · Order (mọi shop) |
 
@@ -38,7 +38,7 @@
 Áp dụng cho **từng Order** (mỗi người bán một Order):
 
 ```
-pending → confirmed (VNPay auto) → shipping → delivered   (Seller / Admin)
+pending → confirmed (PayOS auto) → shipping → delivered   (Seller / Admin)
        ↘ cancelled (fail/timeout/seller/admin) → refunded (Admin)
 ```
 
@@ -46,8 +46,8 @@ pending → confirmed (VNPay auto) → shipping → delivered   (Seller / Admin)
 
 - `stock` không được âm — trừ nguyên tử `stock >= qty` khi tạo Order
 - Đặt hàng → **trừ stock ngay** (reserve)
-- **1 lần checkout = 1 Checkout + N Order** (mỗi người bán 1 Order) · **1 giao dịch VNPay** (`vnp_TxnRef = checkoutCode`)
-- VNPay thất bại / hết hạn 30 phút → **tất cả Order con** `cancelled` + **rollback stock**
+- **1 lần checkout = 1 Checkout + N Order** (mỗi người bán 1 Order) · **1 payment link PayOS** (`orderCode = payosOrderCode`)
+- Người mua hủy thanh toán PayOS / hết hạn 30 phút → **tất cả Order con** `cancelled` + **rollback stock**
 - Seller chỉ sửa SP & xử lý đơn **của mình**; Seller **không mua SP của chính mình**
 - Admin block SP vi phạm; ban user → block toàn bộ SP của user đó
 - Guest cart: **localStorage** (không lưu DB)

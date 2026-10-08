@@ -102,19 +102,19 @@
 | BR-CHK-001 | `POST /orders` nhóm các item theo `sellerId` → tạo **1 Checkout + N Order** (mỗi người bán 1 Order)                                 |
 | BR-CHK-002 | All-or-nothing: nếu bất kỳ SP nào không đủ stock / không hợp lệ → rollback phần đã trừ, **không tạo** Checkout hay Order nào          |
 | BR-CHK-003 | Giá và tên SP luôn lấy từ DB lúc tạo Order — không tin giá do client gửi                                                            |
-| BR-CHK-004 | 1 Checkout = **1 giao dịch VNPay** duy nhất; `totalAmount` của Checkout = tổng `totalAmount` các Order con                          |
+| BR-CHK-004 | 1 Checkout = **1 payment link PayOS** duy nhất (định danh bằng `payosOrderCode`); `totalAmount` của Checkout = tổng `totalAmount` các Order con                          |
 | BR-CHK-005 | Checkout hết hạn sau **30 phút** kể từ lúc tạo (`expiresAt`) nếu chưa thanh toán                                                    |
 | BR-CHK-006 | Thông tin người nhận (`recipient`) dùng chung cho mọi Order con của cùng Checkout                                                   |
 | BR-CHK-007 | Khi Checkout chuyển `paid`: xóa các item đã mua khỏi cart DB của người mua. Checkout `failed`/`expired`: **giữ nguyên** giỏ |
 | BR-CHK-008 | Customer bỏ trống `recipient` → lấy từ profile; nếu profile thiếu `phone`/`address` → 400 yêu cầu bổ sung (email lấy từ tài khoản) |
 | BR-CHK-009 | `checkoutCode` / `orderCode` có đuôi ≥ 10 ký tự ngẫu nhiên (crypto). `GET /checkouts/:checkoutCode` yêu cầu đăng nhập và chỉ **chủ Checkout** (`userId`) xem được — người khác → 404 |
-| BR-CHK-010 | Tạo Checkout (trừ stock từng item + tạo Checkout + N Order) chạy trong **1 MongoDB multi-document transaction** (`session.withTransaction`): lỗi/hết hàng ở bất kỳ bước nào → abort toàn bộ, không có rollback thủ công, không rò rỉ stock. `restockAndCancel` (hủy Order + hoàn stock) cũng là 1 transaction. Không gọi dịch vụ ngoài (VNPay, Cloudinary) bên trong transaction — tạo URL VNPay **sau khi** commit. Yêu cầu MongoDB replica set (Atlas có sẵn) |
+| BR-CHK-010 | Tạo Checkout (trừ stock từng item + tạo Checkout + N Order) chạy trong **1 MongoDB multi-document transaction** (`session.withTransaction`): lỗi/hết hàng ở bất kỳ bước nào → abort toàn bộ, không có rollback thủ công, không rò rỉ stock. `restockAndCancel` (hủy Order + hoàn stock) cũng là 1 transaction. Không gọi dịch vụ ngoài (PayOS, Cloudinary) bên trong transaction — gọi PayOS tạo payment link **sau khi** commit; tạo link lỗi → Checkout `failed` + `restockAndCancel` mọi Order con, trả 502. Yêu cầu MongoDB replica set (Atlas có sẵn) |
 
 ### Order
 
 | ID         | Rule                                                                                                                                        |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| BR-ORD-001 | Guest checkout: bắt buộc điền `fullName`, `phone`, `email`, `shippingAddress`                                                               |
+| BR-ORD-001 | **Không có Guest checkout**: chỉ Customer đã đăng nhập được tạo Checkout (thiếu token → 401, Admin → 403). Guest bấm "Đặt hàng" → đăng nhập, merge giỏ, rồi mới checkout |
 | BR-ORD-002 | Customer checkout: tự động lấy thông tin từ profile, cho phép override địa chỉ                                                              |
 | BR-ORD-003 | Khi tạo Order: trừ `stock` ngay (reserve), bằng cập nhật nguyên tử có điều kiện `stock >= quantity` — chống bán lố khi nhiều người cùng mua |
 | BR-ORD-004 | Thanh toán thất bại hoặc Checkout hết hạn: **tất cả** Order con chuyển `cancelled` và hoàn `stock`                                          |
@@ -133,7 +133,7 @@
 ```
 [pending]
     │
-    │ Thanh toán VNPay thành công (hệ thống)
+    │ Thanh toán PayOS thành công (hệ thống)
     ▼
 [confirmed]
     │
@@ -152,7 +152,7 @@
 
 | Chuyển trạng thái       | Ai được thực hiện              | Điều kiện                                   |
 | ----------------------- | ------------------------------ | ------------------------------------------- |
-| `pending → confirmed`   | **Hệ thống** (VNPay thành công) | Không ai chuyển tay                        |
+| `pending → confirmed`   | **Hệ thống** (PayOS thành công) | Không ai chuyển tay                        |
 | `pending → cancelled`   | **Hệ thống** (không ai hủy tay) | Thanh toán lỗi / Checkout hết hạn           |
 | `confirmed → shipping`  | **Seller của đơn** · Admin     |                                             |
 | `shipping → delivered`  | **Seller của đơn** · Admin     |                                             |
@@ -161,7 +161,7 @@
 
 | ID         | Rule                                                                                         |
 | ---------- | -------------------------------------------------------------------------------------------- |
-| BR-STT-001 | Chuyển `pending → confirmed`: chỉ qua kết quả thanh toán VNPay đã xác thực, không qua API tay |
+| BR-STT-001 | Chuyển `pending → confirmed`: chỉ qua kết quả thanh toán PayOS đã xác thực (webhook đúng chữ ký hoặc tra cứu trực tiếp API PayOS), không qua API tay |
 | BR-STT-002 | Chuyển `confirmed → shipping → delivered`: Seller sở hữu đơn hoặc Admin                       |
 | BR-STT-003 | Chuyển `→ cancelled`: theo bảng trên; từ `shipping` trở đi **không** được hủy                 |
 | BR-STT-004 | Chuyển `cancelled → refunded`: chỉ Admin, và chỉ khi `paymentStatus = paid`                   |
@@ -169,21 +169,25 @@
 | BR-STT-006 | Chuyển sai chiều → 400; user không có quyền với đơn đó → 403                                  |
 | BR-STT-007 | Order `pending` **không** bị Admin/Seller hủy tay: nếu hủy trong lúc Checkout còn `pending` thì người mua vẫn có thể thanh toán đủ `totalAmount` cho cả Checkout → lệch tiền. Chỉ hệ thống hủy khi Checkout `failed`/`expired` |
 
-### Payment — VNPay
+### Payment — PayOS
 
-| ID         | Rule                                                                                                                                           |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| BR-PAY-001 | Redirect user đến VNPay sau khi tạo Checkout                                                                                                   |
-| BR-PAY-002 | VNPay gọi IPN (`GET`, server-to-server) về backend để xác nhận kết quả                                                                         |
-| BR-PAY-003 | Backend verify chữ ký HMAC-SHA512, `vnp_TxnRef` tồn tại, và số tiền khớp `totalAmount × 100` trước khi xử lý                                    |
-| BR-PAY-004 | Thanh toán thành công → Checkout `paid`; **tất cả** Order con `pending → confirmed`, `paymentStatus = paid` (stock đã trừ từ lúc tạo Order)     |
-| BR-PAY-005 | Thanh toán thất bại → Checkout `failed`; tất cả Order con → `cancelled` + hoàn stock                                                           |
-| BR-PAY-006 | Return URL và IPN dùng **chung một hàm xử lý idempotent** (sau khi verify checksum) — bên nào đến trước thì xử lý, bên sau bỏ qua               |
-| BR-PAY-007 | `vnp_TxnRef` = `checkoutCode`; `vnp_Amount` = `totalAmount × 100`                                                                              |
-| BR-PAY-008 | Mọi callback (hợp lệ hay không) đều lưu raw data vào `payments` để audit                                                                       |
-| BR-PAY-009 | Job định kỳ (mỗi phút) tìm Checkout `pending` quá `expiresAt` → `expired`, hủy các Order `pending` con + hoàn stock                            |
-| BR-PAY-010 | Truyền `vnp_ExpireDate = expiresAt` (định dạng `yyyyMMddHHmmss`, GMT+7) khi tạo URL VNPay để VNPay tự từ chối thanh toán sau hạn — giảm tình huống thanh toán muộn |
-| BR-PAY-011 | Chuyển trạng thái Checkout bằng **cập nhật có điều kiện** (`findOneAndUpdate({ _id, status: "pending" }, ...)`) — dùng chung cho IPN, Return và cron hết hạn; bên nào cập nhật được bản ghi trước thì xử lý tiếp (cập nhật Order, hoàn stock), bên sau bỏ qua. Cập nhật Checkout + Order con (+ hoàn stock nếu hủy) nằm trong **cùng 1 transaction** (BR-CHK-010) |
+> PayOS tạo **payment link**: trang thanh toán chuyển khoản / quét VietQR. Tiền về tài khoản ngân hàng của sàn đã liên kết với PayOS.
+
+| ID         | Rule |
+| ---------- | ---- |
+| BR-PAY-001 | Sau khi tạo Checkout, backend gọi PayOS `POST /v2/payment-requests` tạo payment link và trả `paymentUrl` (= `checkoutUrl` của PayOS) để FE redirect |
+| BR-PAY-002 | PayOS gọi **webhook** (`POST`, server-to-server) về backend khi nhận được tiền |
+| BR-PAY-003 | Backend verify `signature` của webhook (HMAC-SHA256 trên các field của `data`, sắp xếp key theo alphabet, giá trị `null` → chuỗi rỗng, key `PAYOS_CHECKSUM_KEY`), `orderCode` tồn tại và `amount` khớp `totalAmount` trước khi xử lý. Chỉ coi là đã thanh toán khi `code = "00"` |
+| BR-PAY-004 | Thanh toán thành công → Checkout `paid`; **tất cả** Order con `pending → confirmed`, `paymentStatus = paid` (stock đã trừ từ lúc tạo Order) |
+| BR-PAY-005 | Người mua hủy trên trang PayOS (link `CANCELLED`) → Checkout `failed`; tất cả Order con → `cancelled` + hoàn stock |
+| BR-PAY-006 | Webhook và **đồng bộ chủ động** (gọi PayOS `GET /v2/payment-requests/{payosOrderCode}` khi FE mở `GET /checkouts/:checkoutCode` mà Checkout còn `pending`, và trong cron hết hạn) dùng **chung một hàm xử lý idempotent**. Return URL / Cancel URL của PayOS **không có chữ ký** → không bao giờ cập nhật đơn dựa vào query trên URL |
+| BR-PAY-007 | PayOS yêu cầu `orderCode` là **số nguyên** → mỗi Checkout có thêm `payosOrderCode` (số nguyên dương, unique, ≤ 9007199254740991; vd timestamp ms × 1000 + 3 chữ số ngẫu nhiên, trùng thì sinh lại). `amount = totalAmount` (VNĐ, **không** nhân 100). `description` ≤ 9 ký tự (giới hạn với tài khoản ngân hàng chưa liên kết payOS) → dùng 9 ký tự cuối của `checkoutCode` |
+| BR-PAY-008 | Mọi webhook (hợp lệ hay không) và mọi lần đồng bộ chủ động đều lưu raw data vào `payments` để audit |
+| BR-PAY-009 | Job định kỳ (mỗi phút) tìm Checkout `pending` quá `expiresAt`: tra cứu PayOS trước (`PAID` → xử lý như thành công); chưa trả → gọi PayOS hủy link (`POST /v2/payment-requests/{id}/cancel`) rồi `expired`, hủy các Order `pending` con + hoàn stock |
+| BR-PAY-010 | Truyền `expiredAt = expiresAt` (Unix timestamp, **giây**) khi tạo payment link để PayOS tự khóa link sau hạn — giảm tình huống thanh toán muộn |
+| BR-PAY-011 | Chuyển trạng thái Checkout bằng **cập nhật có điều kiện** (`findOneAndUpdate({ _id, status: "pending" }, ...)`) — dùng chung cho webhook, đồng bộ chủ động và cron hết hạn; bên nào cập nhật được bản ghi trước thì xử lý tiếp (cập nhật Order, hoàn stock), bên sau bỏ qua. Cập nhật Checkout + Order con (+ hoàn stock nếu hủy) nằm trong **cùng 1 transaction** (BR-CHK-010) |
+| BR-PAY-012 | Thanh toán thành công đến **sau** khi Checkout đã `expired` / `failed` (late success) → không mở lại đơn; ghi `payments.note = late_success_after_expiry`; Admin hoàn tiền **thủ công bằng chuyển khoản** (PayOS không có API hoàn tiền cho payment link) |
+| BR-PAY-013 | Webhook trả **HTTP 200** khi chữ ký hợp lệ, kể cả khi không tìm thấy `orderCode`, đã xử lý trước đó, sai số tiền hay thanh toán muộn (chỉ ghi `payments`) để PayOS không gửi lại; sai chữ ký → 400. Khi đăng ký webhook URL, PayOS gửi một request thử → backend phải trả 200 |
 
 ### Admin
 

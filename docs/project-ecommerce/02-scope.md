@@ -8,8 +8,8 @@
 | 2   | **Category**         | CRUD danh mục sản phẩm (Admin quản lý), liên kết với Product                                    |
 | 3   | **Product**          | Đăng bán / sửa / ẩn SP (**người bán sở hữu SP của mình**), upload ảnh Cloudinary, tìm kiếm & lọc theo category/giá/tên/người bán, quản lý inventory |
 | 4   | **Cart**             | Thêm/xóa/cập nhật giỏ hàng (Guest dùng localStorage, Customer lưu DB); giỏ nhóm theo người bán; không mua SP của chính mình |
-| 5   | **Order & Checkout** | Guest checkout không cần tài khoản; **1 lần checkout tách thành mỗi người bán 1 Order** (gom trong 1 Checkout) |
-| 6   | **Payment — VNPay**  | 1 giao dịch VNPay cho cả Checkout, xử lý Return/IPN, tự động `confirmed` tất cả Order con sau thanh toán |
+| 5   | **Order & Checkout** | Chỉ user đã đăng nhập (không có Guest checkout); **1 lần checkout tách thành mỗi người bán 1 Order** (gom trong 1 Checkout) |
+| 6   | **Payment — PayOS**  | 1 payment link PayOS cho cả Checkout, xử lý webhook + đồng bộ trạng thái, tự động `confirmed` tất cả Order con sau thanh toán |
 | 7   | **Order Management** | Người mua xem đơn đã mua; **Người bán xem & cập nhật trạng thái đơn của mình**; Admin quản lý mọi đơn |
 | 8   | **Admin Dashboard**  | Quản lý User (ban kéo theo block SP), Category, Product (block SP vi phạm), Order               |
 | 9   | **Seller / Gian hàng** | Thiết lập gian hàng (`shopName`, `pickupAddress`), trang shop công khai, "Sản phẩm của tôi", "Đơn bán" |
@@ -25,7 +25,7 @@
 | -   | Duyệt SP trước khi hiển thị        | Admin kiểm duyệt sau bằng block        |
 | -   | Biến thể SP (màu/size), thương hiệu | Mỗi SP một giá + một tồn kho          |
 | -   | Tính phí vận chuyển / chọn đơn vị vận chuyển | Chỉ ghi nhận trạng thái giao hàng |
-| -   | Chia tiền / đối soát / rút tiền cho người bán | Tiền về tài khoản VNPay của sàn; hoàn tiền Admin làm thủ công |
+| -   | Chia tiền / đối soát / rút tiền cho người bán | Tiền về tài khoản ngân hàng của sàn (liên kết PayOS); hoàn tiền Admin chuyển khoản thủ công |
 | -   | Người mua tự hủy đơn / bấm "Đã nhận hàng" | Chỉ Seller & Admin đổi trạng thái |
 | -   | Chat người mua – người bán         | Ngoài scope                            |
 | -   | Video / nhiều ảnh mô tả SP         | Tối đa 5 ảnh                           |

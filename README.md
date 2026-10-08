@@ -2,7 +2,7 @@
 
 Sàn thương mại điện tử **nhiều người bán** (kiểu Shopee thu gọn): một tài khoản vừa **mua** vừa **đăng bán** sản phẩm. Khách chưa đăng nhập chỉ xem hàng; Admin chỉ kiểm duyệt (không mua, không bán). Bài test giao bởi cấp trên · team 2 người · deadline 1 tuần.
 
-**Luồng chính:** đăng bán SP → xem SP → giỏ hàng → checkout (tách đơn theo người bán) → thanh toán VNPay (1 giao dịch) → người bán xử lý đơn → Admin giám sát.
+**Luồng chính:** đăng bán SP → xem SP → giỏ hàng → checkout (tách đơn theo người bán) → thanh toán PayOS (1 payment link) → người bán xử lý đơn → Admin giám sát.
 
 ## Tech stack
 
@@ -10,7 +10,7 @@ Sàn thương mại điện tử **nhiều người bán** (kiểu Shopee thu g�
 | --- | --- |
 | Backend | NestJS 11 · MongoDB Atlas (Mongoose, multi-document transaction) · JWT (access + refresh) |
 | Frontend | React 18 · Vite · TypeScript · Tailwind + shadcn/ui · Zustand · TanStack Query |
-| Dịch vụ ngoài | Cloudinary (ảnh SP) · VNPay Sandbox (thanh toán) |
+| Dịch vụ ngoài | Cloudinary (ảnh SP) · PayOS (thanh toán chuyển khoản / VietQR — không có sandbox, test bằng giao dịch thật số tiền nhỏ) |
 | Deploy | Vercel (frontend) · Render (backend, free tier) · MongoDB Atlas |
 
 ## Cấu trúc repo
@@ -34,7 +34,7 @@ cd backend && npm install && npm run start:dev
 cd frontend && pnpm install && pnpm dev
 ```
 
-Chi tiết biến môi trường, MongoDB Atlas, Cloudinary, VNPay sandbox: [`09-environment-setup.md`](docs/project-ecommerce/09-environment-setup.md). Backend dùng transaction nên MongoDB phải là **replica set** (Atlas free tier là đủ).
+Chi tiết biến môi trường, MongoDB Atlas, Cloudinary, PayOS: [`09-environment-setup.md`](docs/project-ecommerce/09-environment-setup.md). Backend dùng transaction nên MongoDB phải là **replica set** (Atlas free tier là đủ).
 
 ## Tài liệu
 
@@ -53,7 +53,7 @@ Chi tiết biến môi trường, MongoDB Atlas, Cloudinary, VNPay sandbox: [`09
 
 ## Tài khoản demo
 
-_(điền sau khi có seed script — task 1.10: Admin, 2 seller, 1 buyer; thẻ test VNPay xem `09-environment-setup.md`)_
+_(điền sau khi có seed script — task 1.10: Admin, 2 seller, 1 buyer; cách test PayOS xem `09-environment-setup.md`)_
 
 ## Demo online
 

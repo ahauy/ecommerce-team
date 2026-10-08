@@ -5,7 +5,7 @@
 | Mục           | Nội dung                                                                                                                                      |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Tên dự án** | Ecommerce Team Project                                                                                                                        |
-| **Mục tiêu**  | Xây dựng **sàn thương mại điện tử nhiều người bán** (kiểu Shopee thu gọn): user vừa **đăng bán** vừa **mua** sản phẩm vật lý. Luồng: đăng bán SP → xem SP → giỏ hàng → checkout (tách đơn theo người bán) → thanh toán VNPay → người bán xử lý đơn |
+| **Mục tiêu**  | Xây dựng **sàn thương mại điện tử nhiều người bán** (kiểu Shopee thu gọn): user vừa **đăng bán** vừa **mua** sản phẩm vật lý. Luồng: đăng bán SP → xem SP → giỏ hàng → checkout (tách đơn theo người bán) → thanh toán PayOS → người bán xử lý đơn |
 | **Deadline**  | 1 tuần                                                                                                                                        |
 | **Team**      | 2 người — phân công theo feature (mỗi người làm FE→BE của feature mình)                                                                       |
 | **Ngôn ngữ**  | Tiếng Việt                                                                                                                                    |
@@ -20,7 +20,7 @@
 | **Database**     | MongoDB (via Mongoose)             |
 | **Auth**         | JWT (Access Token + Refresh Token) |
 | **File Storage** | Cloudinary (upload ảnh sản phẩm)   |
-| **Payment**      | VNPay                              |
+| **Payment**      | PayOS (payment link: chuyển khoản / VietQR) |
 | **API Style**    | REST — versioned `/api/v1/...`     |
 
 ## Kiến trúc tổng quan
@@ -43,7 +43,7 @@
 └─────────────────────────────────┘
               │
   ┌───────────┴────────────┐
-  │ Cloudinary   VNPay API │
+  │ Cloudinary   PayOS API │
   └────────────────────────┘
 ```
 
@@ -60,7 +60,7 @@
 
 | Vai trò      | Mô tả                                                                          |
 | ------------ | ------------------------------------------------------------------------------ |
-| **Guest**    | Chưa đăng nhập: xem SP, mua hàng (giỏ localStorage, nhập thông tin giao hàng)  |
+| **Guest**    | Chưa đăng nhập: xem SP, thêm giỏ (localStorage); muốn đặt hàng phải đăng nhập  |
 | **Customer** | User đã đăng nhập: mua hàng, và **bán hàng** sau khi thiết lập gian hàng        |
 | **Seller**   | Không phải role — là Customer khi thao tác trên SP/đơn mà mình sở hữu          |
 | **Admin**    | Quản trị sàn: Category, kiểm duyệt SP (block), User, mọi Order                 |
