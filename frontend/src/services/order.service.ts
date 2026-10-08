@@ -36,7 +36,7 @@ export const normalizeCheckoutResult = (raw: Raw | null | undefined): CreateChec
   totalAmount: asNumber(raw?.totalAmount),
   expiresAt: asString(raw?.expiresAt) ?? '',
   orders: asArray(raw?.orders).map(normalizeOrder),
-  vnpayUrl: asString(raw?.vnpayUrl) ?? '',
+  paymentUrl: asString(raw?.paymentUrl) ?? '',
 });
 
 /**
@@ -58,7 +58,7 @@ export const extractStockShortages = (error: unknown): StockShortage[] => {
 };
 
 export const orderService = {
-  /** `POST /orders` — tạo 1 Checkout + N Order (mỗi shop 1 Order), trừ stock, trả `vnpayUrl`. */
+  /** `POST /orders` — tạo 1 Checkout + N Order (mỗi shop 1 Order), trừ stock, trả `paymentUrl` (link thanh toán PayOS). */
   createCheckout: async (payload: CreateCheckoutPayload): Promise<CreateCheckoutResult> => {
     const res = await apiClient.post<Raw>('/orders', payload);
     return normalizeCheckoutResult(res.data);

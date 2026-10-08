@@ -38,7 +38,8 @@ export interface CreateCheckoutResult {
   /** ISO — hạn thanh toán (30 phút kể từ lúc tạo, BR-CHK-005). */
   expiresAt: string;
   orders: CheckoutOrderSummary[];
-  vnpayUrl: string;
+  /** `checkoutUrl` của PayOS — FE redirect tới đây để thanh toán (BR-PAY-001). */
+  paymentUrl: string;
 }
 
 /** 1 SP thiếu hàng trong lỗi 400 của `POST /orders` (BR-CHK-002). */

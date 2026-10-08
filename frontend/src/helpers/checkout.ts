@@ -72,7 +72,7 @@ export const itemHasIssue = (item: CartItem, issueIds: Set<string>): boolean =>
 
 export const groupHasItems = (group: CartGroup): boolean => group.items.length > 0;
 
-/** Chuyển trình duyệt sang cổng VNPay (tách riêng để test mock được `window.location`). */
+/** Chuyển trình duyệt sang trang thanh toán (PayOS `paymentUrl`) (tách riêng để test mock được `window.location`). */
 export const redirectToPayment = (url: string): void => {
   window.location.assign(url);
 };
