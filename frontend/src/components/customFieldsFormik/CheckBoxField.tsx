@@ -36,22 +36,30 @@ const CheckBoxField = (props: CheckBoxFieldProps & AdditionalFormikProps) => {
   };
 
   return (
-    <div className={twMerge("flex items-center gap-3", classNameContainer)}>
-      <Checkbox
-        id={name}
-        checked={value}
-        onCheckedChange={onHandleChange}
-        {...restProps}
-      />
-      {label && (
-        <Label
-          htmlFor={name}
-          className={twMerge(required && "required", classNameLabel)}
-        >
-          {label}
-        </Label>
+    <div className={twMerge("flex flex-col gap-1.5", classNameContainer)}>
+      <div className="flex items-center gap-2.5">
+        <Checkbox
+          id={name}
+          checked={value}
+          onCheckedChange={onHandleChange}
+          aria-invalid={!!msgError}
+          aria-describedby={msgError ? `${name}-error` : undefined}
+          {...restProps}
+        />
+        {label && (
+          <Label
+            htmlFor={name}
+            className={twMerge("text-xs font-medium text-black cursor-pointer", required && "required", classNameLabel)}
+          >
+            {label}
+          </Label>
+        )}
+      </div>
+      {isString(msgError) && (
+        <p id={`${name}-error`} role="alert" className="text-xs text-red-500 font-medium">
+          {msgError}
+        </p>
       )}
-      {isString(msgError) && <span className="invalid-text">{msgError}</span>}
     </div>
   );
 };

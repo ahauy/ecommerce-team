@@ -1,12 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { shopService } from '@/services/shop.service';
+import { apiClient } from '@/services/apiClient';
+import type { PublicShopResponseDto } from '@/types/shop.types';
 
-export const SHOP_KEY = (sellerId: string) => ['shop', 'public', sellerId];
+export const SHOP_KEY = (sellerId: string) => ['shop', 'public', sellerId] as const;
 
 export const usePublicShop = (sellerId: string, enabled = true) => {
   return useQuery({
     queryKey: SHOP_KEY(sellerId),
-    queryFn: () => shopService.getPublicShop(sellerId),
+    queryFn: () => apiClient.get<PublicShopResponseDto>(`/shops/${sellerId}`).then((r) => r.data),
     enabled: enabled && !!sellerId,
   });
 };

@@ -20,7 +20,6 @@ describe('categoryService', () => {
     it('defines expected cache keys', () => {
       expect(CATEGORY_QUERY_KEYS.publicList).toEqual(['categories', 'public']);
       expect(CATEGORY_QUERY_KEYS.publicDetail('ao-nam')).toEqual(['categories', 'public', 'ao-nam']);
-      expect(CATEGORY_QUERY_KEYS.adminList).toEqual(['categories', 'admin']);
     });
   });
 
@@ -59,61 +58,6 @@ describe('categoryService', () => {
       const result = await categoryService.getCategoryBySlug('sach');
       expect(apiClient.get).toHaveBeenCalledWith('/categories/sach');
       expect(result).toEqual(mockCat);
-    });
-  });
-
-  describe('getAdminCategories', () => {
-    it('fetches admin categories with product counts', async () => {
-      const mockAdminList = [
-        { _id: '1', name: 'Đồ chơi', slug: 'do-choi', productCount: 12, isActive: true },
-      ];
-      (apiClient.get as any).mockResolvedValueOnce({
-        data: { success: true, data: mockAdminList },
-      });
-
-      const result = await categoryService.getAdminCategories();
-      expect(apiClient.get).toHaveBeenCalledWith('/admin/categories');
-      expect(result).toEqual(mockAdminList);
-    });
-  });
-
-  describe('createCategory', () => {
-    it('posts new category data to /categories', async () => {
-      const payload = { name: 'Thủ công', description: 'Mô tả', isActive: true };
-      const created = { _id: '3', ...payload, slug: 'thu-cong' };
-      (apiClient.post as any).mockResolvedValueOnce({
-        data: { success: true, data: created },
-      });
-
-      const result = await categoryService.createCategory(payload);
-      expect(apiClient.post).toHaveBeenCalledWith('/categories', payload);
-      expect(result).toEqual(created);
-    });
-  });
-
-  describe('updateCategory', () => {
-    it('patches category by ID', async () => {
-      const payload = { name: 'Gia dụng mới', isActive: false };
-      const updated = { _id: '1', name: 'Gia dụng mới', slug: 'gia-dung', isActive: false };
-      (apiClient.patch as any).mockResolvedValueOnce({
-        data: { success: true, data: updated },
-      });
-
-      const result = await categoryService.updateCategory('1', payload);
-      expect(apiClient.patch).toHaveBeenCalledWith('/categories/1', payload);
-      expect(result).toEqual(updated);
-    });
-  });
-
-  describe('deleteCategory', () => {
-    it('sends delete request to /categories/:id', async () => {
-      (apiClient.delete as any).mockResolvedValueOnce({
-        data: { success: true, data: { id: '1' } },
-      });
-
-      const result = await categoryService.deleteCategory('1');
-      expect(apiClient.delete).toHaveBeenCalledWith('/categories/1');
-      expect(result).toEqual({ id: '1' });
     });
   });
 });

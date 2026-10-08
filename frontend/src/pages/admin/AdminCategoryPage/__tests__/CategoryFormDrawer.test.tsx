@@ -11,8 +11,8 @@ const { mockUseCreateCategory, mockUseUpdateCategory } = vi.hoisted(() => ({
   mockUseUpdateCategory: vi.fn(),
 }));
 
-vi.mock('@/services/category.service', () => ({
-  categoryService: {
+vi.mock('../services/admin-category.service', () => ({
+  adminCategoryService: {
     useCreateCategory: mockUseCreateCategory,
     useUpdateCategory: mockUseUpdateCategory,
   },

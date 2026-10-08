@@ -34,7 +34,7 @@ const ProfilePage: React.FC = () => {
   return (
     <div
       data-testid="profile-page"
-      className="w-full bg-[#fbfbf5] py-6 md:py-8 px-4 sm:px-6 lg:px-8"
+      className="w-full bg-[#fbfbf5]"
       style={{ fontFeatureSettings: '"ss03"' }}
     >
       <div className="w-full space-y-8">
@@ -48,7 +48,7 @@ const ProfilePage: React.FC = () => {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
           {/* Left Column: Summary Card */}
           <div className="space-y-6">
             <div
@@ -154,7 +154,7 @@ const ProfilePage: React.FC = () => {
           </div>
 
           {/* Right Column: Update Profile Form */}
-          <div className="lg:col-span-2 bg-white rounded-2xl p-6 sm:p-8 border border-[#e4e4e7] shadow-card space-y-6">
+          <div className="xl:col-span-2 bg-white rounded-2xl p-6 sm:p-8 border border-[#e4e4e7] shadow-card space-y-6">
             <div className="pb-4 border-b border-[#e4e4e7]">
               <h2 className="text-xl font-semibold text-zinc-900">
                 Thông tin cá nhân

@@ -1,7 +1,7 @@
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form } from 'formik';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import FormikField from '@/components/customFieldsFormik/FormikField';
+import InputField from '@/components/customFieldsFormik/InputField';
 import { showSuccess, showError } from '@/helpers/toast';
 import { userService, UpdateProfileDto } from '@/services/user.service';
 import { profileValidationSchema } from '../../schemas/profile.schema';
@@ -50,71 +50,32 @@ const ProfileForm = ({ initialValues }: ProfileFormProps) => {
               : ''}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="fullName" className="block text-sm font-medium text-zinc-900">
-              Họ tên
-            </Label>
-            <Field
-              as={Input}
-              id="fullName"
-              name="fullName"
-              type="text"
-              placeholder="Nhập họ tên"
-              className={touched.fullName && errors.fullName ? 'border-red-500' : ''}
-              aria-invalid={touched.fullName && errors.fullName ? 'true' : 'false'}
-              aria-describedby={touched.fullName && errors.fullName ? 'fullName-error' : undefined}
-            />
-            {touched.fullName && errors.fullName && (
-              <p id="fullName-error" className="text-sm text-red-700 font-medium" role="alert">
-                {errors.fullName}
-              </p>
-            )}
-          </div>
+          <FormikField
+            name="fullName"
+            component={InputField}
+            label="Họ tên"
+            type="text"
+            placeholder="Nhập họ tên"
+          />
 
-          <div className="space-y-2">
-            <Label htmlFor="phone" className="block text-sm font-medium text-zinc-900">
-              Số điện thoại
-            </Label>
-            <Field
-              as={Input}
-              id="phone"
-              name="phone"
-              type="tel"
-              placeholder="09xxxxxxxx hoặc +84xxxxxxxxx"
-              className={touched.phone && errors.phone ? 'border-red-500' : ''}
-              aria-invalid={touched.phone && errors.phone ? 'true' : 'false'}
-              aria-describedby={touched.phone && errors.phone ? 'phone-error' : undefined}
-            />
-            {touched.phone && errors.phone && (
-              <p id="phone-error" className="text-sm text-red-700 font-medium" role="alert">
-                {errors.phone}
-              </p>
-            )}
-            <p className="text-xs text-zinc-500">Định dạng: 09xxxxxxxx hoặc +84xxxxxxxxx</p>
-          </div>
+          <FormikField
+            name="phone"
+            component={InputField}
+            label="Số điện thoại"
+            type="tel"
+            placeholder="09xxxxxxxx hoặc +84xxxxxxxxx"
+            helperText="Định dạng: 09xxxxxxxx hoặc +84xxxxxxxxx"
+          />
 
-          <div className="space-y-2">
-            <Label htmlFor="address" className="block text-sm font-medium text-zinc-900">
-              Địa chỉ
-            </Label>
-            <Field
-              as={Input}
-              id="address"
-              name="address"
-              type="text"
-              placeholder="Nhập địa chỉ"
-              className={touched.address && errors.address ? 'border-red-500' : ''}
-              aria-invalid={touched.address && errors.address ? 'true' : 'false'}
-              aria-describedby={touched.address && errors.address ? 'address-error' : undefined}
-            />
-            {touched.address && errors.address && (
-              <p id="address-error" className="text-sm text-red-700 font-medium" role="alert">
-                {errors.address}
-              </p>
-            )}
-          </div>
+          <FormikField
+            name="address"
+            component={InputField}
+            label="Địa chỉ"
+            type="text"
+            placeholder="Nhập địa chỉ"
+          />
 
-          <div className="flex justify-end pt-4 border-t border-zinc-200">
+          <div className="flex justify-end pt-4 border-t border-[#e4e4e7]">
             <Button
               type="submit"
               disabled={isSubmitting || !!updateProfileMutation?.isPending}

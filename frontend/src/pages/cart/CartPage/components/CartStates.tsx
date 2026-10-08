@@ -2,17 +2,19 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { AlertCircle, ArrowRight, ShieldCheck, ShoppingBag } from 'lucide-react';
 import BaseUrl from '@/consts/baseUrl';
+import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const primaryLink =
   'inline-flex h-11 items-center justify-center gap-2 rounded-full bg-black px-8 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black';
 
 const Shell: React.FC<React.PropsWithChildren<{ testId: string }>> = ({ testId, children }) => (
-  <div
+  <Card
     data-testid={testId}
-    className="mx-auto w-full max-w-xl space-y-5 rounded-2xl border border-[#e4e4e7] bg-white px-6 py-14 text-center shadow-sm"
+    className="mx-auto w-full max-w-xl space-y-5 px-6 py-14 text-center shadow-card"
   >
     {children}
-  </div>
+  </Card>
 );
 
 /** Giỏ hàng trống (Giỏ hàng #1). */
@@ -72,16 +74,18 @@ export const CartSkeleton: React.FC = () => (
   <div data-testid="cart-skeleton" aria-busy="true" className="grid items-start gap-6 lg:grid-cols-[1fr_340px]">
     <div className="space-y-5">
       {[0, 1].map((i) => (
-        <div key={i} className="space-y-4 rounded-2xl border border-[#e4e4e7] bg-white p-5">
-          <div className="h-4 w-40 animate-pulse rounded bg-zinc-200" />
+        <Card key={i} className="space-y-4 p-5 shadow-card">
+          <Skeleton className="h-4 w-40" />
           <div className="flex items-center gap-4">
-            <div className="h-16 w-16 animate-pulse rounded-lg bg-zinc-200" />
-            <div className="h-4 flex-1 animate-pulse rounded bg-zinc-200" />
-            <div className="h-8 w-24 animate-pulse rounded-full bg-zinc-200" />
+            <Skeleton className="h-16 w-16 rounded-lg" />
+            <Skeleton className="h-4 flex-1" />
+            <Skeleton className="h-8 w-24 rounded-full" />
           </div>
-        </div>
+        </Card>
       ))}
     </div>
-    <div className="h-64 animate-pulse rounded-2xl border border-[#e4e4e7] bg-white" />
+    <Card className="h-64 shadow-card">
+      <Skeleton className="h-full w-full" />
+    </Card>
   </div>
 );

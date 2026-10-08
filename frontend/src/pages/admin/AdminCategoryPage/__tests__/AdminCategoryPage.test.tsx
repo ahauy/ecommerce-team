@@ -11,8 +11,8 @@ const { mockUseAdminCategories, mockUseDeleteCategory } = vi.hoisted(() => ({
   mockUseDeleteCategory: vi.fn(),
 }));
 
-vi.mock('@/services/category.service', () => ({
-  categoryService: {
+vi.mock('../services/admin-category.service', () => ({
+  adminCategoryService: {
     useAdminCategories: mockUseAdminCategories,
     useDeleteCategory: mockUseDeleteCategory,
     useCreateCategory: vi.fn().mockReturnValue({ mutateAsync: vi.fn(), isPending: false }),
