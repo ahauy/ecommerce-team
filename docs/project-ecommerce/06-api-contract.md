@@ -500,6 +500,8 @@ Lỗi thường gặp:
     "checkoutCode": "CHK-20261002-7F3K9QX2AB",
     "status": "paid",              // pending | paid | failed | expired
     "totalAmount": 59980000,
+    "expiresAt": "2026-10-02T10:30:00.000Z",
+    "paymentUrl": null,            // còn pending → link PayOS để thanh toán tiếp; đã kết thúc → null
     "orders": [
       { "orderCode": "ORD-20261002-4M8TQ2ZP6C", "shopName": "Shop A", "totalAmount": 29990000, "status": "confirmed" }
     ]
@@ -507,7 +509,8 @@ Lỗi thường gặp:
 }
 // 404 nếu không tồn tại hoặc không phải checkout của mình. FE dùng endpoint này thay vì tin query trên URL redirect của PayOS.
 // Checkout còn pending → backend tra cứu PayOS (GET /v2/payment-requests/{payosOrderCode}) và xử lý idempotent trước khi trả (BR-PAY-006).
-// Nhờ vậy trạng thái vẫn đúng khi chạy localhost (webhook không gọi tới được). FE poll endpoint này vài giây/lần khi còn pending.
+// Nhờ vậy trạng thái vẫn đúng khi chạy localhost (webhook không gọi tới được). FE poll endpoint này vài giây/lần khi còn pending;
+// backend chỉ gọi PayOS tối đa 1 lần / 10 giây cho mỗi Checkout (các lần poll khác trả trạng thái đang lưu).
 ```
 
 #### GET `/orders/my` — mỗi phần tử
