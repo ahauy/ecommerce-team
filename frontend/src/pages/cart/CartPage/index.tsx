@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { ChevronRight } from 'lucide-react';
 import BaseUrl from '@/consts/baseUrl';
 import { useCart, useRemoveCartItem, useUpdateCartItem } from '@/hooks/queries/useCart';
@@ -49,8 +48,7 @@ const CartPage: React.FC = () => {
       navigate(BaseUrl.Login, { state: { from: { pathname: BaseUrl.Cart } } });
       return;
     }
-    // TODO(US-ORD-001): điều hướng sang trang checkout khi đã có.
-    toast.info('Chức năng đặt hàng sắp ra mắt. Bạn vui lòng quay lại sau nhé!');
+    navigate(BaseUrl.Checkout);
   };
 
   const renderBody = () => {

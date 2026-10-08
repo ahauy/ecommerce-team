@@ -13,10 +13,12 @@ const { mockDetail, mockProducts, mockShop, mockMutate, mockToastInfo, mockAddTo
   mockAddToCart: vi.fn(),
 }));
 
-vi.mock('@/hooks/queries/useProducts', () => ({
+vi.mock('../hooks/useProductDetail', () => ({
   useProductDetail: mockDetail,
-  useProducts: mockProducts,
   useSetProductActive: () => ({ mutate: mockMutate, isPending: false }),
+}));
+vi.mock('@/hooks/queries/useProducts', () => ({
+  useProducts: mockProducts,
 }));
 vi.mock('@/hooks/queries/useCart', () => ({
   useAddToCart: () => ({ mutate: mockAddToCart, isPending: false }),

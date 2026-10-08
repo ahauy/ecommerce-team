@@ -38,9 +38,9 @@ const RadioField = (props: RadioFieldProps & AdditionalFormikProps) => {
   };
 
   return (
-    <div className={twMerge("flex flex-col gap-3", classNameContainer)}>
+    <div className={twMerge("flex flex-col gap-2", classNameContainer)}>
       {label && (
-        <Label className={twMerge(required && "required", classNameLabel)}>
+        <Label className={twMerge("text-xs font-semibold text-black", required && "required", classNameLabel)}>
           {label}
         </Label>
       )}
@@ -50,21 +50,27 @@ const RadioField = (props: RadioFieldProps & AdditionalFormikProps) => {
         {...restProps}
       >
         {options?.map((el, index) => {
-          const id = `${el.label}-${index}`;
+          const id = `${name}-${el.value ?? index}`;
           return (
-            <div key={el.label} className={twMerge("flex gap-3")}>
+            <div key={`${el.value}-${index}`} className="flex items-center gap-2.5">
               <RadioGroupItem
                 id={id}
                 checked={value === el.value}
                 value={el.value}
               />
-              <Label htmlFor={id}>{el.label}</Label>
+              <Label htmlFor={id} className="text-xs font-medium text-black cursor-pointer">
+                {el.label}
+              </Label>
             </div>
           );
         })}
       </RadioGroup>
 
-      {isString(msgError) && <span className="invalid-text">{msgError}</span>}
+      {isString(msgError) && (
+        <p id={`${name}-error`} role="alert" className="text-xs text-red-500 font-medium">
+          {msgError}
+        </p>
+      )}
     </div>
   );
 };

@@ -6,6 +6,8 @@ import { UNKNOWN_SELLER_ID } from '@/helpers/cart';
 import { formatVnd } from '@/helpers/format';
 import type { CartGroup, CartItem } from '@/types/cart.types';
 import CartItemRow from './CartItemRow';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
 interface CartGroupCardProps {
   group: CartGroup;
@@ -22,12 +24,12 @@ const CartGroupCard: React.FC<CartGroupCardProps> = ({ group, busyProductId, onC
   const hasShopPage = !!seller.id && seller.id !== UNKNOWN_SELLER_ID;
 
   return (
-    <section
+    <Card
       data-testid="cart-group"
       aria-label={`Gian hàng ${shopName}`}
-      className="overflow-hidden rounded-2xl border border-[#e4e4e7] bg-white shadow-sm"
+      className="overflow-hidden shadow-card"
     >
-      <header className="flex items-center justify-between gap-3 border-b border-[#f0f0f2] px-5 py-3.5">
+      <CardHeader className="flex flex-row items-center justify-between gap-3 p-0 px-5 py-3.5 space-y-0">
         <div className="flex min-w-0 items-center gap-2">
           <Store className="h-3.5 w-3.5 shrink-0 text-black" aria-hidden="true" />
           <h2 className="truncate text-xs font-semibold text-black">{shopName}</h2>
@@ -41,21 +43,27 @@ const CartGroupCard: React.FC<CartGroupCardProps> = ({ group, busyProductId, onC
             <ChevronRight className="h-3 w-3" aria-hidden="true" />
           </Link>
         )}
-      </header>
+      </CardHeader>
 
-      <ul className="divide-y divide-[#f0f0f2]">
-        {items.map((item) => (
-          <CartItemRow
-            key={item.product.id}
-            item={item}
-            busy={busyProductId === item.product.id}
-            onChangeQuantity={onChangeQuantity}
-            onRemove={onRemove}
-          />
-        ))}
-      </ul>
+      <Separator />
 
-      <footer className="flex items-center justify-between gap-3 border-t border-[#f0f0f2] px-5 py-3.5 text-[11px] text-zinc-500">
+      <CardContent className="p-0">
+        <ul className="divide-y divide-[#e4e4e7]">
+          {items.map((item) => (
+            <CartItemRow
+              key={item.product.id}
+              item={item}
+              busy={busyProductId === item.product.id}
+              onChangeQuantity={onChangeQuantity}
+              onRemove={onRemove}
+            />
+          ))}
+        </ul>
+      </CardContent>
+
+      <Separator />
+
+      <footer className="flex items-center justify-between gap-3 px-5 py-3.5 text-[11px] text-zinc-500">
         <span>{items.length} mặt hàng từ gian này</span>
         <span>
           Tạm tính ({shopName}):{' '}
@@ -64,7 +72,7 @@ const CartGroupCard: React.FC<CartGroupCardProps> = ({ group, busyProductId, onC
           </strong>
         </span>
       </footer>
-    </section>
+    </Card>
   );
 };
 

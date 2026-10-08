@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Form } from 'formik';
 import { X, Lock, Check, Image as ImageIcon, Trash2 } from 'lucide-react';
 import { AdminCategoryItem, CreateCategoryPayload, UpdateCategoryPayload } from '@/types/category.types';
-import { categoryService } from '@/services/category.service';
+import { adminCategoryService } from '../services/admin-category.service';
 import { slugifyVietnamese } from '@/helpers/slugify';
 import { showError, showSuccess } from '@/helpers/toast';
 import {
@@ -11,6 +11,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import FormikField from '@/components/customFieldsFormik/FormikField';
+import InputField from '@/components/customFieldsFormik/InputField';
+import SwitchBoxField from '@/components/customFieldsFormik/SwitchBoxField';
+import { CategorySchema, CategoryFormValues } from '../schemas/category.schema';
 
 export interface CategoryFormDrawerProps {
   isOpen: boolean;
@@ -18,8 +22,6 @@ export interface CategoryFormDrawerProps {
   onClose: () => void;
   onSuccess: () => void;
 }
-
-import { CategorySchema, CategoryFormValues } from '../schemas/category.schema';
 
 export const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
   isOpen,
@@ -30,8 +32,8 @@ export const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
   const [conflictError, setConflictError] = useState<string | null>(null);
   const isEditMode = !!category;
 
-  const createMutation = categoryService.useCreateCategory();
-  const updateMutation = categoryService.useUpdateCategory();
+  const createMutation = adminCategoryService.useCreateCategory();
+  const updateMutation = adminCategoryService.useUpdateCategory();
 
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
@@ -134,20 +136,14 @@ export const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
                   )}
 
                   {/* Tên danh mục */}
-                  <div className="space-y-1.5">
-                    <label htmlFor="cat-name-input" className="block text-xs font-semibold text-black">
-                      Tên danh mục *
-                    </label>
-                    <Field
-                      id="cat-name-input"
-                      name="name"
-                      type="text"
-                      placeholder="Ví dụ: Thiết bị điện tử"
-                      className="w-full h-11 px-3.5 bg-white border border-[#e4e4e7] rounded-lg text-black text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-black transition-all"
-                    />
-                    <ErrorMessage name="name" component="p" className="text-xs text-red-600 font-medium" />
-                    <p className="text-[12px] text-zinc-500">Tên hiển thị trên thanh điều hướng và bộ lọc.</p>
-                  </div>
+                  <FormikField
+                    name="name"
+                    component={InputField}
+                    id="cat-name-input"
+                    label="Tên danh mục *"
+                    placeholder="Ví dụ: Thiết bị điện tử"
+                    helperText="Tên hiển thị trên thanh điều hướng và bộ lọc."
+                  />
 
                   {/* Slug Readonly */}
                   <div className="space-y-1.5">
@@ -172,26 +168,21 @@ export const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
                   </div>
 
                   {/* Mô tả */}
-                  <div className="space-y-1.5">
-                    <label htmlFor="cat-description-input" className="block text-xs font-semibold text-black">
-                      Mô tả danh mục
-                    </label>
-                    <Field
-                      id="cat-description-input"
-                      as="textarea"
-                      name="description"
-                      rows={4}
-                      placeholder="Mô tả ngành hàng, danh mục sản phẩm liên quan..."
-                      className="w-full p-3 bg-white border border-[#e4e4e7] rounded-lg text-black text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-black transition-all resize-none leading-relaxed"
-                    />
-                    <ErrorMessage name="description" component="p" className="text-xs text-red-600 font-medium" />
-                  </div>
+                  <FormikField
+                    name="description"
+                    component={InputField}
+                    as="textarea"
+                    rows={4}
+                    id="cat-description-input"
+                    label="Mô tả danh mục"
+                    placeholder="Mô tả ngành hàng, danh mục sản phẩm liên quan..."
+                  />
 
                   {/* Ảnh danh mục */}
                   <div className="space-y-2">
-                    <label htmlFor="cat-image-input" className="block text-xs font-semibold text-black">
+                    <span className="block text-xs font-semibold text-black">
                       Ảnh danh mục (URL)
-                    </label>
+                    </span>
                     <div className="flex items-center gap-4 p-3 bg-zinc-50 border border-[#e4e4e7] rounded-lg">
                       <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-zinc-200 border border-[#e4e4e7] flex items-center justify-center text-zinc-400">
                         {values.imageUrl ? (
@@ -208,12 +199,12 @@ export const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
                         )}
                       </div>
                       <div className="flex-1 space-y-1.5">
-                        <Field
-                          id="cat-image-input"
+                        <FormikField
                           name="imageUrl"
+                          component={InputField}
                           type="url"
+                          id="cat-image-input"
                           placeholder="https://example.com/image.jpg"
-                          className="w-full h-10 px-3 bg-white border border-[#e4e4e7] rounded-md text-xs text-black focus:outline-none focus:ring-1 focus:ring-black"
                         />
                         {values.imageUrl && (
                           <button
@@ -229,29 +220,20 @@ export const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
                         <p className="text-[11px] text-zinc-500">Định dạng hỗ trợ: JPG, PNG, WEBP. Tối đa 2MB.</p>
                       </div>
                     </div>
-                    <ErrorMessage name="imageUrl" component="p" className="text-xs text-red-600 font-medium" />
                   </div>
 
                   {/* Kích hoạt Switch */}
                   <div className="pt-2 border-t border-[#e4e4e7]">
-                    <label className="flex items-center justify-between cursor-pointer py-2 min-h-[44px]">
-                      <div className="space-y-0.5 pr-4">
-                        <span className="block text-xs font-semibold text-black">Kích hoạt danh mục</span>
-                        <p className="text-[12px] text-zinc-500">
-                          Cho phép danh mục xuất hiện trên trang chủ và menu tìm kiếm
-                        </p>
-                      </div>
-                      <div className="relative inline-flex items-center">
-                        <input
-                          type="checkbox"
-                          id="category-active-toggle"
-                          checked={values.isActive}
-                          onChange={(e) => setFieldValue('isActive', e.target.checked)}
-                          className="sr-only peer"
-                        />
-                        <div className="w-11 h-6 bg-zinc-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black" />
-                      </div>
-                    </label>
+                    <FormikField
+                      name="isActive"
+                      component={SwitchBoxField}
+                      id="category-active-toggle"
+                      label="Kích hoạt danh mục"
+                      classNameContainer="justify-between min-h-[44px]"
+                    />
+                    <p className="text-[12px] text-zinc-500 mt-1">
+                      Cho phép danh mục xuất hiện trên trang chủ và menu tìm kiếm
+                    </p>
                   </div>
                 </div>
 

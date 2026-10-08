@@ -1,5 +1,5 @@
 import React from "react";
-import { Package, PlusCircle, Settings, UserCog } from "lucide-react";
+import { ClipboardList, Package, PlusCircle, Settings, UserCog } from "lucide-react";
 import ConsoleLayout, { type ConsoleNavItem } from "@/layouts/ConsoleLayout";
 import BaseUrl from "@/consts/baseUrl";
 import { useAuthStore } from "@/stores/auth.store";
@@ -19,6 +19,7 @@ const SELLER_MENU: ConsoleNavItem[] = [
     icon: PlusCircle,
     isActive: (pathname) => pathname === BaseUrl.SellerProductCreate,
   },
+  { label: "Đơn bán", href: BaseUrl.SellerOrders, icon: ClipboardList },
   { label: "Hồ sơ người bán", href: BaseUrl.SellerProfile, icon: UserCog },
   { label: "Thiết lập gian hàng", href: BaseUrl.ShopSetup, icon: Settings },
 ];
@@ -30,6 +31,7 @@ const getBreadcrumbs = (pathname: string): string[] => {
   if (path.startsWith(`${BaseUrl.SellerProducts}/`) && path.endsWith("/edit")) {
     return ["Sản phẩm", "Chỉnh sửa"];
   }
+  if (path === BaseUrl.SellerOrders) return ["Đơn bán"];
   if (path === BaseUrl.SellerProfile) return ["Hồ sơ"];
   if (path === BaseUrl.ShopSetup) return ["Thiết lập gian hàng"];
   return [];

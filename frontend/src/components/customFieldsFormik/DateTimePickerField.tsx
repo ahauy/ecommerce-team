@@ -102,7 +102,7 @@ const DateTimePickerField = (
       {label && (
         <Label
           htmlFor={name}
-          className={twMerge("mb-1", required && "required", classNameLabel)}
+          className={twMerge("text-xs font-semibold text-black", required && "required", classNameLabel)}
         >
           {label}
         </Label>
@@ -123,7 +123,7 @@ const DateTimePickerField = (
               <Button
                 variant="outline"
                 className={cn(
-                  "w-full min-w-[200px] flex-1 pl-3 text-left font-normal",
+                  "w-full min-w-[200px] min-h-[44px] flex-1 rounded-lg border border-[#e4e4e7] bg-white pl-3 text-left font-normal text-black",
                   !value && "text-muted-foreground",
                   msgError && "border-red-500"
                 )}
@@ -161,13 +161,18 @@ const DateTimePickerField = (
 
         <Button
           variant="outline"
+          className="rounded-lg border border-[#e4e4e7]"
           onClick={() => setFieldValue(name, undefined)}
         >
           <CommonIcons.X className="ml-auto h-4 w-4 opacity-50" />
         </Button>
       </div>
 
-      {isString(msgError) && <span className="invalid-text">{msgError}</span>}
+      {isString(msgError) && (
+        <p id={`${name}-error`} role="alert" className="text-xs text-red-500 font-medium">
+          {msgError}
+        </p>
+      )}
     </div>
   );
 };

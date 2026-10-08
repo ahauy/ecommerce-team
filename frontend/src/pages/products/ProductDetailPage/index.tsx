@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
-import { useProductDetail, useSetProductActive } from '@/hooks/queries/useProducts';
+import { useProductDetail, useSetProductActive } from './hooks/useProductDetail';
 import { useAddToCart } from '@/hooks/queries/useCart';
 import { getHttpStatus, formatVnd } from '@/helpers/format';
 import { getApiMessage } from '@/helpers/apiError';
