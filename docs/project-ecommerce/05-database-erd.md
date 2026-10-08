@@ -135,6 +135,7 @@ payments       (raw log webhook / tra cứu PayOS)
   paymentLinkId: String,   // id payment link PayOS trả về khi tạo link
   checkoutUrl: String,     // trang thanh toán PayOS (FE redirect tới)
   payosReference: String,  // mã giao dịch ngân hàng (`data.reference` trong webhook)
+  lastSyncedAt: Date,      // lần cuối tra cứu PayOS — giới hạn đồng bộ 1 lần / 10 giây (BR-PAY-006)
 
   createdAt: Date,
   updatedAt: Date
