@@ -71,6 +71,7 @@ const SidebarBody: React.FC<SidebarBodyProps> = ({
         <Link
           to={homeHref}
           onClick={onNavigate}
+          title="Trờ về trang chủ"
           className="text-xl font-bold tracking-tight text-black transition-opacity hover:opacity-80"
         >
           TeamShop
