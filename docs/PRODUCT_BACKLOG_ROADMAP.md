@@ -326,7 +326,7 @@ schema-version: "1.3"
 
 ---
 
-- [ ] **US-CART-001**: Giỏ hàng (Guest localStorage + Customer DB + Merge khi đăng nhập)
+- [x] **US-CART-001**: Giỏ hàng (Guest localStorage + Customer DB + Merge khi đăng nhập)
   - **Slug:** `cart-management`
   - **Effort:** L
   - **Context-budget:** multi-session
@@ -335,18 +335,18 @@ schema-version: "1.3"
   - **Blocks:** `US-ORD-001`
   - **Mô tả:** Guest có giỏ hàng lưu localStorage; Customer có giỏ hàng lưu DB. Khi đăng nhập, giỏ localStorage được merge vào giỏ DB. Admin không mua nên không có giỏ. Giỏ luôn hiện giá hiện tại; SP hết hàng / ngừng bán / vượt tồn kho vẫn nằm trong giỏ kèm trạng thái để người mua tự xử lý.
   - **Acceptance Criteria (AC):**
-    - [ ] Guest bấm "Thêm giỏ" → lưu localStorage (`productId`, `quantity`); bấm "Đặt hàng" → FE chuyển sang trang đăng nhập. Mọi endpoint `/api/v1/cart/*` yêu cầu JWT (thiếu token → 401).
-    - [ ] Sau đăng nhập: `POST /api/v1/cart/merge` gộp giỏ localStorage vào DB (cộng dồn, cap ở stock, tự bỏ SP của mình / ngừng bán / hết hàng), FE xóa localStorage.
-    - [ ] Admin gọi bất kỳ endpoint `/api/v1/cart/*` → 403 (Admin chỉ kiểm duyệt, không mua).
-    - [ ] Customer: `GET /api/v1/cart` → giỏ từ DB, **nhóm theo người bán** (`groups[].seller`, `subtotal`) + `totalAmount`; mỗi item có `status` (`available` / `exceeds_stock` / `out_of_stock` / `unavailable`) và giá hiện tại; chỉ item `available` được cộng tiền.
-    - [ ] Customer: `POST /api/v1/cart/items` → thêm item (đã có thì cộng dồn), validate stock; **SP của chính mình → 400**; tối đa 100 SP khác nhau.
-    - [ ] Customer: `PATCH /api/v1/cart/items/:productId` → đặt lại quantity (≤ stock).
-    - [ ] Customer: `DELETE /api/v1/cart/items/:productId` → xóa item; `DELETE /api/v1/cart` → xóa toàn bộ.
-    - [ ] SP hết hàng / bị ẩn / bị block **vẫn giữ trong giỏ** kèm trạng thái, không mua được; stock giảm dưới số lượng → giữ nguyên số lượng, đánh dấu `exceeds_stock`.
-    - [ ] FE: Trang giỏ hàng (CartPage) hiển thị items **theo từng shop** (subtotal mỗi shop), badge trạng thái, tổng tiền VNĐ, nút checkout.
+    - [x] Guest bấm "Thêm giỏ" → lưu localStorage (`productId`, `quantity`); bấm "Đặt hàng" → FE chuyển sang trang đăng nhập. Mọi endpoint `/api/v1/cart/*` yêu cầu JWT (thiếu token → 401).
+    - [x] Sau đăng nhập: `POST /api/v1/cart/merge` gộp giỏ localStorage vào DB (cộng dồn, cap ở stock, tự bỏ SP của mình / ngừng bán / hết hàng), FE xóa localStorage.
+    - [x] Admin gọi bất kỳ endpoint `/api/v1/cart/*` → 403 (Admin chỉ kiểm duyệt, không mua).
+    - [x] Customer: `GET /api/v1/cart` → giỏ từ DB, **nhóm theo người bán** (`groups[].seller`, `subtotal`) + `totalAmount`; mỗi item có `status` (`available` / `exceeds_stock` / `out_of_stock` / `unavailable`) và giá hiện tại; chỉ item `available` được cộng tiền.
+    - [x] Customer: `POST /api/v1/cart/items` → thêm item (đã có thì cộng dồn), validate stock; **SP của chính mình → 400**; tối đa 100 SP khác nhau.
+    - [x] Customer: `PATCH /api/v1/cart/items/:productId` → đặt lại quantity (≤ stock).
+    - [x] Customer: `DELETE /api/v1/cart/items/:productId` → xóa item; `DELETE /api/v1/cart` → xóa toàn bộ.
+    - [x] SP hết hàng / bị ẩn / bị block **vẫn giữ trong giỏ** kèm trạng thái, không mua được; stock giảm dưới số lượng → giữ nguyên số lượng, đánh dấu `exceeds_stock`.
+    - [x] FE: Trang giỏ hàng (CartPage) hiển thị items **theo từng shop** (subtotal mỗi shop), badge trạng thái, tổng tiền VNĐ, nút checkout.
   - **Tasks:**
-    - [ ] **Backend:** `Cart schema (userId unique, items[{productId, quantity}])` · `Cart service: add/update/remove/clear/merge + group by sellerId + item status khi GET` · `Guard: JwtAuthGuard + RolesGuard (Admin → 403)`
-    - [ ] **Frontend:** `cartStore (localStorage cho Guest, API cho Customer)` · `CartPage, CartItem components` · `Merge cart on login action`
+    - [x] **Backend:** `Cart schema (userId unique, items[{productId, quantity}])` · `Cart service: add/update/remove/clear/merge + group by sellerId + item status khi GET` · `Guard: JwtAuthGuard + RolesGuard (Admin → 403)`
+    - [x] **Frontend:** `cartStore (localStorage cho Guest, API cho Customer)` · `CartPage, CartItem components` · `Merge cart on login action`
   - **Stitch Screens (`projects/6249429078653284294`):**
     - `projects/6249429078653284294/screens/1d4ed0d033504890b15319f87737841e` ("Giỏ hàng #1")
     - `projects/6249429078653284294/screens/a75d371cbb2348d88d117ee45c31a744` ("Giỏ hàng #2")
