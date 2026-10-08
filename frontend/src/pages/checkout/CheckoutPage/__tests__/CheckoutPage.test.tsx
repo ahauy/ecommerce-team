@@ -132,9 +132,9 @@ describe('CheckoutPage', () => {
     expect(screen.getByRole('button', { name: /Thanh toán với VNPay/ })).toBeEnabled();
   });
 
-  it('pays with recipient + productId/quantity only (no price / sellerId) and redirects to VNPay', () => {
+  it('pays with recipient + productId/quantity only (no price / sellerId) and redirects to paymentUrl', () => {
     mockMutate.mockImplementation((_payload, opts) =>
-      opts.onSuccess({ vnpayUrl: 'https://sandbox.vnpayment.vn/pay?x=1' })
+      opts.onSuccess({ paymentUrl: 'https://pay.payos.vn/web/abc123' })
     );
 
     renderPage();
@@ -149,7 +149,7 @@ describe('CheckoutPage', () => {
         { productId: 'p3', quantity: 1 },
       ],
     });
-    expect(mockRedirect).toHaveBeenCalledWith('https://sandbox.vnpayment.vn/pay?x=1');
+    expect(mockRedirect).toHaveBeenCalledWith('https://pay.payos.vn/web/abc123');
   });
 
   it('profile missing phone/address: form is empty there, payment blocked until filled in', async () => {

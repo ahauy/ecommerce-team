@@ -33,7 +33,7 @@ import { isRecipientComplete, type RecipientFormValues } from './schemas/recipie
 
 /**
  * Trang thanh toán (US-ORD-001) — chỉ Customer đã đăng nhập (route đã bọc RequireAuth).
- * Luồng: kiểm tra giỏ + người nhận → `POST /orders` (1 Checkout + N Order) → redirect `vnpayUrl`.
+ * Luồng: kiểm tra giỏ + người nhận → `POST /orders` (1 Checkout + N Order) → redirect `paymentUrl` (PayOS).
  */
 const CheckoutPage: React.FC = () => {
   const { mode, cart, isPending, isError, refetch } = useCart();
@@ -85,11 +85,11 @@ const CheckoutPage: React.FC = () => {
       {
         // Giữ trạng thái "đang chuyển" cho tới khi trình duyệt rời trang → không bấm đúp.
         onSuccess: (result) => {
-          if (!result.vnpayUrl) {
+          if (!result.paymentUrl) {
             showError('Không tạo được liên kết thanh toán. Vui lòng thử lại.');
             return;
           }
-          redirectToPayment(result.vnpayUrl);
+          redirectToPayment(result.paymentUrl);
         },
         onError: (err) => {
           const shortages = extractStockShortages(err);
