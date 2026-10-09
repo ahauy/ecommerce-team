@@ -123,7 +123,7 @@ const DateTimePickerField = (
               <Button
                 variant="outline"
                 className={cn(
-                  "w-full min-w-[200px] min-h-[44px] flex-1 rounded-lg border border-[#e4e4e7] bg-white pl-3 text-left font-normal text-black",
+                  "w-full min-w-[200px] min-h-[44px] flex-1 rounded-lg border border-hairline-light bg-white pl-3 text-left font-normal text-black",
                   !value && "text-muted-foreground",
                   msgError && "border-red-500"
                 )}
@@ -161,7 +161,7 @@ const DateTimePickerField = (
 
         <Button
           variant="outline"
-          className="rounded-lg border border-[#e4e4e7]"
+          className="rounded-full border border-hairline-light"
           onClick={() => setFieldValue(name, undefined)}
         >
           <CommonIcons.X className="ml-auto h-4 w-4 opacity-50" />

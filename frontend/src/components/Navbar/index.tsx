@@ -49,7 +49,7 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <Link
             to={BaseUrl.Login}
-            className="hidden sm:inline-flex items-center justify-center h-10 px-5 rounded-full text-xs font-semibold text-zinc-700 hover:text-black border border-[#e4e4e7] bg-white hover:bg-zinc-50 transition-colors shadow-xs"
+            className="hidden sm:inline-flex items-center justify-center h-10 px-5 rounded-full text-xs font-semibold text-zinc-700 hover:text-black border border-hairline-light bg-white hover:bg-zinc-50 transition-colors shadow-xs"
           >
             Đăng nhập
           </Link>
@@ -66,7 +66,7 @@ export default function Navbar() {
       {isCustomer && (
         <Link
           to={profile?.shop ? BaseUrl.SellerProducts : BaseUrl.ShopSetup}
-          className="hidden lg:inline-flex items-center justify-center h-10 px-5 rounded-full text-xs font-semibold tracking-wider bg-white text-black border border-[#e4e4e7] hover:bg-zinc-50 transition-colors shadow-xs"
+          className="hidden lg:inline-flex items-center justify-center h-10 px-5 rounded-full text-xs font-semibold tracking-wider bg-white text-black border border-hairline-light hover:bg-zinc-50 transition-colors shadow-xs"
         >
           {profile?.shop ? "Kênh người bán" : "Đăng bán"}
         </Link>
@@ -83,7 +83,7 @@ export default function Navbar() {
           {cartCount > 0 && (
             <span
               data-testid="cart-badge"
-              className="absolute top-1 right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-[#c1fbd4] text-black text-[11px] font-bold rounded-full leading-none"
+              className="absolute top-1 right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-aloe text-black text-[11px] font-bold rounded-full leading-none tabular-nums"
             >
               {cartCount > 99 ? "99+" : cartCount}
             </span>
@@ -92,7 +92,7 @@ export default function Navbar() {
       )}
 
       {/* Vertical Hairline Separator */}
-      <div className="h-6 w-[1px] bg-[#e4e4e7] hidden sm:block" />
+      <div className="h-6 w-[1px] bg-hairline-light hidden sm:block" />
 
       {/* Authed User Popover */}
       {status === "authed" && user && (
@@ -103,7 +103,7 @@ export default function Navbar() {
               className="navbar__avatar flex items-center gap-2 pl-1 rounded-full group hover:cursor-pointer focus:outline-none"
               aria-label="Tài khoản cá nhân"
             >
-              <Avatar className="h-9 w-9 ring-1 ring-[#e4e4e7] group-hover:ring-black transition-all">
+              <Avatar className="h-9 w-9 ring-1 ring-hairline-light group-hover:ring-black transition-all">
                 <AvatarFallback className="bg-zinc-100 text-black text-xs font-semibold">
                   {initial}
                 </AvatarFallback>
@@ -119,15 +119,15 @@ export default function Navbar() {
               <ChevronDown className="h-4 w-4 text-zinc-400 group-hover:text-black hidden sm:block transition-colors" />
             </button>
           </PopoverTrigger>
-          <PopoverContent className="mr-2 mt-2 w-56 rounded-xl border border-[#e4e4e7] bg-white p-2 shadow-lg">
-            <div className="px-3 py-2 border-b border-[#e4e4e7] mb-1">
+          <PopoverContent className="mr-2 mt-2 w-56 rounded-xl border border-hairline-light bg-white p-2 shadow-card">
+            <div className="px-3 py-2 border-b border-hairline-light mb-1">
               <p className="text-xs font-semibold text-black truncate">{user.fullName}</p>
               <p className="text-[11px] text-zinc-400 truncate">{user.email}</p>
             </div>
 
             <Link
               to={isAdmin ? BaseUrl.AdminProfile : BaseUrl.AccountProfile}
-              className="navbar__each__menu flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-[#fbfbf5] hover:text-black transition-colors"
+              className="navbar__each__menu flex items-center gap-2.5 rounded-full px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-canvas-cream hover:text-black transition-colors"
               onClick={() => setPopover(false)}
             >
               <UserIcon className="h-4 w-4 text-zinc-500" />
@@ -137,7 +137,7 @@ export default function Navbar() {
             {isCustomer && (
               <Link
                 to={BaseUrl.AccountOrders}
-                className="navbar__each__menu flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-[#fbfbf5] hover:text-black transition-colors"
+                className="navbar__each__menu flex items-center gap-2.5 rounded-full px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-canvas-cream hover:text-black transition-colors"
                 onClick={() => setPopover(false)}
               >
                 <Receipt className="h-4 w-4 text-zinc-500" />
@@ -148,7 +148,7 @@ export default function Navbar() {
             {isCustomer && (
               <Link
                 to={profile?.shop ? BaseUrl.SellerProducts : BaseUrl.ShopSetup}
-                className="navbar__each__menu flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-[#fbfbf5] hover:text-black transition-colors"
+                className="navbar__each__menu flex items-center gap-2.5 rounded-full px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-canvas-cream hover:text-black transition-colors"
                 onClick={() => setPopover(false)}
               >
                 <Store className="h-4 w-4 text-zinc-500" />
@@ -159,7 +159,7 @@ export default function Navbar() {
             {isAdmin && (
               <Link
                 to={BaseUrl.AdminCategories}
-                className="navbar__each__menu flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-[#fbfbf5] hover:text-black transition-colors"
+                className="navbar__each__menu flex items-center gap-2.5 rounded-full px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-canvas-cream hover:text-black transition-colors"
                 onClick={() => setPopover(false)}
               >
                 <ShieldCheck className="h-4 w-4 text-zinc-500" />
@@ -167,11 +167,11 @@ export default function Navbar() {
               </Link>
             )}
 
-            <div className="my-1 border-t border-[#e4e4e7]" />
+            <div className="my-1 border-t border-hairline-light" />
 
             <button
               type="button"
-              className="navbar__each__menu flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
+              className="navbar__each__menu flex w-full items-center gap-2.5 rounded-full px-3 py-2 text-left text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
               onClick={() => {
                 setPopover(false);
                 void logout();

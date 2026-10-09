@@ -32,7 +32,7 @@ const PublicShopPage: React.FC = () => {
   if (isPending) {
     return (
       <div
-        className="w-full min-h-[60vh] flex items-center justify-center bg-[#fbfbf5] p-8"
+        className="w-full min-h-[60vh] flex items-center justify-center bg-canvas-cream p-8"
         style={{ fontFeatureSettings: '"ss03"' }}
       >
         <div className="flex items-center gap-3 text-zinc-600">
@@ -47,10 +47,10 @@ const PublicShopPage: React.FC = () => {
     return (
       <div
         data-testid="public-shop-not-found"
-        className="w-full min-h-[70vh] flex items-center justify-center bg-[#fbfbf5] px-4 py-16"
+        className="w-full min-h-[70vh] flex items-center justify-center bg-canvas-cream px-4 py-16"
         style={{ fontFeatureSettings: '"ss03"' }}
       >
-        <div className="max-w-md w-full bg-white rounded-2xl p-8 border border-[#e4e4e7] shadow-card text-center space-y-6">
+        <div className="max-w-md w-full bg-white rounded-2xl p-8 border border-hairline-light shadow-card text-center space-y-6">
           <div className="w-16 h-16 rounded-full bg-zinc-100 flex items-center justify-center mx-auto text-zinc-400">
             <AlertCircle className="w-8 h-8" />
           </div>
@@ -81,7 +81,7 @@ const PublicShopPage: React.FC = () => {
   return (
     <div
       data-testid="public-shop-page"
-      className="w-full min-h-screen bg-[#fbfbf5] py-8 md:py-12 px-4 sm:px-6 lg:px-8"
+      className="w-full min-h-screen bg-canvas-cream py-8 md:py-12 px-4 sm:px-6 lg:px-8"
       style={{ fontFeatureSettings: '"ss03"' }}
     >
       <div className="w-full space-y-10">
@@ -98,7 +98,7 @@ const PublicShopPage: React.FC = () => {
 
         {/* Hero Band Gian Hang */}
         <section className="w-full">
-          <div className="w-full bg-pistachio rounded-2xl p-6 sm:p-10 md:p-12 border border-[#e4e4e7] shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="w-full bg-pistachio rounded-2xl p-6 sm:p-10 md:p-12 border border-hairline-light shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="flex items-center gap-6">
               {/* Store Avatar */}
               <div className="w-20 h-20 rounded-full bg-black flex items-center justify-center text-white shrink-0 shadow-md">
@@ -113,7 +113,7 @@ const PublicShopPage: React.FC = () => {
                   <h1 className="text-2xl sm:text-3xl md:text-4xl font-light tracking-tight text-zinc-900 leading-tight">
                     {shop.shopName}
                   </h1>
-                  <span className="font-mono text-xs text-zinc-700 bg-white/80 border border-[#e4e4e7] px-2.5 py-0.5 rounded-full">
+                  <span className="font-mono text-xs text-zinc-700 bg-white/80 border border-hairline-light px-2.5 py-0.5 rounded-full">
                     @{shop.shopSlug}
                   </span>
                 </div>
@@ -124,7 +124,7 @@ const PublicShopPage: React.FC = () => {
                     Tham gia từ {formatJoinedDate(shop.joinedAt)}
                   </span>
                   <span className="inline-block w-1 h-1 rounded-full bg-zinc-400" />
-                  <span className="inline-flex items-center gap-1 font-medium text-zinc-800">
+                  <span className="inline-flex items-center gap-1 font-medium text-zinc-800 tabular-nums">
                     <Package className="w-3.5 h-3.5 text-zinc-500" />
                     {shop.productCount} sản phẩm
                   </span>
@@ -136,18 +136,18 @@ const PublicShopPage: React.FC = () => {
 
         {/* Product Catalog Section */}
         <section className="space-y-6">
-          <div className="flex items-center justify-between border-b border-[#e4e4e7] pb-4">
+          <div className="flex items-center justify-between border-b border-hairline-light pb-4">
             <h2 className="text-lg font-semibold text-zinc-900 flex items-center gap-2">
               <Store className="w-5 h-5 text-zinc-700" />
               <span>Sản phẩm của gian hàng</span>
             </h2>
-            <span className="text-xs text-zinc-500">
+            <span className="text-xs text-zinc-500 tabular-nums">
               Tổng số: {shop.productCount} sản phẩm
             </span>
           </div>
 
           {shop.productCount === 0 ? (
-            <div className="w-full bg-white rounded-2xl p-12 text-center border border-[#e4e4e7] shadow-sm space-y-3">
+            <div className="w-full bg-white rounded-2xl p-12 text-center border border-hairline-light shadow-sm space-y-3">
               <div className="w-12 h-12 rounded-full bg-zinc-100 flex items-center justify-center mx-auto text-zinc-400">
                 <Package className="w-6 h-6" />
               </div>
@@ -159,12 +159,12 @@ const PublicShopPage: React.FC = () => {
               </p>
             </div>
           ) : (
-            <div className="w-full bg-white rounded-2xl p-12 text-center border border-[#e4e4e7] shadow-sm space-y-4">
+            <div className="w-full bg-white rounded-2xl p-12 text-center border border-hairline-light shadow-sm space-y-4">
               <div className="w-12 h-12 rounded-full bg-aloe flex items-center justify-center mx-auto text-black">
                 <Package className="w-6 h-6" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-base font-medium text-zinc-900">
+                <h3 className="text-base font-medium text-zinc-900 tabular-nums">
                   Gian hàng có {shop.productCount} sản phẩm đang bày bán
                 </h3>
                 <p className="text-xs text-zinc-500">

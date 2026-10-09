@@ -35,9 +35,9 @@ const ProductFilterDrawer: React.FC<ProductFilterDrawerProps> = ({ open, onOpenC
       <SheetContent
         side="left"
         data-testid="product-filter-drawer"
-        className="flex w-[88vw] max-w-sm flex-col gap-0 bg-[#fbfbf5] p-0"
+        className="flex w-[88vw] max-w-sm flex-col gap-0 bg-canvas-cream p-0"
       >
-        <div className="flex items-center justify-between border-b border-[#e4e4e7] bg-white px-5 py-4 pr-12">
+        <div className="flex items-center justify-between border-b border-hairline-light bg-white px-5 py-4 pr-12">
           <SheetTitle className="text-base font-semibold text-black">Bộ lọc tìm kiếm</SheetTitle>
           <button
             type="button"
@@ -56,7 +56,7 @@ const ProductFilterDrawer: React.FC<ProductFilterDrawerProps> = ({ open, onOpenC
           />
         </div>
 
-        <div className="border-t border-[#e4e4e7] bg-white p-4">
+        <div className="border-t border-hairline-light bg-white p-4">
           <button
             type="button"
             onClick={handleApply}

@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 const primaryBtn =
   'inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-black px-6 text-xs font-semibold text-white transition-colors hover:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black';
 const outlineBtn =
-  'inline-flex h-10 items-center justify-center gap-1.5 rounded-full border border-[#e4e4e7] bg-white px-5 text-xs font-semibold text-black transition-colors hover:border-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black';
+  'inline-flex h-10 items-center justify-center gap-1.5 rounded-full border border-hairline-light bg-white px-5 text-xs font-semibold text-black transition-colors hover:border-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black';
 
 const Shell: React.FC<React.PropsWithChildren<{ testId: string }>> = ({ testId, children }) => (
   <Card
@@ -22,7 +22,7 @@ const Shell: React.FC<React.PropsWithChildren<{ testId: string }>> = ({ testId, 
 /** Shop chưa có đơn nào (Đơn bán #4) — kèm mẹo kích hoạt đơn đầu tiên. */
 export const SellerOrdersEmpty: React.FC<{ onReload: () => void; reloading?: boolean }> = ({ onReload, reloading }) => (
   <Shell testId="seller-orders-empty">
-    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[#e4e4e7] bg-[#fbfbf5] text-zinc-500">
+    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-hairline-light bg-canvas-cream text-zinc-500">
       <ShoppingBag className="h-6 w-6" aria-hidden="true" />
     </div>
     <div className="space-y-1.5">
@@ -33,7 +33,7 @@ export const SellerOrdersEmpty: React.FC<{ onReload: () => void; reloading?: boo
       </p>
     </div>
 
-    <div className="mx-auto flex max-w-md items-start gap-3 rounded-xl border border-[#e4e4e7] bg-[#fbfbf5] px-4 py-3 text-left">
+    <div className="mx-auto flex max-w-md items-start gap-3 rounded-xl border border-hairline-light bg-canvas-cream px-4 py-3 text-left">
       <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#0f5132]" aria-hidden="true" />
       <div className="min-w-0 flex-1 space-y-0.5">
         <p className="text-xs font-semibold text-black">Mẹo kích hoạt đơn hàng đầu tiên</p>

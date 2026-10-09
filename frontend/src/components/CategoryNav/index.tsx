@@ -71,10 +71,10 @@ export const CategoryNav: React.FC<CategoryNavProps> = ({
         aria-pressed={isAllSelected}
         aria-current={isAllSelected ? 'page' : undefined}
         onClick={() => handleSelect('')}
-        className={`shrink-0 min-h-[44px] px-5 rounded-full text-sm font-medium inline-flex items-center justify-center transition-colors ${
+        className={`shrink-0 min-h-[44px] px-5 rounded-full text-sm font-medium inline-flex items-center justify-center transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 ${
           isAllSelected
-            ? 'bg-[#c1fbd4] text-black shadow-sm'
-            : 'bg-white text-zinc-700 border border-[#e4e4e7] hover:bg-zinc-50 hover:text-black'
+            ? 'bg-aloe text-black shadow-xs'
+            : 'bg-white text-zinc-700 border border-hairline-light hover:bg-zinc-50 hover:text-black'
         }`}
       >
         Tất cả
@@ -89,10 +89,10 @@ export const CategoryNav: React.FC<CategoryNavProps> = ({
             aria-pressed={isSelected}
             aria-current={isSelected ? 'page' : undefined}
             onClick={() => handleSelect(cat.slug)}
-            className={`shrink-0 min-h-[44px] px-5 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-colors ${
+            className={`shrink-0 min-h-[44px] px-5 rounded-full text-sm font-medium inline-flex items-center gap-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 ${
               isSelected
-                ? 'bg-[#c1fbd4] text-black shadow-sm'
-                : 'bg-white text-zinc-700 border border-[#e4e4e7] hover:bg-zinc-50 hover:text-black'
+                ? 'bg-aloe text-black shadow-xs'
+                : 'bg-white text-zinc-700 border border-hairline-light hover:bg-zinc-50 hover:text-black'
             }`}
           >
             {cat.imageUrl && (

@@ -48,7 +48,7 @@ const CartGroupCard: React.FC<CartGroupCardProps> = ({ group, busyProductId, onC
       <Separator />
 
       <CardContent className="p-0">
-        <ul className="divide-y divide-[#e4e4e7]">
+        <ul className="divide-y divide-hairline-light">
           {items.map((item) => (
             <CartItemRow
               key={item.product.id}
@@ -64,10 +64,10 @@ const CartGroupCard: React.FC<CartGroupCardProps> = ({ group, busyProductId, onC
       <Separator />
 
       <footer className="flex items-center justify-between gap-3 px-5 py-3.5 text-[11px] text-zinc-500">
-        <span>{items.length} mặt hàng từ gian này</span>
+        <span className="tabular-nums">{items.length} mặt hàng từ gian này</span>
         <span>
           Tạm tính ({shopName}):{' '}
-          <strong data-testid="cart-group-subtotal" className="text-xs font-bold text-black">
+          <strong data-testid="cart-group-subtotal" className="text-xs font-bold text-black tabular-nums">
             {formatVnd(subtotal)}
           </strong>
         </span>

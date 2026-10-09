@@ -66,7 +66,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   return (
     <div
       data-testid="image-uploader"
-      className="flex flex-col gap-4 bg-white rounded-xl p-5 sm:p-6 border border-[#e4e4e7] shadow-card"
+      className="flex flex-col gap-4 bg-white rounded-xl p-5 sm:p-6 border border-hairline-light shadow-card"
     >
       {/* Header & Counter */}
       <div className="flex flex-col gap-1">
@@ -76,7 +76,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
           </h2>
           <span
             data-testid="photo-counter"
-            className="text-[11px] font-medium text-zinc-600 px-2.5 py-0.5 bg-[#fbfbf5] border border-[#e4e4e7] rounded-full"
+            className="text-[11px] font-medium text-zinc-600 px-2.5 py-0.5 bg-canvas-cream border border-hairline-light rounded-full"
           >
             {images.length}/{MAX_IMAGES} ảnh
           </span>
@@ -103,11 +103,11 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
           onClick={() => !disabled && !isUploading && fileInputRef.current?.click()}
-          className={`group relative flex flex-col items-center justify-center p-6 rounded-xl border border-dashed border-[#e4e4e7] bg-[#fbfbf5] hover:bg-zinc-50 transition-all cursor-pointer text-center ${
+          className={`group relative flex flex-col items-center justify-center p-6 rounded-xl border border-dashed border-hairline-light bg-canvas-cream hover:bg-zinc-50 transition-all cursor-pointer text-center ${
             disabled ? 'opacity-50 cursor-not-allowed' : ''
           }`}
         >
-          <div className="w-10 h-10 rounded-full bg-white border border-[#e4e4e7] flex items-center justify-center text-black shadow-xs mb-2 group-hover:scale-105 transition-transform">
+          <div className="w-10 h-10 rounded-full bg-white border border-hairline-light flex items-center justify-center text-black shadow-xs mb-2 group-hover:scale-105 transition-transform">
             {isUploading ? (
               <Loader2 className="w-5 h-5 animate-spin text-black" />
             ) : (
@@ -138,7 +138,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
           <div
             key={url + idx}
             data-testid={`image-slot-${idx}`}
-            className="relative group aspect-square rounded-lg overflow-hidden bg-zinc-100 border border-[#e4e4e7] shadow-xs"
+            className="relative group aspect-square rounded-lg overflow-hidden bg-zinc-100 border border-hairline-light shadow-xs"
           >
             <img
               src={url}
@@ -146,7 +146,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
               className="w-full h-full object-cover"
             />
             {idx === 0 && (
-              <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full bg-[#c1fbd4] text-black text-[10px] font-semibold shadow-xs">
+              <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full bg-aloe text-black text-[10px] font-semibold shadow-xs">
                 Ảnh bìa
               </div>
             )}
@@ -169,7 +169,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
             <div
               key={`empty-${i}`}
               onClick={() => !disabled && !isUploading && fileInputRef.current?.click()}
-              className={`aspect-square rounded-lg bg-[#fbfbf5] border border-dashed border-[#e4e4e7] flex flex-col items-center justify-center text-zinc-400 transition-colors ${
+              className={`aspect-square rounded-lg bg-canvas-cream border border-dashed border-hairline-light flex flex-col items-center justify-center text-zinc-400 transition-colors ${
                 disabled
                   ? 'opacity-40 cursor-not-allowed'
                   : 'hover:text-black hover:border-zinc-400 cursor-pointer'

@@ -33,11 +33,11 @@ export const ProductTable: React.FC<ProductTableProps> = ({
   isTogglingId,
 }) => {
   return (
-    <div className="bg-white border border-[#e4e4e7] rounded-xl overflow-hidden shadow-card">
+    <div className="bg-white border border-hairline-light rounded-xl overflow-hidden shadow-card">
       <div className="overflow-x-auto">
         <Table className="min-w-[760px]">
           <TableHeader>
-            <TableRow className="bg-[#fbfbf5]/60 hover:bg-[#fbfbf5]/60 border-b border-[#e4e4e7] text-zinc-500 text-xs font-semibold uppercase tracking-wider">
+            <TableRow className="bg-canvas-cream/60 hover:bg-canvas-cream/60 border-b border-hairline-light text-zinc-500 text-xs font-semibold uppercase tracking-wider">
               <TableHead className="py-3.5 px-5">Sản phẩm</TableHead>
               <TableHead className="py-3.5 px-4">Danh mục</TableHead>
               <TableHead className="py-3.5 px-4">Giá</TableHead>
@@ -48,7 +48,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
           </TableHeader>
           <TableBody
             id="productTableBody"
-            className="divide-y divide-[#e4e4e7] text-xs text-zinc-900"
+            className="divide-y divide-hairline-light text-xs text-zinc-900"
           >
             {products.map((product) => {
               const categoryName =
@@ -64,7 +64,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                 <TableRow
                   key={product.id}
                   data-testid={`product-row-${product.id}`}
-                  className="hover:bg-[#fbfbf5]/40 transition-colors"
+                  className="hover:bg-canvas-cream/40 transition-colors"
                 >
                   {/* Name and Image */}
                   <TableCell className="py-4 px-5">
@@ -72,7 +72,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                       <img
                         src={firstImage}
                         alt={product.name}
-                        className="w-10 h-10 rounded-md object-cover bg-zinc-100 border border-[#e4e4e7] shrink-0 mt-0.5"
+                        className="w-10 h-10 rounded-md object-cover bg-zinc-100 border border-hairline-light shrink-0 mt-0.5"
                       />
                       <div className="min-w-0">
                         <span
@@ -99,12 +99,12 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                   </TableCell>
 
                   {/* Price */}
-                  <TableCell className="py-4 px-4 font-semibold text-black whitespace-nowrap">
+                  <TableCell className="py-4 px-4 font-semibold text-black whitespace-nowrap tabular-nums">
                     {formatVND(product.price)}
                   </TableCell>
 
                   {/* Stock */}
-                  <TableCell className="py-4 px-4 whitespace-nowrap">
+                  <TableCell className="py-4 px-4 whitespace-nowrap tabular-nums">
                     {product.stock > 0 ? (
                       <span>{product.stock}</span>
                     ) : (
@@ -112,7 +112,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                         <span>0</span>
                         <Badge
                           variant="secondary"
-                          className="bg-[#fbfbf5] text-zinc-600 text-[11px] px-2 py-0.5 font-medium border border-[#e4e4e7]"
+                          className="bg-canvas-cream text-zinc-600 text-[11px] px-2 py-0.5 font-medium border border-hairline-light"
                         >
                           Hết hàng
                         </Badge>
@@ -132,14 +132,14 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                     ) : product.isActive ? (
                       <Badge
                         variant="aloe"
-                        className="px-3 py-1 text-[11px] font-semibold bg-[#c1fbd4] text-black"
+                        className="px-3 py-1 text-[11px] font-semibold bg-aloe text-black"
                       >
                         Đang bán
                       </Badge>
                     ) : (
                       <Badge
                         variant="muted"
-                        className="px-3 py-1 text-[11px] font-medium bg-[#e4e4e7] text-zinc-700"
+                        className="px-3 py-1 text-[11px] font-medium bg-hairline-light text-zinc-700"
                       >
                         Đã ẩn
                       </Badge>
@@ -167,7 +167,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                             disabled
                             aria-disabled="true"
                             aria-label="Sản phẩm bị khóa"
-                            className="w-9 h-5 rounded-full p-0.5 bg-[#e4e4e7] opacity-50 cursor-not-allowed flex items-center"
+                            className="w-9 h-5 rounded-full p-0.5 bg-hairline-light opacity-50 cursor-not-allowed flex items-center"
                           >
                             <span className="block w-4 h-4 rounded-full bg-zinc-400" />
                           </button>
@@ -189,7 +189,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                           }
                           className={cn(
                             'toggle-btn w-9 h-5 rounded-full p-0.5 transition-colors relative cursor-pointer',
-                            product.isActive ? 'bg-[#c1fbd4]' : 'bg-[#d4d4d8]',
+                            product.isActive ? 'bg-aloe' : 'bg-shade-30',
                             isToggling && 'opacity-60 cursor-wait'
                           )}
                         >

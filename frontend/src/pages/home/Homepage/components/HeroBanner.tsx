@@ -4,9 +4,9 @@ import React from 'react';
 const HeroBanner: React.FC = () => (
   <section
     aria-label="Giới thiệu"
-    className="rounded-2xl border border-[#e4e4e7] bg-pistachio px-6 py-8 sm:px-10 sm:py-10"
+    className="rounded-2xl border border-hairline-light bg-pistachio px-6 py-8 sm:px-10 sm:py-10"
   >
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#e4e4e7] bg-white/80 px-3 py-1 text-[11px] font-medium text-zinc-700">
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-hairline-light bg-white/80 px-3 py-1 text-[11px] font-medium text-zinc-700">
       <span className="h-1.5 w-1.5 rounded-full bg-zinc-600" aria-hidden="true" />
       Tuyển chọn độc quyền
     </span>

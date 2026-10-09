@@ -13,7 +13,7 @@ interface ResultHeaderProps {
 }
 
 const iconWrap: Record<ResultTone, string> = {
-  success: 'bg-[#c1fbd4] text-black',
+  success: 'bg-aloe text-black',
   danger: 'border border-red-200 bg-red-50 text-red-500',
   pending: 'bg-zinc-100 text-zinc-600',
 };
@@ -35,7 +35,7 @@ const ResultHeader: React.FC<ResultHeaderProps> = ({ tone, title, description, c
     {chip && (
       <p
         data-testid="result-chip"
-        className="mx-auto inline-flex rounded-full bg-[#c1fbd4] px-3 py-1 text-[11px] font-semibold text-[#0f5132]"
+        className="mx-auto inline-flex rounded-full bg-aloe px-3 py-1 text-[11px] font-semibold text-[#0f5132]"
       >
         {chip}
       </p>

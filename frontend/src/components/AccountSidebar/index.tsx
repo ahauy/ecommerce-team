@@ -7,7 +7,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { userService } from '@/services/user.service';
 
 const itemBase =
-  'flex items-center gap-2.5 rounded-full px-3 py-2 text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black';
+  'flex items-center gap-2.5 rounded-full px-3 py-2 text-xs font-medium transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black';
 
 /**
  * Menu tài khoản của người mua (Hồ sơ · Đơn mua · Kênh người bán) — cột trái trang "Đơn mua".
@@ -23,10 +23,10 @@ const AccountSidebar: React.FC = () => {
     <aside
       data-testid="account-sidebar"
       aria-label="Menu tài khoản"
-      className="w-full rounded-2xl border border-[#e4e4e7] bg-white p-4 shadow-card lg:sticky lg:top-24 lg:w-[240px] lg:shrink-0"
+      className="w-full rounded-2xl border border-hairline-light bg-white p-4 shadow-card lg:sticky lg:top-24 lg:w-[240px] lg:shrink-0"
     >
       <div className="flex items-center gap-3 px-2 pb-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#e4e4e7] bg-zinc-100 text-sm font-semibold text-zinc-900">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-hairline-light bg-zinc-100 text-sm font-semibold text-zinc-900">
           {initial}
         </div>
         <div className="min-w-0">
@@ -39,7 +39,7 @@ const AccountSidebar: React.FC = () => {
         <NavLink
           to={BaseUrl.AccountProfile}
           className={({ isActive }) =>
-            cn(itemBase, 'whitespace-nowrap', isActive ? 'bg-[#c1fbd4] text-black' : 'text-zinc-600 hover:bg-zinc-50 hover:text-black')
+            cn(itemBase, 'whitespace-nowrap', isActive ? 'bg-aloe text-black' : 'text-zinc-600 hover:bg-zinc-50 hover:text-black')
           }
         >
           <UserIcon className="h-4 w-4 shrink-0" aria-hidden="true" />
@@ -49,7 +49,7 @@ const AccountSidebar: React.FC = () => {
         <NavLink
           to={BaseUrl.AccountOrders}
           className={({ isActive }) =>
-            cn(itemBase, 'whitespace-nowrap', isActive ? 'bg-[#c1fbd4] text-black' : 'text-zinc-600 hover:bg-zinc-50 hover:text-black')
+            cn(itemBase, 'whitespace-nowrap', isActive ? 'bg-aloe text-black' : 'text-zinc-600 hover:bg-zinc-50 hover:text-black')
           }
         >
           <ShoppingBag className="h-4 w-4 shrink-0" aria-hidden="true" />

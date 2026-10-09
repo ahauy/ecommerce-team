@@ -29,8 +29,8 @@ const SellerOrderStatusTabs: React.FC<SellerOrderStatusTabsProps> = ({ value, on
           className={cn(
             'flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-4 text-xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black',
             active
-              ? 'bg-[#c1fbd4] font-semibold text-black shadow-xs'
-              : 'border border-[#e4e4e7] bg-white font-medium text-zinc-700 hover:border-zinc-400'
+              ? 'bg-aloe font-semibold text-black shadow-xs'
+              : 'border border-hairline-light bg-white font-medium text-zinc-700 hover:border-zinc-400'
           )}
         >
           <span>{tab.label}</span>

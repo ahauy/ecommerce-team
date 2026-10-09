@@ -40,7 +40,7 @@ const SellerOrderCard: React.FC<SellerOrderCardProps> = ({ order, onView, onActi
     <article
       data-testid="seller-order-card"
       aria-label={`Đơn ${order.orderCode}`}
-      className="rounded-2xl border border-[#e4e4e7] bg-white shadow-card"
+      className="rounded-2xl border border-hairline-light bg-white shadow-card"
     >
       <header className="flex items-start justify-between gap-3 px-5 pt-5 sm:px-6">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-0.5">
@@ -74,9 +74,11 @@ const SellerOrderCard: React.FC<SellerOrderCardProps> = ({ order, onView, onActi
               <OrderItemThumb src={item.imageUrl} alt={item.name} />
               <div className="min-w-0 flex-1">
                 <p className="line-clamp-2 text-xs font-medium text-black">{item.name}</p>
-                <p className="mt-0.5 text-[11px] text-zinc-500">Số lượng: {item.quantity}</p>
+                <p className="mt-0.5 text-[11px] text-zinc-500">
+                  Số lượng: <span className="tabular-nums">{item.quantity}</span>
+                </p>
               </div>
-              <p className="shrink-0 text-xs font-medium text-black">{formatVnd(item.price * item.quantity)}</p>
+              <p className="shrink-0 text-xs font-medium text-black tabular-nums">{formatVnd(item.price * item.quantity)}</p>
             </li>
           ))}
         </ul>
@@ -88,11 +90,11 @@ const SellerOrderCard: React.FC<SellerOrderCardProps> = ({ order, onView, onActi
         </p>
       )}
 
-      <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e4e4e7] px-5 py-4 sm:px-6">
+      <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-hairline-light px-5 py-4 sm:px-6">
         <div className="flex items-center gap-2.5">
           <p className="text-xs text-zinc-600">
             Tổng tiền{' '}
-            <span data-testid="seller-order-total" className="ml-1 text-base font-semibold text-black">
+            <span data-testid="seller-order-total" className="ml-1 text-base font-semibold text-black tabular-nums">
               {formatVnd(order.totalAmount)}
             </span>
           </p>
@@ -105,7 +107,7 @@ const SellerOrderCard: React.FC<SellerOrderCardProps> = ({ order, onView, onActi
             data-testid="action-view"
             aria-label={`Xem chi tiết ${order.orderCode}`}
             onClick={() => onView(order)}
-            className="inline-flex h-9 items-center justify-center rounded-full px-3 text-xs font-medium text-zinc-600 transition-colors hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+            className="inline-flex h-9 items-center justify-center rounded-full px-3 text-xs font-medium text-zinc-600 transition-colors duration-150 hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
           >
             Xem chi tiết
           </button>

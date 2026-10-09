@@ -36,7 +36,7 @@ export const PendingView: React.FC<{ checkout: CheckoutResult }> = ({ checkout }
       title="Đang xác nhận thanh toán..."
       description={`Hệ thống đang kết nối với cổng ${PAYMENT_GATEWAY} để kiểm tra trạng thái giao dịch. Quá trình này có thể mất vài giây, vui lòng không tắt trình duyệt.`}
     />
-    <dl className="mx-auto max-w-sm space-y-3 rounded-2xl border border-[#e4e4e7] bg-white p-5 shadow-card">
+    <dl className="mx-auto max-w-sm space-y-3 rounded-2xl border border-hairline-light bg-white p-5 shadow-card">
       <Row label="Cổng thanh toán">{PAYMENT_GATEWAY}</Row>
       <Row label="Mã thanh toán">
         <span className="font-mono text-[11px]">{checkout.checkoutCode}</span>
@@ -68,7 +68,7 @@ export const FailedView: React.FC<{ checkout: CheckoutResult; kind: 'failed' | '
     <div data-testid={`result-${kind}`} className="space-y-8">
       <ResultHeader tone="danger" title={copy.title} description={copy.description} />
 
-      <div className="space-y-4 rounded-2xl border border-[#e4e4e7] bg-white p-5 shadow-card">
+      <div className="space-y-4 rounded-2xl border border-hairline-light bg-white p-5 shadow-card">
         {copy.notice && (
           <div className="flex items-start gap-3 text-xs leading-relaxed text-zinc-600">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400" aria-hidden="true" />

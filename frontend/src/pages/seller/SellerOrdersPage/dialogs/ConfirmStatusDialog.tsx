@@ -51,7 +51,7 @@ export const ConfirmStatusDialog: React.FC<ConfirmStatusDialogProps> = ({
       {open && copy && order && (
         <DialogContent
           data-testid="confirm-status-dialog"
-          className="max-w-[440px] gap-0 rounded-2xl border-[#e4e4e7] bg-white p-6 sm:rounded-2xl"
+          className="max-w-[440px] gap-0 rounded-2xl border-hairline-light bg-white p-6 sm:rounded-2xl"
           style={{ fontFeatureSettings: '"ss03"' }}
         >
           <DialogTitle className="text-lg font-medium tracking-tight text-black">{copy.title}</DialogTitle>
@@ -59,7 +59,7 @@ export const ConfirmStatusDialog: React.FC<ConfirmStatusDialogProps> = ({
             {copy.question(order.orderCode)}
           </DialogDescription>
 
-          <div className="mt-4 space-y-2.5 rounded-xl border border-[#e4e4e7] bg-[#fbfbf5] px-4 py-3 text-xs">
+          <div className="mt-4 space-y-2.5 rounded-xl border border-hairline-light bg-canvas-cream px-4 py-3 text-xs">
             <p className="flex items-start gap-2 text-zinc-700">
               <User className="mt-0.5 h-3.5 w-3.5 shrink-0 text-zinc-400" aria-hidden="true" />
               <span>
@@ -80,7 +80,7 @@ export const ConfirmStatusDialog: React.FC<ConfirmStatusDialogProps> = ({
             {copy.note}
           </p>
 
-          <div className="mt-5 flex items-center justify-end gap-3 border-t border-[#e4e4e7] pt-4">
+          <div className="mt-5 flex items-center justify-end gap-3 border-t border-hairline-light pt-4">
             <button
               type="button"
               onClick={onClose}

@@ -73,9 +73,9 @@ const InputField = (props: InputFieldProps & AdditionalFormikProps) => {
           aria-invalid={!!msgError}
           aria-describedby={msgError ? `${name}-error` : helperText ? `${name}-hint` : undefined}
           className={twMerge(
-            "w-full rounded-lg border border-[#e4e4e7] bg-white text-sm text-black placeholder:text-zinc-400 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-colors",
+            "w-full rounded-lg border border-hairline-light bg-white text-sm text-black placeholder:text-zinc-400 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:border-black transition-colors duration-150",
             className,
-            msgError && "border-red-500 focus:border-red-500 focus:ring-red-500"
+            msgError && "border-red-500 focus:border-red-500 focus-visible:ring-red-500 focus-visible:border-red-500"
           )}
           {...restPropsInput}
         >

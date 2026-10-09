@@ -7,7 +7,7 @@ const circleClass: Record<OrderStep['state'], string> = {
   done: 'border-black bg-black text-white',
   failed: 'border-red-600 bg-red-600 text-white',
   current: 'border-black bg-white text-black',
-  upcoming: 'border-[#e4e4e7] bg-white text-zinc-400',
+  upcoming: 'border-hairline-light bg-white text-zinc-400',
 };
 
 /** Thanh tiến trình đơn hàng (Đã xác nhận → Đang giao → Đã giao, hoặc nhánh Đã hủy). */
@@ -15,7 +15,7 @@ const OrderStepper: React.FC<{ steps: OrderStep[] }> = ({ steps }) => (
   <section
     data-testid="order-stepper"
     aria-label="Tiến trình đơn hàng"
-    className="rounded-2xl border border-[#e4e4e7] bg-white px-4 py-6 shadow-card sm:px-8"
+    className="rounded-2xl border border-hairline-light bg-white px-4 py-6 shadow-card sm:px-8"
   >
     <ol className="flex w-full items-start">
       {steps.map((step, index) => {
@@ -33,7 +33,7 @@ const OrderStepper: React.FC<{ steps: OrderStep[] }> = ({ steps }) => (
                 aria-hidden="true"
                 className={cn(
                   'absolute left-1/2 top-4 h-px w-full -translate-y-1/2',
-                  step.state === 'done' ? 'bg-black' : 'bg-[#e4e4e7]'
+                  step.state === 'done' ? 'bg-black' : 'bg-hairline-light'
                 )}
               />
             )}

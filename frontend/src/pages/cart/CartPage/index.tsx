@@ -69,7 +69,7 @@ const CartPage: React.FC = () => {
           />
         )}
 
-        <div className="space-y-6 border-b border-[#e4e4e7] pb-6">
+        <div className="space-y-6 border-b border-hairline-light pb-6">
           <PageTitle count={stats.productCount} />
         </div>
 

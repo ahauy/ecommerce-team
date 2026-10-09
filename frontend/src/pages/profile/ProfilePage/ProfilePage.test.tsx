@@ -204,7 +204,7 @@ describe('ProfilePage', () => {
     renderWithProviders(<ProfilePage />);
 
     const mainContent = screen.getByTestId('profile-page');
-    expect(mainContent).toHaveClass('bg-[#fbfbf5]');
+    expect(mainContent).toHaveClass('bg-canvas-cream');
   });
 
   it('uses pill-shaped buttons (rounded-full)', () => {
@@ -282,7 +282,7 @@ describe('ProfilePage', () => {
     renderWithProviders(<ProfilePage />);
 
     const profileCard = screen.getByTestId('profile-card');
-    expect(profileCard).toHaveClass('border border-[#e4e4e7]');
+    expect(profileCard).toHaveClass('border border-hairline-light');
   });
 
   it('applies Level 3 shadows on cards', () => {

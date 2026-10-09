@@ -82,7 +82,7 @@ export const AdminCategoryPage: React.FC = () => {
   return (
     <div
       data-testid="admin-category-page"
-      className="w-full bg-[#fbfbf5]"
+      className="w-full bg-canvas-cream"
       style={{ fontFeatureSettings: '"ss03"' }}
     >
       <div className="w-full space-y-8">
@@ -110,7 +110,7 @@ export const AdminCategoryPage: React.FC = () => {
 
         {/* Quick Stats Bento Strip */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-xl p-4 border border-[#e4e4e7] shadow-sm">
+          <div className="bg-white rounded-xl p-4 border border-hairline-light shadow-sm">
             <span className="text-xs text-zinc-500 font-medium">Tổng số danh mục</span>
             {isLoading ? (
               <div data-testid="stats-skeleton-total" className="h-8 w-14 bg-zinc-200 rounded-md animate-pulse mt-1" />
@@ -118,7 +118,7 @@ export const AdminCategoryPage: React.FC = () => {
               <div className="text-2xl font-semibold text-black mt-1">{totalCount}</div>
             )}
           </div>
-          <div className="bg-white rounded-xl p-4 border border-[#e4e4e7] shadow-sm">
+          <div className="bg-white rounded-xl p-4 border border-hairline-light shadow-sm">
             <span className="text-xs text-zinc-500 font-medium">Đang hoạt động</span>
             {isLoading ? (
               <div data-testid="stats-skeleton-active" className="h-8 w-14 bg-zinc-200 rounded-md animate-pulse mt-1" />
@@ -126,7 +126,7 @@ export const AdminCategoryPage: React.FC = () => {
               <div className="text-2xl font-semibold text-black mt-1">{activeCount}</div>
             )}
           </div>
-          <div className="bg-white rounded-xl p-4 border border-[#e4e4e7] shadow-sm">
+          <div className="bg-white rounded-xl p-4 border border-hairline-light shadow-sm">
             <span className="text-xs text-zinc-500 font-medium">Đang ẩn</span>
             {isLoading ? (
               <div data-testid="stats-skeleton-hidden" className="h-8 w-14 bg-zinc-200 rounded-md animate-pulse mt-1" />
@@ -134,7 +134,7 @@ export const AdminCategoryPage: React.FC = () => {
               <div className="text-2xl font-semibold text-black mt-1">{hiddenCount}</div>
             )}
           </div>
-          <div className="bg-white rounded-xl p-4 border border-[#e4e4e7] shadow-sm">
+          <div className="bg-white rounded-xl p-4 border border-hairline-light shadow-sm">
             <span className="text-xs text-zinc-500 font-medium">Sản phẩm liên kết</span>
             {isLoading ? (
               <div data-testid="stats-skeleton-products" className="h-8 w-14 bg-zinc-200 rounded-md animate-pulse mt-1" />
@@ -158,7 +158,7 @@ export const AdminCategoryPage: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Tìm kiếm danh mục theo tên hoặc slug..."
-              className="w-full h-11 pl-10 pr-4 bg-white text-black rounded-lg text-sm border border-[#e4e4e7] focus:outline-none focus:border-black transition-colors"
+              className="w-full h-11 pl-10 pr-4 bg-white text-black rounded-lg text-sm border border-hairline-light focus:outline-none focus:border-black transition-colors"
             />
           </div>
 
@@ -174,8 +174,8 @@ export const AdminCategoryPage: React.FC = () => {
               onClick={() => setStatusFilter('all')}
               className={`min-h-[44px] px-4 rounded-full text-xs font-medium inline-flex items-center justify-center transition-colors ${
                 statusFilter === 'all'
-                  ? 'bg-[#c1fbd4] text-black shadow-sm'
-                  : 'bg-white text-zinc-700 border border-[#e4e4e7] hover:bg-zinc-50 hover:text-black'
+                  ? 'bg-aloe text-black shadow-sm'
+                  : 'bg-white text-zinc-700 border border-hairline-light hover:bg-zinc-50 hover:text-black'
               }`}
             >
               Tất cả
@@ -186,8 +186,8 @@ export const AdminCategoryPage: React.FC = () => {
               onClick={() => setStatusFilter('active')}
               className={`min-h-[44px] px-4 rounded-full text-xs font-medium inline-flex items-center justify-center transition-colors ${
                 statusFilter === 'active'
-                  ? 'bg-[#c1fbd4] text-black shadow-sm'
-                  : 'bg-white text-zinc-700 border border-[#e4e4e7] hover:bg-zinc-50 hover:text-black'
+                  ? 'bg-aloe text-black shadow-sm'
+                  : 'bg-white text-zinc-700 border border-hairline-light hover:bg-zinc-50 hover:text-black'
               }`}
             >
               Hoạt động
@@ -198,8 +198,8 @@ export const AdminCategoryPage: React.FC = () => {
               onClick={() => setStatusFilter('hidden')}
               className={`min-h-[44px] px-4 rounded-full text-xs font-medium inline-flex items-center justify-center transition-colors ${
                 statusFilter === 'hidden'
-                  ? 'bg-[#c1fbd4] text-black shadow-sm'
-                  : 'bg-white text-zinc-700 border border-[#e4e4e7] hover:bg-zinc-50 hover:text-black'
+                  ? 'bg-aloe text-black shadow-sm'
+                  : 'bg-white text-zinc-700 border border-hairline-light hover:bg-zinc-50 hover:text-black'
               }`}
             >
               Đang ẩn

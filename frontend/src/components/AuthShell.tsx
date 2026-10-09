@@ -12,7 +12,7 @@ const AuthShell: React.FC<AuthShellProps> = ({
 }) => {
   return (
     <div className="flex min-h-screen flex-col bg-canvas-cream text-zinc-900">
-      <header className="flex h-14 items-center justify-between border-b border-zinc-200 px-5 sm:px-8 bg-white">
+      <header className="flex h-14 items-center justify-between border-b border-hairline-light px-5 sm:px-8 bg-white">
         <Link
           to={BaseUrl.Homepage}
           className="flex items-center gap-1.5 text-[15px] font-medium text-black"
@@ -32,13 +32,13 @@ const AuthShell: React.FC<AuthShellProps> = ({
       <main className="flex flex-1 flex-col lg:flex-row">
         <section className="flex flex-1 items-center justify-center px-6 py-14 sm:px-12">
           <div className="w-full max-w-[400px]">
-            <div className="bg-white rounded-xl border border-zinc-200 shadow-card p-8 sm:p-10">
+            <div className="bg-white rounded-xl border border-hairline-light shadow-card p-8 sm:p-10">
               <div className="mt-8">{children}</div>
             </div>
           </div>
         </section>
 
-        <aside className="hidden items-center justify-center bg-gradient-to-b from-pistachio to-aloe px-12 py-16 lg:flex lg:w-[42%]">
+        <aside className="hidden items-center justify-center bg-aloe px-12 py-16 lg:flex lg:w-[42%]">
           <div className="max-w-[320px]">
             <h2 className="text-[30px] font-semibold leading-[1.3] text-black">
               Mua và bán trên cùng một tài khoản
@@ -51,7 +51,7 @@ const AuthShell: React.FC<AuthShellProps> = ({
         </aside>
       </main>
 
-      <footer className="border-t border-zinc-200 px-5 py-6 sm:px-8 bg-white">
+      <footer className="border-t border-hairline-light px-5 py-6 sm:px-8 bg-white">
         <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
           <div className="max-w-[280px]">
             <p className="text-[15px] font-semibold text-black">TeamShop</p>
