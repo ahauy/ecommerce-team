@@ -7,13 +7,7 @@ const OrderGroup: React.FC<{ group: CheckoutGroup }> = ({ group }) => (
   <section data-testid="order-group" className="space-y-3">
     <div className="flex items-center justify-between gap-3 px-1 text-[11px] text-zinc-500">
       <p className="min-w-0 truncate">
-        {group.checkoutCode ? (
-          <>
-            Thanh toán <span className="font-mono tabular-nums">{group.checkoutCode}</span>
-          </>
-        ) : (
-          'Thanh toán'
-        )}
+        {group.checkoutCode ? `Thanh toán ${group.checkoutCode}` : 'Thanh toán'}
         {formatOrderDateTime(group.createdAt) && ` • ${formatOrderDateTime(group.createdAt)}`}
       </p>
       <p className="shrink-0 tabular-nums">{group.orders.length} đơn hàng</p>

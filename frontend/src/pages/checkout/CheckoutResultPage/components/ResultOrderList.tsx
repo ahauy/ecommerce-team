@@ -35,7 +35,7 @@ export const SuccessOrderList: React.FC<{ orders: CheckoutResultOrder[] }> = ({ 
               <Store className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" aria-hidden="true" />
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold text-black">{order.shopName ?? 'Gian hàng'}</p>
-                <p className="text-[11px] text-zinc-500">Đơn hàng: <span className="font-mono tabular-nums">#{order.orderCode}</span></p>
+                <p className="text-[11px] text-zinc-500 font-mono tabular-nums">Đơn hàng: #{order.orderCode}</p>
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-3">
@@ -72,7 +72,7 @@ export const FailedOrderList: React.FC<{ orders: CheckoutResultOrder[] }> = ({ o
         >
           <div className="min-w-0">
             <p className="truncate text-xs font-semibold text-black">{order.shopName ?? 'Gian hàng'}</p>
-            <p className="text-[11px] text-zinc-500">Mã đơn: <span className="font-mono tabular-nums">#{order.orderCode}</span></p>
+            <p className="text-[11px] text-zinc-500 font-mono tabular-nums">Mã đơn: #{order.orderCode}</p>
           </div>
           <OrderStatusBadge status={order.status} />
         </article>
