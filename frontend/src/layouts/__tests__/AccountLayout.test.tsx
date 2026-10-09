@@ -20,7 +20,7 @@ describe('AccountLayout', () => {
     expect(screen.getByTestId('account-sidebar')).toBeInTheDocument();
     expect(screen.getByTestId('page')).toBeInTheDocument();
     const layout = screen.getByTestId('account-layout');
-    expect(layout).toHaveClass('bg-[#fbfbf5]');
+    expect(layout).toHaveClass('bg-canvas-cream');
     expect(layout.innerHTML).not.toContain('max-w-');
   });
 });

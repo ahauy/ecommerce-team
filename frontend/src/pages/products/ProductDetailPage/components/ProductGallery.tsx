@@ -23,7 +23,7 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({ images, name, soldOut }
     <div data-testid="product-gallery" className="space-y-3">
       <div
         className={cn(
-          'relative aspect-square w-full overflow-hidden rounded-2xl border border-[#e4e4e7]',
+          'relative aspect-square w-full overflow-hidden rounded-2xl border border-hairline-light',
           soldOut ? 'bg-zinc-300' : 'bg-white'
         )}
       >

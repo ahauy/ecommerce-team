@@ -159,9 +159,9 @@ const ProductFormPage: React.FC = () => {
               </div>
 
               {/* Right Column: Product Information Form (7 cols) */}
-              <div className="lg:col-span-7 flex flex-col gap-6 bg-white rounded-xl p-5 sm:p-6 border border-[#e4e4e7] shadow-card">
+              <div className="lg:col-span-7 flex flex-col gap-6 bg-white rounded-xl p-5 sm:p-6 border border-hairline-light shadow-card">
                 {/* Header card with public visibility toggle */}
-                <div className="flex items-center justify-between pb-4 border-b border-[#e4e4e7]">
+                <div className="flex items-center justify-between pb-4 border-b border-hairline-light">
                   <div>
                     <h2 className="text-base sm:text-lg font-semibold text-black">
                       Thông tin sản phẩm
@@ -184,7 +184,7 @@ const ProductFormPage: React.FC = () => {
                       onClick={() => setFieldValue('isActive', !values.isActive)}
                       className={cn(
                         'toggle-btn w-10 h-6 rounded-full p-0.5 transition-colors relative cursor-pointer',
-                        values.isActive ? 'bg-[#c1fbd4]' : 'bg-[#d4d4d8]',
+                        values.isActive ? 'bg-aloe' : 'bg-shade-30',
                         isBlocked && 'opacity-50 cursor-not-allowed'
                       )}
                     >
@@ -212,7 +212,7 @@ const ProductFormPage: React.FC = () => {
                       </label>
                       <span
                         id="name-counter"
-                        className="text-[11px] text-zinc-500 font-mono"
+                        className="text-[11px] text-zinc-500 font-mono tabular-nums"
                       >
                         {values.name.length}/120
                       </span>
@@ -227,7 +227,7 @@ const ProductFormPage: React.FC = () => {
                         'h-10 px-3.5 rounded-lg border bg-white text-xs text-black placeholder:text-zinc-400 focus:outline-none transition-colors',
                         touched.name && errors.name
                           ? 'border-red-500 focus:border-red-500'
-                          : 'border-[#e4e4e7] focus:border-black'
+                          : 'border-hairline-light focus:border-black'
                       )}
                     />
                     <ErrorMessage
@@ -253,7 +253,7 @@ const ProductFormPage: React.FC = () => {
                         'h-10 px-3.5 rounded-lg border bg-white text-xs text-black focus:outline-none transition-colors cursor-pointer',
                         touched.categoryId && errors.categoryId
                           ? 'border-red-500 focus:border-red-500'
-                          : 'border-[#e4e4e7] focus:border-black'
+                          : 'border-hairline-light focus:border-black'
                       )}
                     >
                       <option value="">-- Chọn danh mục sản phẩm --</option>
@@ -292,7 +292,7 @@ const ProductFormPage: React.FC = () => {
                         'p-3.5 rounded-lg border bg-white text-xs text-black placeholder:text-zinc-400 focus:outline-none transition-colors resize-y leading-relaxed',
                         touched.description && errors.description
                           ? 'border-red-500 focus:border-red-500'
-                          : 'border-[#e4e4e7] focus:border-black'
+                          : 'border-hairline-light focus:border-black'
                       )}
                     />
                     <ErrorMessage
@@ -320,10 +320,10 @@ const ProductFormPage: React.FC = () => {
                           min={1}
                           placeholder="350000"
                           className={cn(
-                            'w-full h-10 pl-3.5 pr-8 rounded-lg border bg-white text-xs font-semibold text-black placeholder:text-zinc-400 focus:outline-none transition-colors',
+                            'w-full h-10 pl-3.5 pr-8 rounded-lg border bg-white text-xs font-semibold text-black placeholder:text-zinc-400 focus:outline-none transition-colors tabular-nums',
                             touched.price && errors.price
                               ? 'border-red-500 focus:border-red-500'
-                              : 'border-[#e4e4e7] focus:border-black'
+                              : 'border-hairline-light focus:border-black'
                           )}
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 text-xs font-medium pointer-events-none">
@@ -352,10 +352,10 @@ const ProductFormPage: React.FC = () => {
                         min={0}
                         placeholder="24"
                         className={cn(
-                          'w-full h-10 px-3.5 rounded-lg border bg-white text-xs font-semibold text-black placeholder:text-zinc-400 focus:outline-none transition-colors',
+                          'w-full h-10 px-3.5 rounded-lg border bg-white text-xs font-semibold text-black placeholder:text-zinc-400 focus:outline-none transition-colors tabular-nums',
                           touched.stock && errors.stock
                             ? 'border-red-500 focus:border-red-500'
-                            : 'border-[#e4e4e7] focus:border-black'
+                            : 'border-hairline-light focus:border-black'
                         )}
                       />
                       <ErrorMessage

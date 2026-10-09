@@ -7,9 +7,9 @@ export const EmptyProductsState: React.FC = () => {
   return (
     <div
       data-testid="empty-products-state"
-      className="w-full bg-white rounded-xl border border-[#e4e4e7] p-12 text-center flex flex-col items-center justify-center shadow-card"
+      className="w-full bg-white rounded-xl border border-hairline-light p-12 text-center flex flex-col items-center justify-center shadow-card"
     >
-      <div className="w-16 h-16 rounded-full bg-[#fbfbf5] border border-[#e4e4e7] flex items-center justify-center text-zinc-400 mb-4">
+      <div className="w-16 h-16 rounded-full bg-canvas-cream border border-hairline-light flex items-center justify-center text-zinc-400 mb-4">
         <Package className="w-8 h-8 text-zinc-500" />
       </div>
       <h3 className="text-lg font-semibold text-zinc-900 mb-1">

@@ -45,7 +45,7 @@ export const DeleteWarningDialog: React.FC<DeleteWarningDialogProps> = ({
       <AlertDialogContent
         data-testid="delete-warning-dialog"
         onClick={handleBackdropClick}
-        className="max-w-lg w-full bg-white rounded-2xl p-6 flex flex-col relative border border-[#e4e4e7] shadow-[0_20px_40px_rgba(0,0,0,0.08)]"
+        className="max-w-lg w-full bg-white rounded-2xl p-6 flex flex-col relative border border-hairline-light shadow-card"
         style={{ fontFeatureSettings: '"ss03"' }}
       >
         {/* Top Header */}
@@ -93,9 +93,9 @@ export const DeleteWarningDialog: React.FC<DeleteWarningDialogProps> = ({
             </div>
 
             {/* Category Context Row */}
-            <div className="bg-zinc-50 border border-[#e4e4e7] rounded-xl p-4 flex items-center justify-between my-2">
+            <div className="bg-zinc-50 border border-hairline-light rounded-xl p-4 flex items-center justify-between my-2">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-lg bg-zinc-200 overflow-hidden flex items-center justify-center text-zinc-600 shrink-0 border border-[#e4e4e7]">
+                <div className="w-10 h-10 rounded-lg bg-zinc-200 overflow-hidden flex items-center justify-center text-zinc-600 shrink-0 border border-hairline-light">
                   {category.imageUrl ? (
                     <img src={category.imageUrl} alt="" className="w-full h-full object-cover" />
                   ) : (
@@ -108,14 +108,14 @@ export const DeleteWarningDialog: React.FC<DeleteWarningDialogProps> = ({
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5 px-3 py-1 bg-white border border-[#e4e4e7] rounded-full text-zinc-700 text-xs shadow-sm shrink-0">
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-white border border-hairline-light rounded-full text-zinc-700 text-xs shadow-sm shrink-0">
                 <Package className="w-4 h-4 text-zinc-500" />
                 <span>{category.productCount} sản phẩm liên kết</span>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex justify-end items-center pt-4 mt-4 border-t border-[#e4e4e7]">
+            <div className="flex justify-end items-center pt-4 mt-4 border-t border-hairline-light">
               <button
                 type="button"
                 onClick={onClose}
@@ -130,7 +130,7 @@ export const DeleteWarningDialog: React.FC<DeleteWarningDialogProps> = ({
             {/* Permitted Confirm Mode */}
             <div
               data-testid="permitted-delete-alert"
-              className="bg-zinc-50 border border-[#e4e4e7] rounded-xl p-4 my-3 text-xs text-zinc-700 space-y-1.5 leading-relaxed"
+              className="bg-zinc-50 border border-hairline-light rounded-xl p-4 my-3 text-xs text-zinc-700 space-y-1.5 leading-relaxed"
             >
               <p>
                 Bạn có chắc chắn muốn xóa vĩnh viễn danh mục <strong className="text-black">{category.name}</strong>?
@@ -140,12 +140,12 @@ export const DeleteWarningDialog: React.FC<DeleteWarningDialogProps> = ({
               </p>
             </div>
 
-            <div className="flex justify-end items-center gap-3 pt-4 mt-4 border-t border-[#e4e4e7]">
+            <div className="flex justify-end items-center gap-3 pt-4 mt-4 border-t border-hairline-light">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={isDeleting}
-                className="min-h-[44px] rounded-full border border-[#e4e4e7] px-6 py-2.5 text-xs font-medium text-zinc-700 hover:bg-zinc-100 transition-colors inline-flex items-center justify-center"
+                className="min-h-[44px] rounded-full border border-hairline-light px-6 py-2.5 text-xs font-medium text-zinc-700 hover:bg-zinc-100 transition-colors inline-flex items-center justify-center"
               >
                 Hủy
               </button>

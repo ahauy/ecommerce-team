@@ -12,7 +12,7 @@ const AdminComingSoonPage: React.FC<AdminComingSoonPageProps> = ({ title }) => (
     style={{ fontFeatureSettings: '"ss03"' }}
   >
     <h1 className="text-3xl font-light tracking-tight text-black">{title}</h1>
-    <div className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-[#e4e4e7] bg-white p-12 text-center shadow-sm">
+    <div className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-hairline-light bg-white p-12 text-center shadow-card">
       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 text-zinc-400">
         <Hourglass className="h-6 w-6" />
       </div>

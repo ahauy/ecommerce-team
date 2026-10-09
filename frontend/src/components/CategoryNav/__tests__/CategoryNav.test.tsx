@@ -81,7 +81,7 @@ describe('CategoryNav Component', () => {
     const allBtn = screen.getByRole('button', { name: 'Tất cả' });
     expect(allBtn).toHaveClass('rounded-full');
     expect(allBtn).toHaveClass('min-h-[44px]');
-    expect(allBtn).not.toHaveClass('bg-[#c1fbd4]');
+    expect(allBtn).not.toHaveClass('bg-aloe');
     expect(allBtn).toHaveAttribute('aria-pressed', 'false');
     expect(allBtn).not.toHaveAttribute('aria-current');
 
@@ -89,7 +89,7 @@ describe('CategoryNav Component', () => {
     const giaDungBtn = screen.getByRole('button', { name: 'Gia dụng' });
     expect(giaDungBtn).toHaveClass('rounded-full');
     expect(giaDungBtn).toHaveClass('min-h-[44px]');
-    expect(giaDungBtn).toHaveClass('bg-[#c1fbd4]');
+    expect(giaDungBtn).toHaveClass('bg-aloe');
     expect(giaDungBtn).toHaveAttribute('aria-pressed', 'true');
     expect(giaDungBtn).toHaveAttribute('aria-current', 'page');
 
@@ -97,7 +97,7 @@ describe('CategoryNav Component', () => {
     const thoiTrangBtn = screen.getByRole('button', { name: 'Thời trang' });
     expect(thoiTrangBtn).toHaveClass('rounded-full');
     expect(thoiTrangBtn).toHaveClass('min-h-[44px]');
-    expect(thoiTrangBtn).not.toHaveClass('bg-[#c1fbd4]');
+    expect(thoiTrangBtn).not.toHaveClass('bg-aloe');
     expect(thoiTrangBtn).toHaveAttribute('aria-pressed', 'false');
     expect(thoiTrangBtn).not.toHaveAttribute('aria-current');
 

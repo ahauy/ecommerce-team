@@ -83,7 +83,7 @@ export const ShopSetupForm: React.FC<ShopSetupFormProps> = ({ initialValues, onS
                   Tên gian hàng <span className="text-red-500">*</span>
                 </span>
                 <span
-                  className={`text-xs ${
+                  className={`text-xs tabular-nums ${
                     values.shopName.length > 0 ? 'text-zinc-600' : 'text-zinc-400'
                   }`}
                 >
@@ -142,7 +142,7 @@ export const ShopSetupForm: React.FC<ShopSetupFormProps> = ({ initialValues, onS
             />
 
             {/* Actions */}
-            <div className="pt-4 flex items-center justify-end gap-4 border-t border-[#e4e4e7]">
+            <div className="pt-4 flex items-center justify-end gap-4 border-t border-hairline-light">
               <Button
                 type="submit"
                 disabled={isSubmitting || setupShopMutation.isPending}

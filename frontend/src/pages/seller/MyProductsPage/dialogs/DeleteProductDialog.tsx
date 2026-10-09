@@ -40,7 +40,7 @@ export const DeleteProductDialog: React.FC<DeleteProductDialogProps> = ({
     <AlertDialog open={isOpen} onOpenChange={(open) => !open && !isDeleting && onClose()}>
       <AlertDialogContent
         data-testid="delete-product-dialog"
-        className="max-w-md w-full bg-white rounded-2xl p-6 flex flex-col relative border border-[#e4e4e7] shadow-xl"
+        className="max-w-md w-full bg-white rounded-2xl p-6 flex flex-col relative border border-hairline-light shadow-card"
         style={{ fontFeatureSettings: '"ss03"' }}
       >
         <AlertDialogHeader className="pb-3 text-left">
@@ -65,7 +65,7 @@ export const DeleteProductDialog: React.FC<DeleteProductDialogProps> = ({
           </div>
         </AlertDialogHeader>
 
-        <div className="bg-zinc-50 border border-[#e4e4e7] rounded-xl p-4 my-2 text-xs text-zinc-700 space-y-1.5 leading-relaxed">
+        <div className="bg-zinc-50 border border-hairline-light rounded-xl p-4 my-2 text-xs text-zinc-700 space-y-1.5 leading-relaxed">
           <p>
             Bạn có chắc chắn muốn ẩn sản phẩm{' '}
             <strong className="text-black font-semibold">{product.name}</strong>?
@@ -75,12 +75,12 @@ export const DeleteProductDialog: React.FC<DeleteProductDialogProps> = ({
           </p>
         </div>
 
-        <div className="flex justify-end items-center gap-3 pt-4 mt-2 border-t border-[#e4e4e7]">
+        <div className="flex justify-end items-center gap-3 pt-4 mt-2 border-t border-hairline-light">
           <button
             type="button"
             onClick={onClose}
             disabled={isDeleting}
-            className="min-h-[40px] rounded-full border border-[#e4e4e7] px-5 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-100 transition-colors"
+            className="min-h-[40px] rounded-full border border-hairline-light px-5 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-100 transition-colors"
           >
             Hủy
           </button>

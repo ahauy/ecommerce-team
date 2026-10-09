@@ -20,7 +20,7 @@ interface CheckoutSummaryProps {
 }
 
 const primaryBtn =
-  'inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-black text-sm font-semibold text-white transition-colors hover:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:hover:bg-zinc-300';
+  'inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-black text-sm font-semibold text-white transition-all duration-150 hover:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:hover:bg-zinc-300';
 
 /** Cột phải "Tóm tắt đơn hàng": tổng tiền · VNPay · nút thanh toán. */
 const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
@@ -34,7 +34,7 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
   <aside
     data-testid="checkout-summary"
     aria-label="Tóm tắt đơn hàng"
-    className="space-y-5 rounded-2xl border border-[#e4e4e7] bg-white p-5 shadow-sm lg:sticky lg:top-6"
+    className="space-y-5 rounded-2xl border border-hairline-light bg-white p-5 shadow-card lg:sticky lg:top-6"
   >
     <div className="flex items-center justify-between">
       <h2 className="text-sm font-semibold text-black">{blocked ? 'Tóm tắt thanh toán' : 'Tóm tắt đơn hàng'}</h2>
@@ -47,24 +47,24 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
           {cart.groups.map((group) => (
             <li key={group.seller.id} className="flex items-center justify-between gap-3 text-[11px] text-zinc-600">
               <span className="min-w-0 truncate">
-                {group.seller.shopName ?? 'Gian hàng khác'} ({countPurchasable(group)} sản phẩm)
+                {group.seller.shopName ?? 'Gian hàng khác'} (<span className="tabular-nums">{countPurchasable(group)}</span> sản phẩm)
               </span>
-              <span className="shrink-0 font-medium text-black">{formatVnd(group.subtotal)}</span>
+              <span className="shrink-0 font-medium text-black tabular-nums">{formatVnd(group.subtotal)}</span>
             </li>
           ))}
         </ul>
         {orderCount > 1 && (
-          <p data-testid="checkout-split-note" className="flex items-center gap-1.5 border-t border-[#f0f0f2] pt-3 text-[11px] text-zinc-500">
+          <p data-testid="checkout-split-note" className="flex items-center gap-1.5 border-t border-hairline-light pt-3 text-[11px] text-zinc-500">
             <Clock className="h-3 w-3 shrink-0" aria-hidden="true" />
-            Đơn hàng sẽ được tách thành {orderCount} đơn theo gian hàng
+            Đơn hàng sẽ được tách thành <span className="tabular-nums">{orderCount}</span> đơn theo gian hàng
           </p>
         )}
       </>
     )}
 
-    <div className="flex items-end justify-between gap-3 border-t border-[#f0f0f2] pt-4">
+    <div className="flex items-end justify-between gap-3 border-t border-hairline-light pt-4">
       <span className="text-xs font-medium text-black">{blocked ? 'Tổng cộng' : 'Tổng thanh toán'}</span>
-      <span data-testid="checkout-total" className="text-2xl font-bold leading-none text-black">
+      <span data-testid="checkout-total" className="text-2xl font-bold leading-none text-black tabular-nums">
         {formatVnd(cart.totalAmount)}
       </span>
     </div>
@@ -73,7 +73,7 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
     <div className="space-y-2.5">
       <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Phương thức thanh toán</p>
       {blocked ? (
-        <div className="flex items-center gap-3 rounded-lg border border-[#e4e4e7] bg-[#f6f6f1] px-3 py-2.5 opacity-80">
+        <div className="flex items-center gap-3 rounded-lg border border-hairline-light bg-[#f6f6f1] px-3 py-2.5 opacity-80">
           <span className="text-[10px] font-bold text-zinc-500">VNPAY</span>
           <div className="min-w-0 flex-1">
             <p className="text-[11px] font-medium text-zinc-700">Cổng VNPAY (QR / ATM / Thẻ)</p>
@@ -83,7 +83,7 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
         </div>
       ) : (
         <div className="flex items-center gap-3 rounded-lg border-2 border-emerald-700/70 bg-emerald-50/40 px-3 py-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded border border-[#e4e4e7] bg-white text-[8px] font-extrabold text-blue-700">
+          <span className="flex h-8 w-8 items-center justify-center rounded border border-hairline-light bg-white text-[8px] font-extrabold text-blue-700">
             VNPAY
           </span>
           <div className="min-w-0 flex-1">
@@ -97,7 +97,7 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
       )}
     </div>
 
-    <div className="flex items-start gap-2 rounded-lg bg-[#c1fbd4]/60 px-3 py-2.5 text-[11px] leading-relaxed text-zinc-800">
+    <div className="flex items-start gap-2 rounded-lg bg-aloe/60 px-3 py-2.5 text-[11px] leading-relaxed text-zinc-800">
       <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
       <p>
         {blocked

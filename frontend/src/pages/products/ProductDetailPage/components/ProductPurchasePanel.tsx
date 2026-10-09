@@ -18,11 +18,11 @@ interface ProductPurchasePanelProps {
   onToggleActive: () => void;
 }
 
-const card = 'space-y-4 rounded-2xl border border-[#e4e4e7] bg-white p-4 sm:p-5';
+const card = 'space-y-4 rounded-2xl border border-hairline-light bg-white p-4 sm:p-5';
 const primaryBtn =
-  'inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-black text-sm font-semibold text-white transition-colors hover:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black';
+  'inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-black text-sm font-semibold text-white transition-all duration-150 hover:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black';
 const outlineBtn =
-  'inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-[#e4e4e7] bg-white text-sm font-semibold text-black transition-colors hover:border-black disabled:cursor-not-allowed disabled:text-zinc-400 disabled:hover:border-[#e4e4e7]';
+  'inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-hairline-light bg-white text-sm font-semibold text-black transition-all duration-150 hover:border-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black disabled:cursor-not-allowed disabled:text-zinc-400 disabled:hover:border-hairline-light';
 
 /** Khung mua hàng — thay đổi theo người xem (khách / người mua / chủ shop / admin) và tồn kho. */
 const ProductPurchasePanel: React.FC<ProductPurchasePanelProps> = ({
@@ -111,11 +111,11 @@ const ProductPurchasePanel: React.FC<ProductPurchasePanelProps> = ({
             aria-label="Giảm số lượng"
             disabled={soldOut || quantity <= 1}
             onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-700 transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-700 transition-colors duration-150 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black disabled:cursor-not-allowed disabled:opacity-40"
           >
             <Minus className="h-3.5 w-3.5" />
           </button>
-          <output aria-live="polite" data-testid="qty-value" className="w-9 text-center text-sm font-semibold text-black">
+          <output aria-live="polite" data-testid="qty-value" className="w-9 text-center text-sm font-semibold text-black tabular-nums">
             {soldOut ? 0 : quantity}
           </output>
           <button
@@ -123,7 +123,7 @@ const ProductPurchasePanel: React.FC<ProductPurchasePanelProps> = ({
             aria-label="Tăng số lượng"
             disabled={soldOut || atMax}
             onClick={() => setQuantity((q) => Math.min(stock, q + 1))}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-700 transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-700 transition-colors duration-150 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black disabled:cursor-not-allowed disabled:opacity-40"
           >
             <Plus className="h-3.5 w-3.5" />
           </button>
@@ -131,7 +131,7 @@ const ProductPurchasePanel: React.FC<ProductPurchasePanelProps> = ({
       </div>
 
       {!soldOut && atMax && stock > 1 && (
-        <p className="text-right text-[11px] text-zinc-500">Đã chọn tối đa số lượng còn trong kho ({stock}).</p>
+        <p className="text-right text-[11px] text-zinc-500">Đã chọn tối đa số lượng còn trong kho (<span className="tabular-nums">{stock}</span>).</p>
       )}
 
       {soldOut ? (

@@ -155,7 +155,7 @@ const SellerOrdersPage: React.FC = () => {
         <div className="flex shrink-0 items-center gap-2">
           <Link
             to={BaseUrl.SellerProducts}
-            className="flex h-10 items-center gap-1.5 rounded-full border border-[#e4e4e7] bg-white px-4 text-xs font-semibold text-black transition-colors hover:border-black"
+            className="flex h-10 items-center gap-1.5 rounded-full border border-hairline-light bg-white px-4 text-xs font-semibold text-black transition-colors hover:border-black"
           >
             <Eye className="h-4 w-4" aria-hidden="true" />
             <span>Xem kho hàng</span>

@@ -6,7 +6,7 @@ import { formatVnd } from '@/helpers/format';
 import type { CheckoutResultOrder } from '@/types/checkout-result.types';
 import OrderStatusBadge from '@/pages/orders/components/OrderStatusBadge';
 
-const cardClass = 'rounded-2xl border border-[#e4e4e7] bg-white p-5 shadow-card';
+const cardClass = 'rounded-2xl border border-hairline-light bg-white p-5 shadow-card';
 
 /** "2 sản phẩm (Tên A, Tên B)" — chỉ có khi BE trả `items`; thiếu thì trả null. */
 export const summarizeItems = (order: CheckoutResultOrder): string | null => {
@@ -35,7 +35,7 @@ export const SuccessOrderList: React.FC<{ orders: CheckoutResultOrder[] }> = ({ 
               <Store className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" aria-hidden="true" />
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold text-black">{order.shopName ?? 'Gian hàng'}</p>
-                <p className="text-[11px] text-zinc-500">Đơn hàng: #{order.orderCode}</p>
+                <p className="text-[11px] text-zinc-500">Đơn hàng: <span className="font-mono tabular-nums">#{order.orderCode}</span></p>
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-3">
@@ -48,7 +48,7 @@ export const SuccessOrderList: React.FC<{ orders: CheckoutResultOrder[] }> = ({ 
 
           <div className="mt-3 flex items-center justify-between gap-3 rounded-xl bg-zinc-50 px-4 py-3 text-xs">
             <p className="min-w-0 truncate text-zinc-600">{summary ?? 'Tổng tiền đơn hàng'}</p>
-            <p data-testid="result-order-total" className="shrink-0 font-semibold text-black">
+            <p data-testid="result-order-total" className="shrink-0 font-semibold text-black tabular-nums">
               {formatVnd(order.totalAmount)}
             </p>
           </div>
@@ -68,11 +68,11 @@ export const FailedOrderList: React.FC<{ orders: CheckoutResultOrder[] }> = ({ o
         <article
           key={order.orderCode}
           data-testid="result-order"
-          className="flex items-center justify-between gap-3 rounded-2xl border border-[#e4e4e7] bg-white px-5 py-4 shadow-card"
+          className="flex items-center justify-between gap-3 rounded-2xl border border-hairline-light bg-white px-5 py-4 shadow-card"
         >
           <div className="min-w-0">
             <p className="truncate text-xs font-semibold text-black">{order.shopName ?? 'Gian hàng'}</p>
-            <p className="text-[11px] text-zinc-500">Mã đơn: #{order.orderCode}</p>
+            <p className="text-[11px] text-zinc-500">Mã đơn: <span className="font-mono tabular-nums">#{order.orderCode}</span></p>
           </div>
           <OrderStatusBadge status={order.status} />
         </article>

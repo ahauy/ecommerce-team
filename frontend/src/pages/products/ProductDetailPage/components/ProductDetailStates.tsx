@@ -5,7 +5,7 @@ import BaseUrl from '@/consts/baseUrl';
 
 const Shell: React.FC<React.PropsWithChildren<{ testId: string }>> = ({ testId, children }) => (
   <div data-testid={testId} className="flex min-h-[60vh] w-full items-center justify-center px-4 py-16">
-    <div className="w-full max-w-md space-y-5 rounded-2xl border border-[#e4e4e7] bg-white p-8 text-center shadow-sm">
+    <div className="w-full max-w-md space-y-5 rounded-2xl border border-hairline-light bg-white p-8 text-center shadow-card">
       {children}
     </div>
   </div>

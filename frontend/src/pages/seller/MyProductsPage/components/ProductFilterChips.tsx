@@ -43,8 +43,8 @@ export const ProductFilterChips: React.FC<ProductFilterChipsProps> = ({
             className={cn(
               'h-8 px-4 rounded-full text-xs whitespace-nowrap transition-colors flex items-center gap-1.5',
               isActive
-                ? 'bg-[#c1fbd4] text-black font-semibold shadow-xs'
-                : 'bg-white text-zinc-700 border border-[#e4e4e7] hover:border-zinc-400 font-medium'
+                ? 'bg-aloe text-black font-semibold shadow-xs'
+                : 'bg-white text-zinc-700 border border-hairline-light hover:border-zinc-400 font-medium'
             )}
           >
             <span>{label}</span>
