@@ -14,7 +14,6 @@ import {
   redirectToPayment,
   shortagesToIssues,
   toCheckoutLines,
-  type CheckoutIssue,
 } from '@/helpers/checkout';
 import { getApiMessage } from '@/helpers/apiError';
 import { showError } from '@/helpers/toast';
@@ -43,7 +42,7 @@ const CheckoutPage: React.FC = () => {
   /** Giá trị người nhận người mua đang nhập (null = chưa sửa, dùng hồ sơ). */
   const [draft, setDraft] = useState<RecipientFormValues | null>(null);
   /** Cảnh báo thiếu hàng do BE trả về khi đặt (BR-CHK-002). */
-  const [serverIssues, setServerIssues] = useState<CheckoutIssue[]>([]);
+  const [serverIssues, setServerIssues] = useState<ReturnType<typeof extractStockShortages>>([]);
 
   useEffect(() => {
     document.title = 'Thanh toán | TeamShop';
@@ -94,7 +93,7 @@ const CheckoutPage: React.FC = () => {
         onError: (err) => {
           const shortages = extractStockShortages(err);
           if (cart && shortages.length > 0) {
-            setServerIssues(shortagesToIssues(cart, shortages));
+            setServerIssues(shortages);
             return;
           }
           showError(getApiMessage(err));

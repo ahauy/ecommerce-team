@@ -201,7 +201,6 @@ export class PaymentReconcileService {
 
     const outcome = await this.paymentResult.markPaid(checkout._id, reference);
     if (outcome === 'paid') {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return amount > checkout.totalAmount
         ? PaymentNote.OVERPAID
         : PaymentNote.PAID;
