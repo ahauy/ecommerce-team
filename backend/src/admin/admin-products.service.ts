@@ -9,6 +9,7 @@ import {
   Category,
   CategoryDocument,
 } from '../categories/schemas/category.schema';
+import { docDate } from '../common/utils/doc-date';
 import { escapeRegex } from '../common/utils/escape-regex';
 import { Product, ProductDocument } from '../products/schemas/product.schema';
 import { User, UserDocument } from '../users/schemas/user.schema';
@@ -42,7 +43,7 @@ interface ProductRecord {
   blockReason?: string | null;
   categoryId: Types.ObjectId;
   sellerId: Types.ObjectId;
-  createdAt: Date;
+  createdAt?: Date | null;
 }
 
 interface SellerRecord {
@@ -80,7 +81,7 @@ export class AdminProductsService {
       this.productModel
         .find(filter)
         .select(PRODUCT_FIELDS)
-        .sort({ createdAt: -1, _id: -1 })
+        .sort({ _id: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .lean<ProductRecord[]>()
@@ -209,7 +210,7 @@ export class AdminProductsService {
               isActive: seller.isActive,
             }
           : null,
-        createdAt: p.createdAt.toISOString(),
+        createdAt: docDate(p.createdAt, p._id),
       };
     });
   }

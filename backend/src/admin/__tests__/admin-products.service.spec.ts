@@ -97,7 +97,7 @@ describe('AdminProductsService', () => {
       const result = await service.list(query({ page: 3 }));
 
       expect(productModel.find).toHaveBeenCalledWith({});
-      expect(q.sort).toHaveBeenCalledWith({ createdAt: -1, _id: -1 });
+      expect(q.sort).toHaveBeenCalledWith({ _id: -1 });
       expect(q.skip).toHaveBeenCalledWith(40);
       expect(result).toMatchObject({
         total: 41,
@@ -125,6 +125,20 @@ describe('AdminProductsService', () => {
         },
         createdAt: '2026-10-01T00:00:00.000Z',
       });
+    });
+
+    it('SP được nạp thẳng vào DB, không có createdAt: lấy thời điểm tạo từ _id thay vì lỗi 500', async () => {
+      const legacyId = new Types.ObjectId('6ac5b0448b6dc4e266f17412');
+      productModel.find.mockReturnValue(
+        chain([makeProduct({ _id: legacyId, createdAt: undefined })]),
+      );
+      productModel.countDocuments.mockReturnValue(chain(1));
+
+      const result = await service.list(query());
+
+      expect(result.items[0].createdAt).toBe(
+        legacyId.getTimestamp().toISOString(),
+      );
     });
 
     it('lọc isBlocked, sellerId và tìm theo tên (escape regex)', async () => {
