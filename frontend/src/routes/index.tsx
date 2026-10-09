@@ -32,7 +32,7 @@ import SellerOrdersPage from '@/pages/seller/SellerOrdersPage';
 import AdminLoginPage from '@/pages/admin/AdminLoginPage';
 import AdminProfilePage from '@/pages/admin/AdminProfilePage';
 import AdminCategoryPage from '@/pages/admin/AdminCategoryPage';
-import AdminComingSoonPage from '@/pages/admin/AdminComingSoonPage';
+import AdminProductPage from '@/pages/admin/AdminProductPage';
 import { AdminUserPage } from '@/pages/admin/AdminUserPage';
 
 const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => (
@@ -141,7 +141,7 @@ const AppRoutes = () => {
               />
               <Route
                 path={BaseUrl.AdminProducts}
-                element={<AdminComingSoonPage title="Kiểm duyệt sản phẩm" />}
+                element={<AdminProductPage title="Kiểm duyệt sản phẩm" />}
               />
               <Route path={BaseUrl.AdminProfile} element={<AdminProfilePage />} />
             </Route>

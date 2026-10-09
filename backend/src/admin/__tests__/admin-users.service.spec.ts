@@ -7,11 +7,11 @@ import { User, UserRole } from '../../users/schemas/user.schema';
 import {
   AdminUsersService,
   CANNOT_BAN_SELF,
-  escapeRegex,
   SELLER_BANNED_REASON,
   USER_NOT_FOUND,
 } from '../admin-users.service';
 import { AdminUsersQueryDto } from '../dto/admin-users-query.dto';
+import { escapeRegex } from '../../common/utils/escape-regex';
 
 const ADMIN_ID = new Types.ObjectId().toString();
 const SELLER = new Types.ObjectId();

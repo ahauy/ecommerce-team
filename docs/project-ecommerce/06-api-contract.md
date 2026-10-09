@@ -710,6 +710,58 @@ Xử lý: verify `signature` trên `data` (BR-PAY-003) → ghi `payments` → t�
 | Admin tự khóa chính mình           | 400 `Bạn không thể khóa chính tài khoản của mình` |
 | `:id` sai định dạng                | 400 `Mã người dùng không hợp lệ`           |
 | User không tồn tại                 | 404                                        |
+
+#### GET `/admin/products`
+
+```
+?page=1&limit=20       // limit tối đa 100 (mặc định 20)
+&isBlocked=true        // true = đang bị chặn, false = không bị chặn
+&sellerId=...          // lọc theo người bán
+&search=áo thun        // tìm theo tên sản phẩm (không phân biệt hoa thường)
+// Trả MỌI sản phẩm, kể cả bị ẩn (isActive = false) và bị chặn. Sắp xếp: mới nhất trước
+```
+
+```json
+// Response 200 — mỗi phần tử (PATCH block / unblock cũng trả đúng định dạng này cho SP vừa cập nhật)
+{
+  "id": "...",
+  "name": "Áo thun",
+  "slug": "ao-thun-k3f9a1",
+  "price": 100000,
+  "stock": 5,
+  "imageUrl": "https://res.cloudinary.com/...",
+  "isActive": true,
+  "isBlocked": true,
+  "blockReason": "Hàng giả",          // "seller_banned" nếu bị chặn do khóa người bán
+  "category": { "id": "...", "name": "Thời trang" },
+  "seller": { "id": "...", "fullName": "...", "email": "...", "shopName": "Shop A", "isActive": true },
+  "createdAt": "..."
+}
+// Danh sách: { "items": [...], "total": 41, "page": 1, "limit": 20, "totalPages": 3 }
+```
+
+#### PATCH `/admin/products/:id/block`
+
+```json
+{ "reason": "Hàng giả, vi phạm chính sách sàn" }   // bắt buộc, 5–500 ký tự (đã trim)
+```
+
+| Tình huống | Response |
+| ---------- | -------- |
+| Thiếu / lý do < 5 ký tự | 400 |
+| Lý do đúng bằng `seller_banned` (dành riêng cho hệ thống) | 400 |
+| SP đã bị chặn | 400 `Sản phẩm đã bị chặn` |
+| SP không tồn tại | 404 |
+
+#### PATCH `/admin/products/:id/unblock`
+
+| Tình huống | Response |
+| ---------- | -------- |
+| SP không bị chặn | 400 `Sản phẩm không bị chặn` |
+| SP bị chặn do khóa người bán (`seller_banned`) mà người bán **vẫn đang bị khóa** | 400 — mở khóa người bán trước |
+| SP không tồn tại | 404 |
+
+> Mở chặn chỉ gỡ `isBlocked`. SP mà Seller đã tự ẩn (`isActive = false`) vẫn ẩn sau khi mở chặn.
 > Xóa / sửa Category và quản lý Order dùng các endpoint ở các mục trên.
 
 ---

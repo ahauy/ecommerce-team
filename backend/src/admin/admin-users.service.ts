@@ -5,6 +5,8 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Model, QueryFilter, Types } from 'mongoose';
+import { docDate } from '../common/utils/doc-date';
+import { escapeRegex } from '../common/utils/escape-regex';
 import { Product, ProductDocument } from '../products/schemas/product.schema';
 import { User, UserDocument, UserRole } from '../users/schemas/user.schema';
 import { AdminUserDto, PaginatedAdminUsersDto } from './dto/admin-user.dto';
@@ -24,11 +26,8 @@ interface UserRecord {
   role: UserRole;
   isActive: boolean;
   shop?: { shopName?: string | null; shopSlug?: string | null } | null;
-  createdAt: Date;
+  createdAt?: Date | null;
 }
-
-export const escapeRegex = (text: string): string =>
-  text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 @Injectable()
 export class AdminUsersService {
@@ -79,7 +78,7 @@ export class AdminUsersService {
           ? { shopName: u.shop.shopName, shopSlug: u.shop.shopSlug ?? null }
           : null,
         productCount: productCounts.get(u._id.toString()) ?? 0,
-        createdAt: u.createdAt.toISOString(),
+        createdAt: docDate(u.createdAt, u._id),
       })) satisfies AdminUserDto[],
       total,
       page,

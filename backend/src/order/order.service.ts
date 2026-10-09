@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, QueryFilter, Types } from 'mongoose';
+import { docDate } from '../common/utils/doc-date';
 import { UserRole } from '../users/schemas/user.schema';
 import {
   AdminListOrdersQueryDto,
@@ -52,8 +53,8 @@ interface OrderRecord {
   paymentStatus: PaymentStatus;
   cancelReason: string | null;
   cancelledBy: CancelledBy | null;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
 }
 
 export const ORDER_NOT_FOUND = 'Không tìm thấy đơn hàng';
@@ -294,8 +295,8 @@ export class OrderService {
       },
       cancelReason: o.cancelReason ?? null,
       cancelledBy: o.cancelledBy ?? null,
-      createdAt: o.createdAt.toISOString(),
-      updatedAt: o.updatedAt.toISOString(),
+      createdAt: docDate(o.createdAt, o._id),
+      updatedAt: docDate(o.updatedAt ?? o.createdAt, o._id),
     }));
   }
 }
