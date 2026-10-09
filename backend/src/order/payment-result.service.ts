@@ -122,7 +122,15 @@ export class PaymentResultService {
         .exec();
 
       for (const { _id } of pendingOrders) {
-        await this.restockAndCancel(_id, reason, session);
+        await this.restockAndCancel(
+          _id,
+          {
+            from: OrderStatus.PENDING,
+            cancelledBy: CancelledBy.SYSTEM,
+            reason,
+          },
+          session,
+        );
       }
 
       cancelled = true;
@@ -131,26 +139,26 @@ export class PaymentResultService {
     return cancelled;
   }
 
-  private async restockAndCancel(
+  async restockAndCancel(
     orderId: Types.ObjectId,
-    reason: string,
+    options: { from: OrderStatus; cancelledBy: CancelledBy; reason: string },
     session: ClientSession,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const order = await this.orderModel
       .findOneAndUpdate(
-        { _id: orderId, status: OrderStatus.PENDING },
+        { _id: orderId, status: options.from },
         {
           $set: {
             status: OrderStatus.CANCELLED,
-            cancelledBy: CancelledBy.SYSTEM,
-            cancelReason: reason,
+            cancelledBy: options.cancelledBy,
+            cancelReason: options.reason,
           },
         },
         { session, returnDocument: 'after' },
       )
       .lean<{ items: OrderItem[] }>()
       .exec();
-    if (!order) return;
+    if (!order) return false;
 
     for (const item of order.items) {
       await this.productModel
@@ -161,9 +169,10 @@ export class PaymentResultService {
         )
         .exec();
     }
+    return true;
   }
 
-  private async inTransaction(
+  async inTransaction(
     work: (session: ClientSession) => Promise<void>,
   ): Promise<void> {
     const session = await this.connection.startSession();
