@@ -33,7 +33,7 @@ let _openDialogCount = 0;
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => {
+>(({ className, children, style, ...props }, ref) => {
   const [zIndex, setZIndex] = React.useState(2000);
 
   React.useEffect(() => {
@@ -51,9 +51,13 @@ const DialogContent = React.forwardRef<
       <DialogOverlay style={{ zIndex: zIndex - 1 }} />
       <DialogPrimitive.Content
         ref={ref}
-        style={{ zIndex: zIndex }}
+        style={{ ...style, zIndex: typeof style?.zIndex === 'number' ? style.zIndex : zIndex }}
         className={cn(
+<<<<<<< HEAD
           "fixed left-[50%] top-[50%] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-hairline-light bg-background p-6 shadow-card duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-xl md:w-full",
+=======
+          "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-hairline-light bg-background p-6 shadow-card duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-xl md:w-full",
+>>>>>>> b53379902b0f88e294cf82756021e9b4e6bb7c5e
           className
         )}
         {...props}

@@ -33,6 +33,7 @@ import AdminLoginPage from '@/pages/admin/AdminLoginPage';
 import AdminProfilePage from '@/pages/admin/AdminProfilePage';
 import AdminCategoryPage from '@/pages/admin/AdminCategoryPage';
 import AdminComingSoonPage from '@/pages/admin/AdminComingSoonPage';
+import { AdminUserPage } from '@/pages/admin/AdminUserPage';
 
 const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => (
   <div role="alert" className="p-6 text-center">
@@ -136,7 +137,7 @@ const AppRoutes = () => {
               <Route path={BaseUrl.AdminCategories} element={<AdminCategoryPage />} />
               <Route
                 path={BaseUrl.AdminUsers}
-                element={<AdminComingSoonPage title="Quản lý người dùng" />}
+                element={<AdminUserPage title="Quản lý người dùng" />}
               />
               <Route
                 path={BaseUrl.AdminProducts}
