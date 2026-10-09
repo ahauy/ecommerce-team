@@ -46,7 +46,7 @@ const CancelForm: React.FC<Required<Pick<CancelReasonDialogProps, 'isSubmitting'
         </DialogDescription>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 rounded-xl border border-[#e4e4e7] bg-[#fbfbf5] px-4 py-3 text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 rounded-xl border border-hairline-light bg-canvas-cream px-4 py-3 text-xs">
         <p className="flex items-center gap-1.5 text-zinc-600">
           <User className="h-3.5 w-3.5 text-zinc-400" aria-hidden="true" />
           Người mua: <span className="font-semibold text-black">{order.recipient?.fullName || '—'}</span>
@@ -74,7 +74,7 @@ const CancelForm: React.FC<Required<Pick<CancelReasonDialogProps, 'isSubmitting'
           aria-describedby={showError ? 'cancel-reason-error' : undefined}
           className={cn(
             'min-h-[96px] resize-none rounded-lg bg-white px-3 py-2.5 text-xs placeholder:text-zinc-400',
-            showError ? 'border-red-600 focus-visible:ring-red-200' : 'border-[#e4e4e7] focus-visible:ring-zinc-200'
+            showError ? 'border-red-600 focus-visible:ring-red-200' : 'border-hairline-light focus-visible:ring-zinc-200'
           )}
         />
         {showError && (
@@ -85,7 +85,7 @@ const CancelForm: React.FC<Required<Pick<CancelReasonDialogProps, 'isSubmitting'
         )}
       </div>
 
-      <div className="flex items-start gap-2.5 rounded-xl bg-[#fbfbf5] px-4 py-3 text-[11px] leading-relaxed text-zinc-600">
+      <div className="flex items-start gap-2.5 rounded-xl bg-canvas-cream px-4 py-3 text-[11px] leading-relaxed text-zinc-600">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-zinc-400" aria-hidden="true" />
         <p>Sản phẩm sẽ được hoàn lại kho. Quản trị viên sẽ xử lý hoàn tiền cho người mua.</p>
       </div>
@@ -123,7 +123,7 @@ export const CancelReasonDialog: React.FC<CancelReasonDialogProps> = ({
     {order && (
       <DialogContent
         data-testid="cancel-reason-dialog"
-        className="max-w-[480px] rounded-2xl border-[#e4e4e7] bg-white p-6 sm:rounded-2xl"
+        className="max-w-[480px] rounded-2xl border-hairline-light bg-white p-6 sm:rounded-2xl"
         style={{ fontFeatureSettings: '"ss03"' }}
       >
         <CancelForm order={order} isSubmitting={isSubmitting} onClose={onClose} onConfirm={onConfirm} />

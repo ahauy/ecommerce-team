@@ -75,7 +75,7 @@ const ProfileForm = ({ initialValues }: ProfileFormProps) => {
             placeholder="Nhập địa chỉ"
           />
 
-          <div className="flex justify-end pt-4 border-t border-[#e4e4e7]">
+          <div className="flex justify-end pt-4 border-t border-hairline-light">
             <Button
               type="submit"
               disabled={isSubmitting || !!updateProfileMutation?.isPending}

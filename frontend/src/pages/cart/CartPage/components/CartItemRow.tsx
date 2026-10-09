@@ -16,7 +16,7 @@ interface CartItemRowProps {
 }
 
 const stepBtn =
-  'flex h-7 w-7 items-center justify-center rounded-full text-zinc-700 transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-40';
+  'flex h-7 w-7 items-center justify-center rounded-full text-zinc-700 transition-colors duration-150 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black disabled:cursor-not-allowed disabled:opacity-40';
 
 /** 1 dòng sản phẩm trong giỏ: ảnh · tên/giá/badge · số lượng · thành tiền · xóa. */
 const CartItemRow: React.FC<CartItemRowProps> = ({ item, busy, onChangeQuantity, onRemove }) => {
@@ -59,7 +59,7 @@ const CartItemRow: React.FC<CartItemRowProps> = ({ item, busy, onChangeQuantity,
         >
           {product.name}
         </Link>
-        <p className="text-[11px] text-zinc-500">{formatVnd(product.price)}</p>
+        <p className="text-[11px] text-zinc-500 tabular-nums">{formatVnd(product.price)}</p>
         {label && (
           <span
             data-testid="cart-item-status"
@@ -86,7 +86,7 @@ const CartItemRow: React.FC<CartItemRowProps> = ({ item, busy, onChangeQuantity,
           >
             <Minus className="h-3 w-3" />
           </button>
-          <output aria-live="polite" data-testid="cart-item-qty" className="w-8 text-center text-xs font-semibold text-black">
+          <output aria-live="polite" data-testid="cart-item-qty" className="w-8 text-center text-xs font-semibold text-black tabular-nums">
             {quantity}
           </output>
           <button
@@ -103,7 +103,7 @@ const CartItemRow: React.FC<CartItemRowProps> = ({ item, busy, onChangeQuantity,
         <p
           data-testid="cart-item-total"
           className={cn(
-            'w-28 text-right text-xs font-bold',
+            'w-28 text-right text-xs font-bold tabular-nums',
             purchasable ? 'text-black' : 'text-zinc-400 line-through'
           )}
         >
@@ -115,7 +115,7 @@ const CartItemRow: React.FC<CartItemRowProps> = ({ item, busy, onChangeQuantity,
           aria-label={`Xóa ${product.name} khỏi giỏ hàng`}
           disabled={busy}
           onClick={() => onRemove(item)}
-          className="rounded-full p-1.5 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-full p-1.5 text-zinc-400 transition-colors duration-150 hover:bg-red-50 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black disabled:cursor-not-allowed disabled:opacity-40"
         >
           <Trash2 className="h-4 w-4" />
         </button>

@@ -34,7 +34,7 @@ const PriceInput: React.FC<{
       placeholder={placeholder}
       value={withDots(value)}
       onChange={(e) => onChange(digits(e.target.value))}
-      className="h-10 w-full rounded-lg border border-[#e4e4e7] bg-white pl-3 pr-7 text-sm text-black placeholder:text-zinc-400 focus:border-black focus:outline-none"
+      className="h-10 w-full rounded-lg border border-hairline-light bg-white pl-3 pr-7 text-sm text-black placeholder:text-zinc-400 focus:border-black focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black tabular-nums transition-colors duration-150"
     />
     <span aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400">
       ₫
@@ -122,7 +122,7 @@ const ProductFilterPanel: React.FC<ProductFilterPanelProps> = ({ value, onChange
                   </span>
                   <span className="flex-1 truncate">{cat.name}</span>
                   {typeof cat.productCount === 'number' && (
-                    <span className="text-xs font-normal text-zinc-400">{cat.productCount}</span>
+                    <span className="text-xs font-normal text-zinc-400 tabular-nums">{cat.productCount}</span>
                   )}
                 </button>
               );
@@ -131,7 +131,7 @@ const ProductFilterPanel: React.FC<ProductFilterPanelProps> = ({ value, onChange
         )}
       </section>
 
-      <div className="border-t border-[#ececef]" />
+      <div className="border-t border-hairline-light" />
 
       <section aria-label="Khoảng giá">
         <BlockTitle>Khoảng giá</BlockTitle>
@@ -149,7 +149,7 @@ const ProductFilterPanel: React.FC<ProductFilterPanelProps> = ({ value, onChange
           <button
             type="button"
             onClick={applyPrice}
-            className="mt-3 h-11 w-full rounded-full bg-black text-sm font-semibold text-white transition-colors hover:bg-zinc-800"
+            className="mt-3 h-11 w-full rounded-full bg-black text-sm font-semibold text-white transition-all duration-150 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
           >
             Áp dụng
           </button>

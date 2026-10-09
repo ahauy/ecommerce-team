@@ -25,14 +25,14 @@ const CategoryThumbnail: React.FC<{ imageUrl?: string | null; name: string }> = 
 
   if (!imageUrl || hasError) {
     return (
-      <div className="w-12 h-12 rounded-lg bg-zinc-100 flex items-center justify-center border border-[#e4e4e7]">
+      <div className="w-12 h-12 rounded-lg bg-zinc-100 flex items-center justify-center border border-hairline-light">
         <Folder className="w-5 h-5 text-zinc-400" />
       </div>
     );
   }
 
   return (
-    <div className="w-12 h-12 rounded-lg overflow-hidden bg-zinc-100 flex items-center justify-center border border-[#e4e4e7]">
+    <div className="w-12 h-12 rounded-lg overflow-hidden bg-zinc-100 flex items-center justify-center border border-hairline-light">
       <img
         src={imageUrl}
         alt={name}
@@ -54,7 +54,7 @@ export const AdminCategoryListTable: React.FC<AdminCategoryListTableProps> = ({
       <Card className="w-full p-8 shadow-card">
         <div className="space-y-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="flex items-center justify-between gap-4 py-3 border-b border-[#e4e4e7] last:border-0">
+            <div key={i} className="flex items-center justify-between gap-4 py-3 border-b border-hairline-light last:border-0">
               <div className="flex items-center gap-4">
                 <Skeleton className="w-12 h-12 rounded-lg shrink-0" />
                 <div className="space-y-2">
@@ -92,12 +92,12 @@ export const AdminCategoryListTable: React.FC<AdminCategoryListTableProps> = ({
   return (
     <div
       data-testid="admin-category-table"
-      className="w-full bg-white rounded-xl shadow-card border border-[#e4e4e7] overflow-hidden"
+      className="w-full bg-white rounded-xl shadow-card border border-hairline-light overflow-hidden"
     >
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-zinc-50/50 hover:bg-zinc-50/50 border-b border-[#e4e4e7]">
+            <TableRow className="bg-zinc-50/50 hover:bg-zinc-50/50 border-b border-hairline-light">
               <TableHead className="w-[76px] py-3.5 px-6 text-xs font-semibold text-zinc-500">Ảnh</TableHead>
               <TableHead className="py-3.5 px-6 text-xs font-semibold text-zinc-500">Tên danh mục</TableHead>
               <TableHead className="py-3.5 px-6 text-xs font-semibold text-zinc-500">Đường dẫn (slug)</TableHead>
@@ -106,12 +106,12 @@ export const AdminCategoryListTable: React.FC<AdminCategoryListTableProps> = ({
               <TableHead className="py-3.5 px-6 text-xs font-semibold text-zinc-500 text-right">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody className="divide-y divide-[#e4e4e7] bg-white" data-testid="category-table-body">
+          <TableBody className="divide-y divide-hairline-light bg-white" data-testid="category-table-body">
             {categories.map((category) => (
               <TableRow
                 key={category._id}
                 data-testid={`category-row-${category._id}`}
-                className="hover:bg-[#fbfbf5]/50 transition-colors"
+                className="hover:bg-canvas-cream/50 transition-colors"
               >
                 {/* Ảnh */}
                 <TableCell className="py-4 px-6">
@@ -129,18 +129,18 @@ export const AdminCategoryListTable: React.FC<AdminCategoryListTableProps> = ({
                 </TableCell>
 
                 {/* Số sản phẩm */}
-                <TableCell className="py-4 px-6 text-[14px] text-zinc-800">
+                <TableCell className="py-4 px-6 text-[14px] text-zinc-800 tabular-nums">
                   {category.productCount ?? 0} sản phẩm
                 </TableCell>
 
                 {/* Trạng thái */}
                 <TableCell className="py-4 px-6">
                   {category.isActive ? (
-                    <Badge variant="aloe" className="px-3 py-1 text-[12px] font-medium bg-[#c1fbd4] text-black">
+                    <Badge variant="aloe" className="px-3 py-1 text-[12px] font-medium bg-aloe text-black">
                       Hoạt động
                     </Badge>
                   ) : (
-                    <Badge variant="muted" className="px-3 py-1 text-[12px] font-medium bg-[#d4d4d8] text-[#3f3f46]">
+                    <Badge variant="muted" className="px-3 py-1 text-[12px] font-medium bg-shade-30 text-shade-70">
                       Đang ẩn
                     </Badge>
                   )}
@@ -153,7 +153,7 @@ export const AdminCategoryListTable: React.FC<AdminCategoryListTableProps> = ({
                       type="button"
                       aria-label={`Chỉnh sửa ${category.name}`}
                       onClick={() => onEdit(category)}
-                      className="min-h-[44px] px-4 rounded-full text-xs font-medium bg-transparent text-black border border-[#e4e4e7] hover:bg-zinc-100 inline-flex items-center justify-center transition-colors"
+                      className="min-h-[44px] px-4 rounded-full text-xs font-medium bg-transparent text-black border border-hairline-light hover:bg-zinc-100 inline-flex items-center justify-center transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
                     >
                       Chỉnh sửa
                     </button>
@@ -161,7 +161,7 @@ export const AdminCategoryListTable: React.FC<AdminCategoryListTableProps> = ({
                       type="button"
                       aria-label={`Xóa ${category.name}`}
                       onClick={() => onDelete(category)}
-                      className="min-h-[44px] px-4 rounded-full text-xs font-medium bg-transparent text-red-600 border border-[#e4e4e7] hover:border-red-600 hover:bg-red-50 inline-flex items-center justify-center transition-colors"
+                      className="min-h-[44px] px-4 rounded-full text-xs font-medium bg-transparent text-red-600 border border-hairline-light hover:border-red-600 hover:bg-red-50 inline-flex items-center justify-center transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
                     >
                       Xóa
                     </button>

@@ -12,7 +12,7 @@ const ShopSetupPage: React.FC = () => {
       className="w-full flex items-start justify-center py-4 md:py-8"
       style={{ fontFeatureSettings: '"ss03"' }}
     >
-      <div className="w-full max-w-[640px] bg-white rounded-2xl p-6 sm:p-10 shadow-card border border-[#e4e4e7] space-y-8">
+      <div className="w-full max-w-[640px] bg-white rounded-2xl p-6 sm:p-10 shadow-card border border-hairline-light space-y-8">
         <header className="space-y-2">
           <div className="w-12 h-12 rounded-full bg-pistachio flex items-center justify-center text-black mb-2">
             <Store className="w-6 h-6" />
@@ -39,7 +39,7 @@ const ShopSetupPage: React.FC = () => {
           />
         )}
 
-        <footer className="pt-2 border-t border-[#e4e4e7]">
+        <footer className="pt-2 border-t border-hairline-light">
           <div className="flex items-center gap-2 text-xs text-zinc-500">
             <ShieldCheck className="w-4 h-4 text-zinc-600 shrink-0" />
             <span>Thông tin gian hàng sẽ được hiển thị công khai tới người mua trên toàn hệ thống.</span>

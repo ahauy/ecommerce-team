@@ -21,7 +21,7 @@ export const ProductSearchInput: React.FC<ProductSearchInputProps> = ({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full h-10 pl-10 pr-9 bg-white border border-[#e4e4e7] rounded-lg text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-black transition-colors"
+        className="w-full h-10 pl-10 pr-9 bg-white border border-hairline-light rounded-lg text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-black transition-colors"
       />
       {value && (
         <button

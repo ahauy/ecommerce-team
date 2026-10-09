@@ -23,7 +23,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
       to={productPath(product.id)}
       data-testid="product-card"
       className={cn(
-        'group flex h-full flex-col rounded-2xl border border-[#e4e4e7] bg-white p-2.5 shadow-sm transition-colors hover:border-zinc-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black',
+        'group flex h-full flex-col rounded-2xl border border-hairline-light bg-white p-2.5 shadow-sm transition-colors duration-150 hover:border-zinc-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black',
         className
       )}
     >
@@ -62,7 +62,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
         >
           {product.name}
         </h3>
-        <p className={cn('mt-1.5 text-sm font-bold', soldOut ? 'text-zinc-400' : 'text-black')}>
+        <p className={cn('mt-1.5 text-sm font-bold tabular-nums', soldOut ? 'text-zinc-400' : 'text-black')}>
           {formatVnd(product.price)}
         </p>
 
@@ -80,7 +80,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
 export const ProductCardSkeleton: React.FC = () => (
   <div
     data-testid="product-card-skeleton"
-    className="rounded-2xl border border-[#e4e4e7] bg-white p-2.5 shadow-sm"
+    className="rounded-2xl border border-hairline-light bg-white p-2.5 shadow-sm"
   >
     <div className="aspect-square w-full animate-pulse rounded-xl bg-zinc-100" />
     <div className="space-y-2 px-1 pb-1 pt-3">

@@ -160,13 +160,13 @@ const MyProductsPage: React.FC = () => {
 
       {/* Content State */}
       {isProductsLoading ? (
-        <div className="flex h-64 w-full items-center justify-center bg-white rounded-xl border border-[#e4e4e7]">
+        <div className="flex h-64 w-full items-center justify-center bg-white rounded-xl border border-hairline-light">
           <div className="h-6 w-6 animate-spin rounded-full border-2 border-black border-t-transparent" />
         </div>
       ) : allItems.length === 0 ? (
         <EmptyProductsState />
       ) : filteredProducts.length === 0 ? (
-        <div className="bg-white rounded-xl border border-[#e4e4e7] p-8 text-center text-zinc-500 text-xs">
+        <div className="bg-white rounded-xl border border-hairline-light p-8 text-center text-zinc-500 text-xs">
           Không tìm thấy sản phẩm phù hợp với bộ lọc hiện tại.
         </div>
       ) : (
@@ -191,7 +191,7 @@ const MyProductsPage: React.FC = () => {
                     className={`w-8 h-8 rounded-full text-xs font-semibold flex items-center justify-center transition-colors ${
                       currentPage === p
                         ? 'bg-black text-white shadow-xs'
-                        : 'bg-white border border-[#e4e4e7] text-black hover:border-zinc-400'
+                        : 'bg-white border border-hairline-light text-black hover:border-zinc-400'
                     }`}
                   >
                     {p}

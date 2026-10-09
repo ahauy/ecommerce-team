@@ -32,7 +32,7 @@ const CheckoutOrderCard: React.FC<CheckoutOrderCardProps> = ({ cart, productCoun
           </span>
           Đơn hàng của bạn
         </h2>
-        <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">{productCount} sản phẩm</span>
+        <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-500 tabular-nums">{productCount} sản phẩm</span>
       </CardHeader>
 
       <CardContent className="p-0 space-y-6">
@@ -47,7 +47,7 @@ const CheckoutOrderCard: React.FC<CheckoutOrderCardProps> = ({ cart, productCoun
               </div>
               <Separator />
 
-              <ul className="divide-y divide-[#e4e4e7]">
+              <ul className="divide-y divide-hairline-light">
                 {group.items.map((item) => {
                   const issue = issueById.get(item.product.id);
                   const hasIssue = !!issue || item.status !== 'available';
@@ -85,15 +85,15 @@ const CheckoutOrderCard: React.FC<CheckoutOrderCardProps> = ({ cart, productCoun
                             {product.name}
                           </Link>
                           <p className="text-[11px] text-zinc-500">
-                            Số lượng: <span className={cn(hasIssue && 'font-semibold text-red-600')}>{quantity}</span>
-                            {quantity > 1 && <span className="text-zinc-400"> · Đơn giá: {formatVnd(product.price)}</span>}
+                            Số lượng: <span className={cn('tabular-nums', hasIssue && 'font-semibold text-red-600')}>{quantity}</span>
+                            {quantity > 1 && <span className="text-zinc-400"> · Đơn giá: <span className="tabular-nums">{formatVnd(product.price)}</span></span>}
                           </p>
                         </div>
 
                         <p
                           data-testid="checkout-item-total"
                           className={cn(
-                            'shrink-0 text-xs font-bold',
+                            'shrink-0 text-xs font-bold tabular-nums',
                             item.status === 'available' ? 'text-black' : 'text-zinc-400 line-through'
                           )}
                         >
@@ -134,7 +134,7 @@ const CheckoutOrderCard: React.FC<CheckoutOrderCardProps> = ({ cart, productCoun
                 <Package className="h-3 w-3" aria-hidden="true" />
                 <span>
                   Tạm tính ({shopName}):{' '}
-                  <strong data-testid="checkout-group-subtotal" className="text-xs font-bold text-black">
+                  <strong data-testid="checkout-group-subtotal" className="text-xs font-bold text-black tabular-nums">
                     {formatVnd(group.subtotal)}
                   </strong>
                 </span>

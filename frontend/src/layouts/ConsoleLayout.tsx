@@ -36,8 +36,8 @@ export interface ConsoleLayoutProps {
 
 const VARIANT_STYLES = {
   seller: {
-    badge: "bg-[#c1fbd4] text-black",
-    active: "bg-[#c1fbd4] text-black font-semibold shadow-xs",
+    badge: "bg-aloe text-black",
+    active: "bg-aloe text-black font-semibold shadow-xs",
   },
   admin: {
     badge: "bg-black text-white",
@@ -67,7 +67,7 @@ const SidebarBody: React.FC<SidebarBodyProps> = ({
   return (
     <div className="flex h-full w-full flex-col bg-white">
       {/* Top: Logo + badge (không có link về sàn) */}
-      <div className="border-b border-[#e4e4e7] px-5 py-5">
+      <div className="border-b border-hairline-light px-5 py-5">
         <Link
           to={homeHref}
           onClick={onNavigate}
@@ -109,10 +109,10 @@ const SidebarBody: React.FC<SidebarBodyProps> = ({
               onClick={onNavigate}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex items-center justify-between rounded-full px-3.5 py-2.5 text-xs transition-colors",
+                "flex items-center justify-between rounded-full px-3.5 py-2.5 text-xs transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2",
                 active
                   ? styles.active
-                  : "font-medium text-zinc-600 hover:bg-[#fbfbf5] hover:text-black"
+                  : "font-medium text-zinc-600 hover:bg-canvas-cream hover:text-black"
               )}
             >
               <span className="flex min-w-0 items-center gap-3">
@@ -135,9 +135,9 @@ const SidebarBody: React.FC<SidebarBodyProps> = ({
       </nav>
 
       {/* Footer: thẻ user + Đăng xuất */}
-      <div className="space-y-2 border-t border-[#e4e4e7] p-3">
+      <div className="space-y-2 border-t border-hairline-light p-3">
         <div className="flex items-center gap-3 rounded-xl px-2 py-1.5">
-          <Avatar className="h-9 w-9 ring-1 ring-[#e4e4e7]">
+          <Avatar className="h-9 w-9 ring-1 ring-hairline-light">
             <AvatarFallback className="bg-zinc-100 text-xs font-semibold text-black">
               {initial}
             </AvatarFallback>
@@ -150,7 +150,7 @@ const SidebarBody: React.FC<SidebarBodyProps> = ({
         <button
           type="button"
           onClick={() => void logout()}
-          className="flex w-full items-center gap-3 rounded-full px-3.5 py-2 text-left text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+          className="flex w-full items-center gap-3 rounded-full px-3.5 py-2 text-left text-xs font-medium text-red-600 transition-colors duration-150 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
         >
           <LogOut className="h-4 w-4 shrink-0 text-red-500" />
           <span>Đăng xuất</span>
@@ -184,12 +184,12 @@ const ConsoleLayout: React.FC<ConsoleLayoutProps> = (props) => {
     <div
       className={cn(
         variant === "admin" ? "component:AdminLayout" : "component:SellerLayout",
-        "flex h-screen w-full overflow-hidden bg-[#fbfbf5] text-black antialiased"
+        "flex h-screen w-full overflow-hidden bg-canvas-cream text-black antialiased"
       )}
       style={{ fontFeatureSettings: '"ss03"' }}
     >
       {/* Sidebar cố định 260px (desktop) */}
-      <aside className="hidden h-full w-[260px] shrink-0 border-r border-[#e4e4e7] lg:block">
+      <aside className="hidden h-full w-[260px] shrink-0 border-r border-hairline-light lg:block">
         <SidebarBody {...props} />
       </aside>
 
@@ -203,7 +203,7 @@ const ConsoleLayout: React.FC<ConsoleLayoutProps> = (props) => {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Header tối giản: Breadcrumb + Avatar */}
-        <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[#e4e4e7] bg-white/95 px-4 backdrop-blur sm:px-6 lg:px-8">
+        <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-hairline-light bg-white px-4 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-2">
             <button
               type="button"
@@ -241,7 +241,7 @@ const ConsoleLayout: React.FC<ConsoleLayoutProps> = (props) => {
             <span className="hidden max-w-[140px] truncate text-xs font-medium text-zinc-700 group-hover:text-black sm:block">
               {user?.fullName}
             </span>
-            <Avatar className="h-8 w-8 ring-1 ring-[#e4e4e7] transition-all group-hover:ring-black">
+            <Avatar className="h-8 w-8 ring-1 ring-hairline-light transition-all group-hover:ring-black">
               <AvatarFallback className="bg-zinc-100 text-xs font-semibold text-black">
                 {initial}
               </AvatarFallback>

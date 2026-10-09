@@ -86,11 +86,11 @@ export const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
         side="right"
         data-testid="category-form-drawer"
         aria-describedby={undefined}
-        className="w-full max-w-lg p-0 flex flex-col justify-between overflow-hidden bg-white sm:max-w-lg border-l border-[#e4e4e7] [&>button]:hidden"
+        className="w-full max-w-lg p-0 flex flex-col justify-between overflow-hidden bg-white sm:max-w-lg border-l border-hairline-light [&>button]:hidden"
         style={{ fontFeatureSettings: '"ss03"' }}
       >
         {/* Header */}
-        <SheetHeader className="p-6 bg-white border-b border-[#e4e4e7] flex flex-row items-start justify-between shrink-0 space-y-0 text-left">
+        <SheetHeader className="p-6 bg-white border-b border-hairline-light flex flex-row items-start justify-between shrink-0 space-y-0 text-left">
           <div className="space-y-1 pr-4">
             <SheetTitle id="drawer-title" className="text-2xl font-light text-black tracking-tight leading-snug">
               {isEditMode ? 'Chỉnh sửa danh mục' : 'Thêm danh mục mới'}
@@ -150,7 +150,7 @@ export const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
                     <label htmlFor="cat-slug-input" className="block text-xs font-semibold text-black">
                       Đường dẫn (slug)
                     </label>
-                    <div className="flex items-center h-11 bg-zinc-100 border border-[#e4e4e7] rounded-lg px-3.5 text-zinc-500 cursor-not-allowed">
+                    <div className="flex items-center h-11 bg-zinc-100 border border-hairline-light rounded-lg px-3.5 text-zinc-500 cursor-not-allowed">
                       <span className="text-xs text-zinc-400 select-none">/category/</span>
                       <input
                         id="cat-slug-input"
@@ -183,8 +183,8 @@ export const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
                     <span className="block text-xs font-semibold text-black">
                       Ảnh danh mục (URL)
                     </span>
-                    <div className="flex items-center gap-4 p-3 bg-zinc-50 border border-[#e4e4e7] rounded-lg">
-                      <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-zinc-200 border border-[#e4e4e7] flex items-center justify-center text-zinc-400">
+                    <div className="flex items-center gap-4 p-3 bg-zinc-50 border border-hairline-light rounded-lg">
+                      <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-zinc-200 border border-hairline-light flex items-center justify-center text-zinc-400">
                         {values.imageUrl ? (
                           <img
                             src={values.imageUrl}
@@ -211,7 +211,7 @@ export const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
                             type="button"
                             aria-label="Xóa ảnh"
                             onClick={() => setFieldValue('imageUrl', '')}
-                            className="min-h-[32px] px-3 py-1 rounded-full border border-[#e4e4e7] bg-white text-[11px] text-red-600 hover:bg-red-50 hover:border-red-200 font-medium inline-flex items-center gap-1.5 transition-colors"
+                            className="min-h-[32px] px-3 py-1 rounded-full border border-hairline-light bg-white text-[11px] text-red-600 hover:bg-red-50 hover:border-red-200 font-medium inline-flex items-center gap-1.5 transition-colors"
                           >
                             <Trash2 className="w-3 h-3" />
                             <span>Xóa ảnh</span>
@@ -223,7 +223,7 @@ export const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
                   </div>
 
                   {/* Kích hoạt Switch */}
-                  <div className="pt-2 border-t border-[#e4e4e7]">
+                  <div className="pt-2 border-t border-hairline-light">
                     <FormikField
                       name="isActive"
                       component={SwitchBoxField}
@@ -238,19 +238,19 @@ export const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
                 </div>
 
                 {/* Footer Buttons */}
-                <div className="p-6 flex items-center justify-end gap-3 bg-white border-t border-[#e4e4e7] shrink-0">
+                <div className="p-6 flex items-center justify-end gap-3 bg-white border-t border-hairline-light shrink-0">
                   <button
                     type="button"
                     onClick={onClose}
                     disabled={isSubmitting}
-                    className="min-h-[44px] px-6 py-2.5 rounded-full border border-[#e4e4e7] bg-white text-zinc-700 hover:bg-zinc-100 text-xs font-medium transition-colors inline-flex items-center justify-center"
+                    className="min-h-[44px] px-6 py-2.5 rounded-full border border-hairline-light bg-white text-zinc-700 hover:bg-zinc-100 text-xs font-medium transition-colors duration-150 inline-flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
                   >
                     Hủy
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="min-h-[44px] px-6 py-2.5 rounded-full bg-black text-white text-xs font-medium hover:bg-zinc-800 shadow-sm transition-all inline-flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="min-h-[44px] px-6 py-2.5 rounded-full bg-black text-white text-xs font-medium hover:bg-zinc-800 shadow-sm transition-all duration-150 inline-flex items-center justify-center gap-2 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
                   >
                     {isSubmitting ? (
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

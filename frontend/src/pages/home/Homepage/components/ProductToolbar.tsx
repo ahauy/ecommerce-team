@@ -18,22 +18,22 @@ const ProductToolbar: React.FC<ProductToolbarProps> = ({
   onOpenFilters,
   range,
 }) => (
-  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e4e4e7] pb-4">
+  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-hairline-light pb-4">
     <div className="flex items-center gap-3">
       {/* Mobile: nút mở Drawer */}
       <button
         type="button"
         onClick={onOpenFilters}
-        className="inline-flex h-10 items-center gap-2 rounded-full border border-[#e4e4e7] bg-white px-4 text-xs font-semibold text-zinc-800 shadow-xs transition-colors hover:border-black lg:hidden"
+        className="inline-flex h-10 items-center gap-2 rounded-full border border-hairline-light bg-white px-4 text-xs font-semibold text-zinc-800 shadow-xs transition-colors duration-150 hover:border-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 lg:hidden"
       >
         <SlidersHorizontal className="h-4 w-4" />
-        <span>{activeFilterCount > 0 ? `Bộ lọc (${activeFilterCount})` : 'Bộ lọc'}</span>
+        <span>{activeFilterCount > 0 ? <>Bộ lọc (<span className="tabular-nums">{activeFilterCount}</span>)</> : 'Bộ lọc'}</span>
       </button>
 
       {range && range.total > 0 && (
         <p data-testid="product-range" className="text-sm text-zinc-600">
-          Hiển thị <strong className="font-semibold text-black">{range.from}-{range.to}</strong> /{' '}
-          <strong className="font-semibold text-black">{range.total}</strong> sản phẩm
+          Hiển thị <strong className="font-semibold text-black tabular-nums">{range.from}-{range.to}</strong> /{' '}
+          <strong className="font-semibold text-black tabular-nums">{range.total}</strong> sản phẩm
         </p>
       )}
     </div>
@@ -44,7 +44,7 @@ const ProductToolbar: React.FC<ProductToolbarProps> = ({
         aria-label="Sắp xếp sản phẩm"
         value={sort}
         onChange={(e) => onSortChange(e.target.value as SortOption)}
-        className="h-10 rounded-full border border-[#e4e4e7] bg-white px-4 text-xs font-medium text-black focus:border-black focus:outline-none"
+        className="h-10 rounded-full border border-hairline-light bg-white px-4 text-xs font-medium text-black transition-colors duration-150 focus:border-black focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
       >
         {SORT_OPTIONS.map((o) => (
           <option key={o.value} value={o.value}>

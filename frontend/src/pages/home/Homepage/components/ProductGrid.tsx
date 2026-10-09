@@ -25,7 +25,7 @@ const StateBox: React.FC<{
 }> = ({ testId, icon, title, hint, action }) => (
   <div
     data-testid={testId}
-    className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-[#e4e4e7] bg-white p-12 text-center shadow-sm"
+    className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-hairline-light bg-white p-12 text-center shadow-card"
   >
     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 text-zinc-400">{icon}</div>
     <p className="text-sm font-semibold text-black">{title}</p>
@@ -34,7 +34,7 @@ const StateBox: React.FC<{
       <button
         type="button"
         onClick={action.onClick}
-        className="mt-1 h-10 rounded-full bg-black px-6 text-xs font-semibold text-white transition-colors hover:bg-zinc-800"
+        className="mt-1 h-10 rounded-full bg-black px-6 text-xs font-semibold text-white transition-all duration-150 hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
       >
         {action.label}
       </button>

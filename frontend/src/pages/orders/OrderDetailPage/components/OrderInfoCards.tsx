@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { formatOrderDateTime, getPaymentMethodLabel, PAYMENT_STATUS_LABEL } from '@/helpers/orderHistory';
 import type { MyOrder } from '@/types/order-history.types';
 
-const cardClass = 'rounded-2xl border border-[#e4e4e7] bg-white p-6 shadow-card';
+const cardClass = 'rounded-2xl border border-hairline-light bg-white p-6 shadow-card';
 
 const Row: React.FC<React.PropsWithChildren<{ label: string }>> = ({ label, children }) => (
   <div className="flex items-start justify-between gap-4 text-xs">

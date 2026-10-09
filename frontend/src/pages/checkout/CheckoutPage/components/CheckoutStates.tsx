@@ -9,7 +9,7 @@ const primaryLink =
 const Shell: React.FC<React.PropsWithChildren<{ testId: string }>> = ({ testId, children }) => (
   <div
     data-testid={testId}
-    className="mx-auto w-full max-w-xl space-y-5 rounded-2xl border border-[#e4e4e7] bg-white px-6 py-14 text-center shadow-sm"
+    className="mx-auto w-full max-w-xl space-y-5 rounded-2xl border border-hairline-light bg-white px-6 py-14 text-center shadow-card"
   >
     {children}
   </div>
@@ -100,9 +100,9 @@ export const CheckoutLoadError: React.FC<{ onRetry: () => void }> = ({ onRetry }
 export const CheckoutSkeleton: React.FC = () => (
   <div data-testid="checkout-skeleton" aria-busy="true" className="grid items-start gap-6 lg:grid-cols-[1fr_380px]">
     <div className="space-y-5">
-      <div className="h-64 animate-pulse rounded-2xl border border-[#e4e4e7] bg-white" />
-      <div className="h-80 animate-pulse rounded-2xl border border-[#e4e4e7] bg-white" />
+      <div className="h-64 animate-pulse rounded-2xl border border-hairline-light bg-white" />
+      <div className="h-80 animate-pulse rounded-2xl border border-hairline-light bg-white" />
     </div>
-    <div className="h-96 animate-pulse rounded-2xl border border-[#e4e4e7] bg-white" />
+    <div className="h-96 animate-pulse rounded-2xl border border-hairline-light bg-white" />
   </div>
 );

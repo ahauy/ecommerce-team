@@ -266,7 +266,7 @@ describe('AdminCategoryPage (Stitch Screen 1 & DESIGN.md)', () => {
 
     // Cream canvas
     const pageContainer = screen.getByTestId('admin-category-page');
-    expect(pageContainer).toHaveClass('bg-[#fbfbf5]');
+    expect(pageContainer).toHaveClass('bg-canvas-cream');
 
     // Headline uses brand weight 330
     const headline = screen.getByRole('heading', { level: 1, name: 'Danh mục' });
@@ -280,12 +280,12 @@ describe('AdminCategoryPage (Stitch Screen 1 & DESIGN.md)', () => {
     // Status badges use Aloe-10 and shade-30 / shade-70 tokens
     const row1 = screen.getByTestId('category-row-cat-1');
     const activeBadge = within(row1).getByText('Hoạt động');
-    expect(activeBadge).toHaveClass('bg-[#c1fbd4]');
+    expect(activeBadge).toHaveClass('bg-aloe');
     expect(activeBadge).toHaveClass('text-black');
 
     const row3 = screen.getByTestId('category-row-cat-3');
     const hiddenBadge = within(row3).getByText('Đang ẩn');
-    expect(hiddenBadge).toHaveClass('bg-[#d4d4d8]');
-    expect(hiddenBadge).toHaveClass('text-[#3f3f46]');
+    expect(hiddenBadge).toHaveClass('bg-shade-30');
+    expect(hiddenBadge).toHaveClass('text-shade-70');
   });
 });

@@ -5,7 +5,7 @@ import BaseUrl from '@/consts/baseUrl';
 
 const Page404: React.FC = () => {
   return (
-    <div className="flex h-[100vh] w-[100vw] items-center justify-center bg-[#fbfbf5]">
+    <div className="flex h-[100vh] w-[100vw] items-center justify-center bg-canvas-cream">
       <div className="m-auto flex h-full w-full flex-col items-center justify-center gap-2">
         <h1 className="text-[7rem] font-light leading-tight text-zinc-900">404</h1>
         <span className="font-medium text-zinc-900">Oops! Page Not Found!</span>
