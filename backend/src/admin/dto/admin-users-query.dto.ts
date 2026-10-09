@@ -39,7 +39,9 @@ export class AdminUsersQueryDto {
   @IsEnum(UserRole, { message: 'Vai trò không hợp lệ' })
   role?: UserRole;
 
-  @ApiPropertyOptional({ description: 'true = đang hoạt động, false = bị khóa' })
+  @ApiPropertyOptional({
+    description: 'true = đang hoạt động, false = bị khóa',
+  })
   @IsOptional()
   @Transform(toBoolean)
   @IsBoolean({ message: 'isActive phải là true hoặc false' })

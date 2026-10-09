@@ -1,185 +1,153 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException } from '@nestjs/common';
-import { Types } from 'mongoose';
+import {
+  ExecutionContext,
+  INestApplication,
+  UnauthorizedException,
+  ValidationPipe as NestValidationPipe,
+} from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import request from 'supertest';
+import { App } from 'supertest/types';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../auth/guards/roles.guard';
+import { GlobalExceptionFilter } from '../../common/filters/global-exception.filter';
+import { ResponseInterceptor } from '../../common/interceptors/response.interceptor';
+import { ValidationPipe } from '../../common/pipes/validation.pipe';
+import { UserRole } from '../../users/schemas/user.schema';
 import { AdminUsersController } from '../admin-users.controller';
-import { User, UserDocument } from '../../users/schemas/user.schema';
-import { getModelToken } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { AdminUsersService } from '../admin-users.service';
 
-const mockUser = (
-  overrides: Partial<UserDocument> = {},
-): Partial<UserDocument> => ({
-  _id: new Types.ObjectId('66a1b2c3d4e5f67890123456'),
-  email: 'seller@example.com',
-  password: 'hashed',
-  fullName: 'Seller User',
-  phone: '0901234567',
-  address: null,
-  role: 'customer',
-  isActive: true,
-  refreshToken: null,
-  shop: {
-    shopName: 'Test Shop',
-    shopSlug: 'test-shop',
-    pickupAddress: '123 Test St',
-    phone: '0901234567',
-    joinedAt: new Date('2024-01-15T10:30:00.000Z'),
-  },
-  version: 1,
-  ...overrides,
-});
+const USER_ID = '66a1b2c3d4e5f67890123456';
 
-describe('AdminUsersController', () => {
-  let controller: AdminUsersController;
-  let userModel: jest.Mocked<Model<UserDocument>>;
-  let productModel: any;
+describe('AdminUsersController (HTTP)', () => {
+  let app: INestApplication<App>;
+  let currentUser: { id: string; role: UserRole } | null;
+  const service = { list: jest.fn(), ban: jest.fn(), unban: jest.fn() };
 
-  beforeEach(async () => {
-    productModel = {
-      updateMany: jest.fn().mockReturnValue({
-        exec: jest.fn().mockResolvedValue({ modifiedCount: 3 }),
-      }),
-    };
-
-    const mockUserModel = {
-      findByIdAndUpdate: jest.fn(),
-      db: {
-        models: {
-          Product: productModel,
-        },
-        model: jest.fn().mockReturnValue(productModel),
-        startSession: jest.fn().mockResolvedValue({
-          startTransaction: jest.fn(),
-          commitTransaction: jest.fn(),
-          abortTransaction: jest.fn(),
-          endSession: jest.fn(),
-        }),
-      },
-    };
-
-    const module: TestingModule = await Test.createTestingModule({
+  beforeAll(async () => {
+    const module = await Test.createTestingModule({
       controllers: [AdminUsersController],
       providers: [
-        { provide: getModelToken(User.name), useValue: mockUserModel },
+        { provide: AdminUsersService, useValue: service },
+        RolesGuard,
       ],
-    }).compile();
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useValue({
+        canActivate: (ctx: ExecutionContext) => {
+          if (!currentUser) throw new UnauthorizedException();
+          ctx.switchToHttp().getRequest<{ user: unknown }>().user = currentUser;
+          return true;
+        },
+      })
+      .compile();
 
-    controller = module.get<AdminUsersController>(AdminUsersController);
-    userModel = module.get(getModelToken(User.name));
-    jest.clearAllMocks();
+    app = module.createNestApplication();
+    app.useGlobalPipes(
+      new NestValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+      new ValidationPipe(),
+    );
+    app.useGlobalFilters(new GlobalExceptionFilter());
+    app.useGlobalInterceptors(new ResponseInterceptor());
+    await app.init();
   });
 
-  describe('banUser', () => {
-    it('should ban user and block products', async () => {
-      const user = mockUser({ isActive: true });
-      userModel.findByIdAndUpdate.mockReturnValue({
-        exec: jest.fn().mockResolvedValue({ ...user, isActive: false }),
-      } as any);
+  afterAll(() => app.close());
 
-      const result = await controller.banUser('66a1b2c3d4e5f67890123456');
-
-      expect(result).toEqual({
-        message: 'Đã khóa tài khoản và chặn gian hàng/sản phẩm',
-      });
-      expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith(
-        '66a1b2c3d4e5f67890123456',
-        { isActive: false },
-        { new: true, session: expect.anything() },
-      );
-      expect(productModel.updateMany).toHaveBeenCalledWith(
-        {
-          sellerId: new Types.ObjectId('66a1b2c3d4e5f67890123456'),
-          isBlocked: false,
-        },
-        { isBlocked: true, blockReason: 'seller_banned' },
-        { session: expect.anything() },
-      );
+  beforeEach(() => {
+    jest.resetAllMocks();
+    currentUser = { id: 'admin-1', role: UserRole.ADMIN };
+    service.list.mockResolvedValue({
+      items: [],
+      total: 0,
+      page: 1,
+      limit: 20,
+      totalPages: 0,
     });
-
-    it('should ban user without blocking products if Product model is not registered', async () => {
-      const user = mockUser({ isActive: true });
-      userModel.findByIdAndUpdate.mockReturnValue({
-        exec: jest.fn().mockResolvedValue({ ...user, isActive: false }),
-      } as any);
-
-      const savedModels = (userModel.db as any).models;
-      (userModel.db as any).models = {};
-
-      const result = await controller.banUser('66a1b2c3d4e5f67890123456');
-
-      expect(result).toEqual({
-        message: 'Đã khóa tài khoản và chặn gian hàng/sản phẩm',
-      });
-      expect(productModel.updateMany).not.toHaveBeenCalled();
-
-      (userModel.db as any).models = savedModels;
-    });
-
-    it('should throw NotFoundException when user not found', async () => {
-      userModel.findByIdAndUpdate.mockReturnValue({
-        exec: jest.fn().mockResolvedValue(null),
-      } as any);
-
-      await expect(
-        controller.banUser('66a1b2c3d4e5f67890123456'),
-      ).rejects.toThrow(NotFoundException);
-    });
+    service.ban.mockResolvedValue({ message: 'ok' });
+    service.unban.mockResolvedValue({ message: 'ok' });
   });
 
-  describe('unbanUser', () => {
-    it('should unban user and restore products blocked due to ban', async () => {
-      const user = mockUser({ isActive: false });
-      userModel.findByIdAndUpdate.mockReturnValue({
-        exec: jest.fn().mockResolvedValue({ ...user, isActive: true }),
-      } as any);
+  const http = () => request(app.getHttpServer());
 
-      const result = await controller.unbanUser('66a1b2c3d4e5f67890123456');
+  it('chưa đăng nhập → 401', async () => {
+    currentUser = null;
+    await http().get('/admin/users').expect(401);
+  });
 
-      expect(result).toEqual({
-        message: 'Đã mở khóa tài khoản và khôi phục gian hàng/sản phẩm',
-      });
-      expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith(
-        '66a1b2c3d4e5f67890123456',
-        { isActive: true },
-        { new: true, session: expect.anything() },
-      );
-      expect(productModel.updateMany).toHaveBeenCalledWith(
-        {
-          sellerId: new Types.ObjectId('66a1b2c3d4e5f67890123456'),
-          blockReason: 'seller_banned',
-        },
-        { isBlocked: false, blockReason: null },
-        { session: expect.anything() },
-      );
-    });
+  it('Customer gọi bất kỳ API admin users nào → 403', async () => {
+    currentUser = { id: 'user-1', role: UserRole.CUSTOMER };
 
-    it('should unban user without restoring products if Product model is not registered', async () => {
-      const user = mockUser({ isActive: false });
-      userModel.findByIdAndUpdate.mockReturnValue({
-        exec: jest.fn().mockResolvedValue({ ...user, isActive: true }),
-      } as any);
+    await http().get('/admin/users').expect(403);
+    await http().patch(`/admin/users/${USER_ID}/ban`).expect(403);
+    await http().patch(`/admin/users/${USER_ID}/unban`).expect(403);
 
-      const savedModels = (userModel.db as any).models;
-      (userModel.db as any).models = {};
+    expect(service.ban).not.toHaveBeenCalled();
+    expect(service.unban).not.toHaveBeenCalled();
+  });
 
-      const result = await controller.unbanUser('66a1b2c3d4e5f67890123456');
+  it('GET mặc định page 1, limit 20', async () => {
+    await http().get('/admin/users').expect(200);
 
-      expect(result).toEqual({
-        message: 'Đã mở khóa tài khoản và khôi phục gian hàng/sản phẩm',
-      });
-      expect(productModel.updateMany).not.toHaveBeenCalled();
+    expect(service.list).toHaveBeenCalledWith(
+      expect.objectContaining({ page: 1, limit: 20 }),
+    );
+  });
 
-      (userModel.db as any).models = savedModels;
-    });
+  it.each([
+    ['false', false],
+    ['true', true],
+  ])('?isActive=%s được hiểu đúng là %s', async (raw, expected) => {
+    await http().get(`/admin/users?isActive=${raw}`).expect(200);
 
-    it('should throw NotFoundException when user not found', async () => {
-      userModel.findByIdAndUpdate.mockReturnValue({
-        exec: jest.fn().mockResolvedValue(null),
-      } as any);
+    expect(service.list.mock.calls[0][0].isActive).toBe(expected);
+  });
 
-      await expect(
-        controller.unbanUser('66a1b2c3d4e5f67890123456'),
-      ).rejects.toThrow(NotFoundException);
-    });
+  it('lọc role + search + phân trang', async () => {
+    await http()
+      .get('/admin/users?role=customer&search=%20shop%20a%20&page=2&limit=10')
+      .expect(200);
+
+    expect(service.list).toHaveBeenCalledWith(
+      expect.objectContaining({
+        role: 'customer',
+        search: 'shop a',
+        page: 2,
+        limit: 10,
+      }),
+    );
+  });
+
+  it.each([
+    ['role=seller', 'Vai trò không hợp lệ'],
+    ['isActive=yes', 'isActive phải là true hoặc false'],
+    ['limit=500', 'limit tối đa là 100'],
+  ])('query sai (%s) → 400', async (qs, message) => {
+    const res = await http().get(`/admin/users?${qs}`).expect(400);
+
+    expect(res.body.errors).toContain(message);
+    expect(service.list).not.toHaveBeenCalled();
+  });
+
+  it('ban: truyền id admin đang đăng nhập để chặn tự khóa', async () => {
+    await http().patch(`/admin/users/${USER_ID}/ban`).expect(200);
+
+    expect(service.ban).toHaveBeenCalledWith('admin-1', USER_ID);
+  });
+
+  it('id sai định dạng → 400 thay vì 500', async () => {
+    const res = await http().patch('/admin/users/abc/ban').expect(400);
+
+    expect(res.body.message).toBe('Mã người dùng không hợp lệ');
+    expect(service.ban).not.toHaveBeenCalled();
+  });
+
+  it('unban', async () => {
+    await http().patch(`/admin/users/${USER_ID}/unban`).expect(200);
+
+    expect(service.unban).toHaveBeenCalledWith(USER_ID);
   });
 });

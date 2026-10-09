@@ -6,11 +6,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Model, QueryFilter, Types } from 'mongoose';
 import { Product, ProductDocument } from '../products/schemas/product.schema';
-import {
-  User,
-  UserDocument,
-  UserRole,
-} from '../users/schemas/user.schema';
+import { User, UserDocument, UserRole } from '../users/schemas/user.schema';
 import { AdminUserDto, PaginatedAdminUsersDto } from './dto/admin-user.dto';
 import { AdminUsersQueryDto } from './dto/admin-users-query.dto';
 
