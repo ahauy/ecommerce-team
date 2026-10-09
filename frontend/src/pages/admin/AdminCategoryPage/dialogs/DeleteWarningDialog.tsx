@@ -45,7 +45,7 @@ export const DeleteWarningDialog: React.FC<DeleteWarningDialogProps> = ({
       <AlertDialogContent
         data-testid="delete-warning-dialog"
         onClick={handleBackdropClick}
-        className="max-w-lg w-full bg-white rounded-2xl p-6 flex flex-col relative border border-hairline-light shadow-card"
+        className="max-w-lg w-full bg-white rounded-2xl p-6 flex flex-col border border-hairline-light shadow-card"
         style={{ fontFeatureSettings: '"ss03"' }}
       >
         {/* Top Header */}
