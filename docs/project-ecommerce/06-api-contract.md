@@ -666,6 +666,50 @@ Xử lý: verify `signature` trên `data` (BR-PAY-003) → ghi `payments` → t�
 | PATCH  | `/admin/products/:id/unblock`  | ✅ Admin | Mở lại SP bị block                                             |
 
 > Admin không thể ban chính mình → 400.
+
+#### GET `/admin/users`
+
+```
+?page=1&limit=20       // limit tối đa 100 (mặc định 20)
+&role=customer         // customer | admin
+&isActive=false        // true = đang hoạt động, false = bị khóa
+&search=shop a         // tìm theo email, họ tên hoặc tên shop (không phân biệt hoa thường)
+// Sắp xếp: mới tham gia trước
+```
+
+```json
+// Response 200
+{
+  "items": [
+    {
+      "id": "...",
+      "email": "seller@example.com",
+      "fullName": "Nguyễn Văn A",
+      "phone": "0901234567",
+      "role": "customer",
+      "isActive": true,
+      "shop": { "shopName": "Shop A", "shopSlug": "shop-a" },   // null nếu chưa thiết lập gian hàng
+      "productCount": 12,                                      // tổng SP của user (kể cả ẩn / bị block)
+      "createdAt": "..."
+    }
+  ],
+  "total": 45, "page": 1, "limit": 20, "totalPages": 3
+}
+```
+
+#### PATCH `/admin/users/:id/ban` · `/admin/users/:id/unban`
+
+```json
+// Response 200
+{ "message": "Đã khóa tài khoản và chặn gian hàng/sản phẩm" }
+```
+
+| Tình huống                         | Response                                   |
+| ---------------------------------- | ------------------------------------------ |
+| Không phải Admin                   | 403                                        |
+| Admin tự khóa chính mình           | 400 `Bạn không thể khóa chính tài khoản của mình` |
+| `:id` sai định dạng                | 400 `Mã người dùng không hợp lệ`           |
+| User không tồn tại                 | 404                                        |
 > Xóa / sửa Category và quản lý Order dùng các endpoint ở các mục trên.
 
 ---
