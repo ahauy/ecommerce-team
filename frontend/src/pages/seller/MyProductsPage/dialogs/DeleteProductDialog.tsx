@@ -40,7 +40,7 @@ export const DeleteProductDialog: React.FC<DeleteProductDialogProps> = ({
     <AlertDialog open={isOpen} onOpenChange={(open) => !open && !isDeleting && onClose()}>
       <AlertDialogContent
         data-testid="delete-product-dialog"
-        className="max-w-md w-full bg-white rounded-2xl p-6 flex flex-col relative border border-hairline-light shadow-card"
+        className="max-w-md w-full bg-white rounded-2xl p-6 flex flex-col border border-hairline-light shadow-card"
         style={{ fontFeatureSettings: '"ss03"' }}
       >
         <AlertDialogHeader className="pb-3 text-left">
