@@ -513,21 +513,42 @@ Lỗi thường gặp:
 // backend chỉ gọi PayOS tối đa 1 lần / 10 giây cho mỗi Checkout (các lần poll khác trả trạng thái đang lưu).
 ```
 
-#### GET `/orders/my` — mỗi phần tử
+#### Danh sách & chi tiết đơn — `GET /orders/my`, `/orders/selling`, `/orders` (Admin)
+
+```
+?page=1&limit=10        // limit tối đa 100 (mặc định 10)
+&status=confirmed       // pending | confirmed | shipping | delivered | cancelled | refunded
+&sellerId=...&userId=... // CHỈ GET /orders (Admin)
+// Sắp xếp: mới nhất trước
+```
 
 ```json
+// Response 200 — danh sách (phân trang)
+{ "items": [ /* Order */ ], "total": 25, "page": 1, "limit": 10, "totalPages": 3 }
+
+// Order — mỗi phần tử danh sách, và cũng là response của GET /orders/my/:id, /orders/selling/:id, /orders/:id
 {
   "id": "...",
   "orderCode": "ORD-20261002-4M8TQ2ZP6C",
   "checkoutCode": "CHK-20261002-7F3K9QX2AB",
+  "buyerId": "...",
   "seller": { "id": "...", "shopName": "Shop A" },
-  "items": [ { "name": "...", "imageUrl": "...", "price": 100000, "quantity": 2 } ],
+  "items": [ { "productId": "...", "name": "...", "imageUrl": "...", "price": 100000, "quantity": 2 } ],
   "totalAmount": 200000,
   "status": "confirmed",
   "paymentStatus": "paid",
-  "createdAt": "..."
+  "paymentMethod": "payos",
+  "recipient": { "fullName": "...", "phone": "...", "email": "...", "address": "..." },
+  "cancelReason": null,
+  "cancelledBy": null,            // system | seller | admin
+  "createdAt": "...",
+  "updatedAt": "..."
 }
 ```
+
+> - `/orders/my*` lọc theo người mua trong token, `/orders/selling*` lọc theo người bán trong token → đơn không thuộc mình trả **404** (không lộ sự tồn tại). Admin gọi `/orders/my*` / `/orders/selling*` → 403.
+> - `GET /orders`, `GET /orders/:id`: chỉ Admin.
+> - `:id` sai định dạng ObjectId → 400 `Mã đơn hàng không hợp lệ`.
 
 #### PATCH `/orders/:id/status`
 
@@ -546,6 +567,10 @@ Lỗi thường gặp:
 | Thiếu `reason` khi `cancelled`               | 400      |
 | Seller không phải chủ đơn                    | 403      |
 | Seller đặt `refunded`                        | 403      |
+| Admin hoàn tiền đơn chưa thanh toán (`paymentStatus` ≠ `paid`) | 400 |
+| Trạng thái đơn vừa bị thay đổi bởi request khác (vd hủy 2 lần cùng lúc) | 409 — không hoàn kho lần 2 |
+
+> Response 200: đơn sau khi cập nhật (cùng định dạng Order ở trên). Hủy đơn (`confirmed → cancelled`) hoàn stock đúng 1 lần, `cancelledBy` = `seller` hoặc `admin`. Hoàn tiền (`cancelled → refunded`) đặt luôn `paymentStatus = refunded`; tiền Admin chuyển khoản thủ công.
 
 ---
 

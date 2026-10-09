@@ -10,6 +10,7 @@ import { CheckoutExpiryJob } from './checkout-expiry.job';
 import { CheckoutService } from './checkout.service';
 import { CheckoutsController } from './checkouts.controller';
 import { OrdersController } from './orders.controller';
+import { OrderService } from './order.service';
 import { PaymentReconcileService } from './payment-reconcile.service';
 import { PaymentResultService } from './payment-result.service';
 import { PayosWebhookController } from './payos-webhook.controller';
@@ -31,6 +32,7 @@ import { Order, OrderSchema } from './schemas/order.schema';
   controllers: [OrdersController, CheckoutsController, PayosWebhookController],
   providers: [
     CheckoutService,
+    OrderService,
     PaymentResultService,
     PaymentReconcileService,
     CheckoutExpiryJob,
