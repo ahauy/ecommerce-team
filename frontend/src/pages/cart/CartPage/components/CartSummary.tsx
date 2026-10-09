@@ -51,8 +51,8 @@ const CartSummary: React.FC<CartSummaryProps> = ({ cart, orderCount, isGuest, on
           {!canCheckout
             ? 'Chưa có sản phẩm nào có thể đặt hàng. Hãy điều chỉnh số lượng hoặc xóa sản phẩm không còn bán.'
             : orderCount > 1
-              ? `Đơn hàng sẽ được tách thành ${orderCount} đơn theo gian hàng, thanh toán một lần qua VNPay.`
-              : 'Đơn hàng được thanh toán một lần qua VNPay.'}
+              ? `Đơn hàng sẽ được tách thành ${orderCount} đơn theo gian hàng, thanh toán một lần qua PayOS.`
+              : 'Đơn hàng được thanh toán một lần qua PayOS.'}
         </p>
       </div>
 
@@ -72,7 +72,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({ cart, orderCount, isGuest, on
 
       <p className="flex items-center justify-center gap-1.5 text-[10px] text-zinc-400">
         <ShieldCheck className="h-3 w-3" aria-hidden="true" />
-        Thanh toán an toàn qua VNPay
+        Thanh toán an toàn qua PayOS
       </p>
     </aside>
   );

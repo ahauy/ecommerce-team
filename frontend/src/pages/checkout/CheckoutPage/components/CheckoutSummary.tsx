@@ -22,7 +22,7 @@ interface CheckoutSummaryProps {
 const primaryBtn =
   'inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-black text-sm font-semibold text-white transition-all duration-150 hover:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:hover:bg-zinc-300';
 
-/** Cột phải "Tóm tắt đơn hàng": tổng tiền · VNPay · nút thanh toán. */
+/** Cột phải "Tóm tắt đơn hàng": tổng tiền · PayOS · nút thanh toán. */
 const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
   cart,
   orderCount,
@@ -74,9 +74,9 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
       <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Phương thức thanh toán</p>
       {blocked ? (
         <div className="flex items-center gap-3 rounded-lg border border-hairline-light bg-[#f6f6f1] px-3 py-2.5 opacity-80">
-          <span className="text-[10px] font-bold text-zinc-500">VNPAY</span>
+          <span className="text-[10px] font-bold text-zinc-500">PAYOS</span>
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-medium text-zinc-700">Cổng VNPAY (QR / ATM / Thẻ)</p>
+            <p className="text-[11px] font-medium text-zinc-700">Cổng PayOS (QR / VietQR)</p>
             <p className="text-[10px] text-zinc-500">Tạm hoãn do tồn kho chưa khớp</p>
           </div>
           <Lock className="h-3.5 w-3.5 text-zinc-400" aria-hidden="true" />
@@ -84,11 +84,11 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
       ) : (
         <div className="flex items-center gap-3 rounded-lg border-2 border-emerald-700/70 bg-emerald-50/40 px-3 py-2.5">
           <span className="flex h-8 w-8 items-center justify-center rounded border border-hairline-light bg-white text-[8px] font-extrabold text-blue-700">
-            VNPAY
+            PAYOS
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold text-black">VNPay</p>
-            <p className="text-[10px] text-zinc-500">Thanh toán qua cổng VNPay</p>
+            <p className="text-xs font-semibold text-black">PayOS</p>
+            <p className="text-[10px] text-zinc-500">Thanh toán qua cổng PayOS</p>
           </div>
           <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-800 text-white">
             <Check className="h-3 w-3" aria-hidden="true" />
@@ -102,14 +102,14 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
       <p>
         {blocked
           ? `Đơn hàng được giữ trong ${CHECKOUT_HOLD_MINUTES} phút để bạn thanh toán.`
-          : `Sau khi đặt hàng, đơn được giữ ${CHECKOUT_HOLD_MINUTES} phút để bạn hoàn tất thanh toán qua VNPay.`}
+          : `Sau khi đặt hàng, đơn được giữ ${CHECKOUT_HOLD_MINUTES} phút để bạn hoàn tất thanh toán qua PayOS.`}
       </p>
     </div>
 
     {blocked ? (
       <div className="space-y-3">
         <button type="button" disabled className={`${primaryBtn} !bg-zinc-200 !text-zinc-500`}>
-          Thanh toán với VNPay
+          Thanh toán với PayOS
         </button>
         <Link to={BaseUrl.Cart} className={primaryBtn}>
           Cập nhật lại giỏ hàng
@@ -124,11 +124,11 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
           {submitting ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-              Đang chuyển tới VNPay...
+              Đang chuyển tới PayOS...
             </>
           ) : (
             <>
-              Thanh toán với VNPay
+              Thanh toán với PayOS
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </>
           )}
@@ -140,7 +140,7 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
         )}
         <p className="flex items-center justify-center gap-1.5 pt-1 text-[10px] text-zinc-400">
           <ShieldCheck className="h-3 w-3" aria-hidden="true" />
-          Thanh toán an toàn, bảo mật qua cổng VNPay
+          Thanh toán an toàn, bảo mật qua cổng PayOS
         </p>
       </div>
     )}
