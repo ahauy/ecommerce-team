@@ -69,7 +69,7 @@ const AuthShell: React.FC<AuthShellProps> = ({
               </p>
               <ul className="mt-3 space-y-2 text-[13px] text-zinc-500">
                 <li>Hướng dẫn mua hàng</li>
-                <li>Thanh toán qua VNPay</li>
+                <li>Thanh toán qua PayOS</li>
               </ul>
             </div>
             <div>
