@@ -22,11 +22,11 @@ const StorefrontLayout = () => {
 
   return (
     <div
-      className="component:StorefrontLayout flex min-h-[100vh] flex-col bg-[#fbfbf5] text-black antialiased"
+      className="component:StorefrontLayout flex min-h-[100vh] flex-col bg-canvas-cream text-black antialiased"
       style={{ fontFeatureSettings: '"ss03"' }}
     >
       {/* 1. SHARED CUSTOMER HEADER (Stitch Screen 1: h-20 / 80px) */}
-      <header className="sticky top-0 z-50 bg-white border-b border-[#e4e4e7] shadow-[0_1px_4px_rgba(0,0,0,0.03)]">
+      <header className="sticky top-0 z-50 bg-white border-b border-hairline-light shadow-xs">
         <div className="w-full px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-6">
           {/* Brand Logo */}
           <div className="flex items-center gap-8 shrink-0">
@@ -49,7 +49,7 @@ const StorefrontLayout = () => {
                 defaultValue={currentQuery}
                 type="search"
                 placeholder="Tìm kiếm sản phẩm, thương hiệu hoặc cửa hàng thủ công..."
-                className="w-full h-11 pl-11 pr-4 bg-white hover:bg-zinc-50 focus:bg-white text-sm text-black placeholder:text-zinc-400 rounded-full border border-[#e4e4e7] focus:border-black focus:outline-none transition-all"
+                className="w-full h-11 pl-11 pr-4 bg-white hover:bg-zinc-50 focus:bg-white text-sm text-black placeholder:text-zinc-400 rounded-full border border-hairline-light focus:border-black focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black transition-all duration-150"
               />
             </div>
           </form>

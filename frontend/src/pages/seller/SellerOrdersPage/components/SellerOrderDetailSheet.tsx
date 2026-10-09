@@ -82,11 +82,11 @@ const DetailBody: React.FC<{ order: SellerOrder }> = ({ order }) => {
               <OrderItemThumb src={item.imageUrl} alt={item.name} className="h-14 w-14" />
               <div className="min-w-0 flex-1">
                 <p className="line-clamp-2 text-xs font-medium text-black">{item.name}</p>
-                <p className="mt-0.5 text-[11px] text-zinc-500">
+                <p className="mt-0.5 text-[11px] text-zinc-500 tabular-nums">
                   SL: {item.quantity} • Đơn giá: {formatVnd(item.price)}
                 </p>
               </div>
-              <p className="shrink-0 text-xs font-semibold text-black">{formatVnd(item.price * item.quantity)}</p>
+              <p className="shrink-0 text-xs font-semibold text-black tabular-nums">{formatVnd(item.price * item.quantity)}</p>
             </li>
           ))}
         </ul>
@@ -94,7 +94,7 @@ const DetailBody: React.FC<{ order: SellerOrder }> = ({ order }) => {
 
       <section aria-label="Thanh toán và chi tiết">
         <SectionLabel>Thanh toán &amp; chi tiết</SectionLabel>
-        <dl className="space-y-2.5 rounded-xl border border-[#e4e4e7] bg-[#fbfbf5] px-4 py-4 text-xs">
+        <dl className="space-y-2.5 rounded-xl border border-hairline-light bg-canvas-cream px-4 py-4 text-xs">
           <div className="flex items-start justify-between gap-4">
             <dt className="shrink-0 text-zinc-500">Phương thức thanh toán</dt>
             <dd className={cn('flex items-center gap-1 text-right font-medium', paid ? 'text-[#0f5132]' : 'text-zinc-600')}>
@@ -108,9 +108,9 @@ const DetailBody: React.FC<{ order: SellerOrder }> = ({ order }) => {
             <dt className="shrink-0 text-zinc-500">Thời gian đặt hàng</dt>
             <dd className="font-mono text-[11px] font-medium text-black">{formatOrderDateTime(order.createdAt) || '—'}</dd>
           </div>
-          <div className="flex items-end justify-between gap-4 border-t border-[#e4e4e7] pt-3">
+          <div className="flex items-end justify-between gap-4 border-t border-hairline-light pt-3">
             <dt className="text-xs font-semibold text-black">Tổng thanh toán</dt>
-            <dd data-testid="seller-order-detail-total" className="text-lg font-semibold text-black">
+            <dd data-testid="seller-order-detail-total" className="text-lg font-semibold text-black tabular-nums">
               {formatVnd(order.totalAmount)}
             </dd>
           </div>
@@ -140,7 +140,7 @@ const SellerOrderDetailSheet: React.FC<SellerOrderDetailSheetProps> = ({
         className="flex w-full flex-col gap-0 overflow-hidden bg-white p-0 sm:max-w-md"
         style={{ fontFeatureSettings: '"ss03"' }}
       >
-        <SheetHeader className="space-y-1 border-b border-[#e4e4e7] px-6 py-5 pr-12 text-left">
+        <SheetHeader className="space-y-1 border-b border-hairline-light px-6 py-5 pr-12 text-left">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Đơn bán</p>
           <SheetTitle className="text-base font-semibold tracking-tight text-black">
             Chi tiết đơn bán{' '}
@@ -166,7 +166,7 @@ const SellerOrderDetailSheet: React.FC<SellerOrderDetailSheetProps> = ({
         </div>
 
         {order && hasActions && (
-          <div className="flex items-center justify-end border-t border-[#e4e4e7] bg-white px-6 py-4">
+          <div className="flex items-center justify-end border-t border-hairline-light bg-white px-6 py-4">
             <StatusActionButtons order={order} onAction={onAction} disabled={busy} />
           </div>
         )}

@@ -11,7 +11,7 @@ const ProfilePage: React.FC = () => {
 
   if (isPending) {
     return (
-      <div className="flex min-h-[400px] w-full items-center justify-center p-8 bg-[#fbfbf5]">
+      <div className="flex min-h-[400px] w-full items-center justify-center p-8 bg-canvas-cream">
         <div className="flex items-center gap-3 text-zinc-600">
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-black border-t-transparent" />
           <span className="text-base font-medium">Đang tải hồ sơ...</span>
@@ -22,7 +22,7 @@ const ProfilePage: React.FC = () => {
 
   if (isError || !profile) {
     return (
-      <div className="flex min-h-[400px] w-full items-center justify-center p-8 bg-[#fbfbf5]">
+      <div className="flex min-h-[400px] w-full items-center justify-center p-8 bg-canvas-cream">
         <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700 max-w-md">
           <p className="font-medium">Không thể tải thông tin hồ sơ.</p>
           <p className="text-sm mt-1 text-red-700">Vui lòng kiểm tra lại kết nối mạng hoặc thử lại sau.</p>
@@ -34,7 +34,7 @@ const ProfilePage: React.FC = () => {
   return (
     <div
       data-testid="profile-page"
-      className="w-full bg-[#fbfbf5]"
+      className="w-full bg-canvas-cream"
       style={{ fontFeatureSettings: '"ss03"' }}
     >
       <div className="w-full space-y-8">
@@ -53,10 +53,10 @@ const ProfilePage: React.FC = () => {
           <div className="space-y-6">
             <div
               data-testid="profile-card"
-              className="bg-white rounded-2xl p-6 border border-[#e4e4e7] shadow-card space-y-6"
+              className="bg-white rounded-2xl p-6 border border-hairline-light shadow-card space-y-6"
             >
-              <div className="flex items-center gap-4 pb-6 border-b border-[#e4e4e7]">
-                <div className="w-14 h-14 rounded-full bg-zinc-100 border border-[#e4e4e7] flex items-center justify-center text-lg font-semibold text-zinc-900 shrink-0">
+              <div className="flex items-center gap-4 pb-6 border-b border-hairline-light">
+                <div className="w-14 h-14 rounded-full bg-zinc-100 border border-hairline-light flex items-center justify-center text-lg font-semibold text-zinc-900 shrink-0">
                   {profile.fullName?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -96,11 +96,11 @@ const ProfilePage: React.FC = () => {
               </div>
 
               {/* Shop Badge Status */}
-              <div className="pt-4 border-t border-[#e4e4e7]">
+              <div className="pt-4 border-t border-hairline-light">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-zinc-500">Trạng thái bán hàng:</span>
                   {profile.shop ? (
-                    <span className="inline-flex items-center gap-1 font-medium text-black bg-aloe px-2.5 py-1 rounded-full border border-[#e4e4e7]">
+                    <span className="inline-flex items-center gap-1 font-medium text-black bg-aloe px-2.5 py-1 rounded-full border border-hairline-light">
                       <Store className="w-3 h-3" />
                       Đang hoạt động
                     </span>
@@ -114,7 +114,7 @@ const ProfilePage: React.FC = () => {
             </div>
 
             {/* Kênh người bán: thông tin gian hàng nằm ở /seller/profile */}
-            <div className="bg-pistachio rounded-2xl p-6 border border-[#e4e4e7] shadow-sm space-y-4">
+            <div className="bg-pistachio rounded-2xl p-6 border border-hairline-light shadow-sm space-y-4">
               <div className="flex items-center gap-2">
                 <Store className="w-5 h-5 text-zinc-900" />
                 <h3 className="font-semibold text-zinc-900 text-base">Kênh người bán</h3>
@@ -154,8 +154,8 @@ const ProfilePage: React.FC = () => {
           </div>
 
           {/* Right Column: Update Profile Form */}
-          <div className="xl:col-span-2 bg-white rounded-2xl p-6 sm:p-8 border border-[#e4e4e7] shadow-card space-y-6">
-            <div className="pb-4 border-b border-[#e4e4e7]">
+          <div className="xl:col-span-2 bg-white rounded-2xl p-6 sm:p-8 border border-hairline-light shadow-card space-y-6">
+            <div className="pb-4 border-b border-hairline-light">
               <h2 className="text-xl font-semibold text-zinc-900">
                 Thông tin cá nhân
               </h2>

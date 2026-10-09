@@ -9,7 +9,7 @@ const primaryLink =
 const Shell: React.FC<React.PropsWithChildren<{ testId: string }>> = ({ testId, children }) => (
   <div
     data-testid={testId}
-    className="space-y-4 rounded-2xl border border-[#e4e4e7] bg-white px-6 py-14 text-center shadow-card"
+    className="space-y-4 rounded-2xl border border-hairline-light bg-white px-6 py-14 text-center shadow-card"
   >
     {children}
   </div>
@@ -56,6 +56,6 @@ export const ResultSkeleton: React.FC = () => (
   <div data-testid="result-skeleton" aria-busy="true" className="space-y-6">
     <div className="mx-auto h-16 w-16 animate-pulse rounded-full bg-zinc-200" />
     <div className="mx-auto h-9 w-72 max-w-full animate-pulse rounded bg-zinc-200" />
-    <div className="h-28 animate-pulse rounded-2xl border border-[#e4e4e7] bg-white" />
+    <div className="h-28 animate-pulse rounded-2xl border border-hairline-light bg-white" />
   </div>
 );

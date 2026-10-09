@@ -4,9 +4,9 @@ import BaseUrl from "@/consts/baseUrl";
 
 const Footer: React.FC = () => {
   return (
-    <footer className="w-full bg-white border-t border-[#e4e4e7] mt-12">
+    <footer className="w-full bg-white border-t border-hairline-light mt-12">
       <div className="w-full px-4 sm:px-6 lg:px-8 pt-12 pb-10">
-        <div className="flex flex-col md:flex-row justify-between items-start gap-10 pb-8 border-b border-[#e4e4e7]">
+        <div className="flex flex-col md:flex-row justify-between items-start gap-10 pb-8 border-b border-hairline-light">
           <div>
             <Link
               to={BaseUrl.Homepage}

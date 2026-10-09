@@ -9,7 +9,7 @@ const primaryLink =
 const Shell: React.FC<React.PropsWithChildren<{ testId: string }>> = ({ testId, children }) => (
   <div
     data-testid={testId}
-    className="space-y-4 rounded-2xl border border-[#e4e4e7] bg-white px-6 py-14 text-center shadow-card"
+    className="space-y-4 rounded-2xl border border-hairline-light bg-white px-6 py-14 text-center shadow-card"
   >
     {children}
   </div>
@@ -49,11 +49,11 @@ export const OrderDetailError: React.FC<{ onRetry: () => void }> = ({ onRetry })
 export const OrderDetailSkeleton: React.FC = () => (
   <div data-testid="order-detail-skeleton" aria-busy="true" className="space-y-5">
     <div className="h-8 w-72 animate-pulse rounded bg-zinc-200" />
-    <div className="h-28 animate-pulse rounded-2xl border border-[#e4e4e7] bg-white" />
+    <div className="h-28 animate-pulse rounded-2xl border border-hairline-light bg-white" />
     <div className="grid gap-4 md:grid-cols-2">
-      <div className="h-32 animate-pulse rounded-2xl border border-[#e4e4e7] bg-white" />
-      <div className="h-32 animate-pulse rounded-2xl border border-[#e4e4e7] bg-white" />
+      <div className="h-32 animate-pulse rounded-2xl border border-hairline-light bg-white" />
+      <div className="h-32 animate-pulse rounded-2xl border border-hairline-light bg-white" />
     </div>
-    <div className="h-56 animate-pulse rounded-2xl border border-[#e4e4e7] bg-white" />
+    <div className="h-56 animate-pulse rounded-2xl border border-hairline-light bg-white" />
   </div>
 );

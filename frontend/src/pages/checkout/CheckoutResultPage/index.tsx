@@ -8,7 +8,7 @@ import { ResultLoadError, ResultNotFound, ResultSkeleton } from './components/Re
 const Frame: React.FC<React.PropsWithChildren> = ({ children }) => (
   <div
     data-testid="checkout-result-page"
-    className="w-full bg-[#fbfbf5] px-4 py-12 sm:px-6 md:py-16"
+    className="w-full bg-canvas-cream px-4 py-12 sm:px-6 md:py-16"
     style={{ fontFeatureSettings: '"ss03"' }}
   >
     <div className="mx-auto w-full max-w-2xl">{children}</div>

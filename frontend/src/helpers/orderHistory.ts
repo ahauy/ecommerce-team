@@ -10,7 +10,7 @@ import type {
 /** Nhãn + màu badge cho từng trạng thái đơn (bám giao diện "Đơn mua"). */
 export const ORDER_STATUS_META: Record<OrderStatus, { label: string; badgeClass: string }> = {
   pending: { label: 'Chờ thanh toán', badgeClass: 'border-zinc-300 bg-white text-zinc-600' },
-  confirmed: { label: 'Đã xác nhận', badgeClass: 'border-transparent bg-[#c1fbd4] text-[#0f5132]' },
+  confirmed: { label: 'Đã xác nhận', badgeClass: 'border-transparent bg-aloe text-[#0f5132]' },
   shipping: { label: 'Đang giao', badgeClass: 'border-[#86d9a3] bg-white text-[#0f5132]' },
   delivered: { label: 'Đã giao', badgeClass: 'border-black bg-black text-white' },
   cancelled: { label: 'Đã hủy', badgeClass: 'border-red-300 bg-white text-red-600' },

@@ -14,9 +14,9 @@ const ProductFilterSidebar: React.FC<ProductFilterSidebarProps> = ({ value, onCh
   <aside
     data-testid="product-filter-sidebar"
     aria-label="Bộ lọc tìm kiếm"
-    className="sticky top-24 hidden w-[280px] shrink-0 self-start rounded-2xl border border-[#e4e4e7] bg-white p-5 shadow-sm lg:block"
+    className="sticky top-24 hidden w-[280px] shrink-0 self-start rounded-2xl border border-hairline-light bg-white p-5 shadow-card lg:block"
   >
-    <div className="mb-5 flex items-center justify-between border-b border-[#ececef] pb-4">
+    <div className="mb-5 flex items-center justify-between border-b border-hairline-light pb-4">
       <h2 className="flex items-center gap-2 text-sm font-semibold text-black">
         <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
         Bộ lọc tìm kiếm

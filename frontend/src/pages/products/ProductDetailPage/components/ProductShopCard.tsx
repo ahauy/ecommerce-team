@@ -22,7 +22,7 @@ const ProductShopCard: React.FC<ProductShopCardProps> = ({ sellerId, shopName, i
   return (
     <div
       data-testid="product-shop-card"
-      className="flex items-center gap-3 rounded-2xl border border-[#e4e4e7] bg-white p-3.5"
+      className="flex items-center gap-3 rounded-2xl border border-hairline-light bg-white p-3.5"
     >
       <div
         className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
@@ -36,17 +36,17 @@ const ProductShopCard: React.FC<ProductShopCardProps> = ({ sellerId, shopName, i
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-black">{name}</p>
         {isOwner && (
-          <span className="mt-0.5 inline-block rounded-full bg-[#c1fbd4] px-2 py-0.5 text-[10px] font-semibold text-black">
+          <span className="mt-0.5 inline-block rounded-full bg-aloe px-2 py-0.5 text-[10px] font-semibold text-black">
             Gian hàng của bạn
           </span>
         )}
-        {meta && <p className="mt-0.5 truncate text-[11px] text-zinc-500">{meta}</p>}
+        {meta && <p className="mt-0.5 truncate text-[11px] text-zinc-500 tabular-nums">{meta}</p>}
       </div>
 
       {sellerId && (
         <Link
           to={shopPath(sellerId)}
-          className="inline-flex h-9 shrink-0 items-center rounded-full border border-[#e4e4e7] bg-white px-4 text-xs font-semibold text-black transition-colors hover:border-black"
+          className="inline-flex h-9 shrink-0 items-center rounded-full border border-hairline-light bg-white px-4 text-xs font-semibold text-black transition-colors duration-150 hover:border-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
         >
           Xem gian hàng
         </Link>

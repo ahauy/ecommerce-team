@@ -11,7 +11,7 @@ const CartNoticeBanner: React.FC<CartNoticeBannerProps> = ({ message, onDismiss 
   <div
     role="status"
     data-testid="cart-notice"
-    className="flex items-center gap-3 rounded-lg border border-emerald-200 bg-[#c1fbd4]/70 px-4 py-3 text-[11px] text-zinc-900"
+    className="flex items-center gap-3 rounded-lg border border-emerald-200 bg-aloe/70 px-4 py-3 text-[11px] text-zinc-900"
   >
     <Info className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
     <p className="flex-1">{message}</p>

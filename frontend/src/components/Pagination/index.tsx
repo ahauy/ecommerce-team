@@ -27,7 +27,7 @@ export const buildPageItems = (page: number, totalPages: number): PageItem[] => 
 };
 
 const baseBtn =
-  'inline-flex h-10 w-10 items-center justify-center rounded-full border text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black';
+  'inline-flex h-10 w-10 items-center justify-center rounded-full border text-sm font-medium tabular-nums transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black';
 
 const Pagination: React.FC<PaginationProps> = ({ page, totalPages, onPageChange, className }) => {
   if (totalPages <= 1) return null;
@@ -41,7 +41,7 @@ const Pagination: React.FC<PaginationProps> = ({ page, totalPages, onPageChange,
         onClick={() => onPageChange(page - 1)}
         className={cn(
           baseBtn,
-          'border-[#e4e4e7] bg-white text-zinc-700 hover:border-black disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#e4e4e7]'
+          'border-hairline-light bg-white text-zinc-700 hover:border-black disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-hairline-light'
         )}
       >
         <ChevronLeft className="h-4 w-4" />
@@ -59,7 +59,7 @@ const Pagination: React.FC<PaginationProps> = ({ page, totalPages, onPageChange,
               baseBtn,
               item === page
                 ? 'border-black bg-black text-white'
-                : 'border-[#e4e4e7] bg-white text-zinc-700 hover:border-black'
+                : 'border-hairline-light bg-white text-zinc-700 hover:border-black'
             )}
           >
             {item}
@@ -78,7 +78,7 @@ const Pagination: React.FC<PaginationProps> = ({ page, totalPages, onPageChange,
         onClick={() => onPageChange(page + 1)}
         className={cn(
           baseBtn,
-          'border-[#e4e4e7] bg-white text-zinc-700 hover:border-black disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#e4e4e7]'
+          'border-hairline-light bg-white text-zinc-700 hover:border-black disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-hairline-light'
         )}
       >
         <ChevronRight className="h-4 w-4" />

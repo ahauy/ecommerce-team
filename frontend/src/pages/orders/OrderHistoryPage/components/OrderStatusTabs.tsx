@@ -26,7 +26,7 @@ const OrderStatusTabs: React.FC<OrderStatusTabsProps> = ({ value, onChange }) =>
             'inline-flex h-8 shrink-0 items-center rounded-full border px-4 text-xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black',
             active
               ? 'border-black bg-black text-white'
-              : 'border-[#e4e4e7] bg-white text-zinc-700 hover:border-black'
+              : 'border-hairline-light bg-white text-zinc-700 hover:border-black'
           )}
         >
           {tab.label}

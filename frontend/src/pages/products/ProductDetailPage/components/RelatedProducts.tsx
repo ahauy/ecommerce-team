@@ -31,7 +31,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ sellerId, currentProd
             Sản phẩm khác của gian hàng
           </h2>
           {isOwner && (
-            <span className="rounded-full bg-[#c1fbd4] px-2 py-0.5 text-[10px] font-semibold text-black">
+            <span className="rounded-full bg-aloe px-2 py-0.5 text-[10px] font-semibold text-black">
               Gian hàng của bạn
             </span>
           )}

@@ -120,7 +120,7 @@ const ProductDetailPage: React.FC = () => {
         <div className="space-y-5">
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
-              {product.category && <Chip className="bg-[#c1fbd4] text-black">{product.category.name}</Chip>}
+              {product.category && <Chip className="bg-aloe text-black">{product.category.name}</Chip>}
               {soldOut && <Chip className="bg-zinc-800 text-white">Hết hàng</Chip>}
               {canSeeState && product.isBlocked && (
                 <Chip className="border border-red-300 bg-red-50 text-red-700">Bị khóa</Chip>
@@ -133,10 +133,10 @@ const ProductDetailPage: React.FC = () => {
             <h1 className="text-2xl font-light leading-tight tracking-tight text-black sm:text-3xl">
               {product.name}
             </h1>
-            <p data-testid="product-price" className="text-2xl font-bold text-black sm:text-3xl">
+            <p data-testid="product-price" className="text-2xl font-bold text-black sm:text-3xl tabular-nums">
               {formatVnd(product.price)}
             </p>
-            <p className="flex items-center gap-2 text-xs text-zinc-600" data-testid="product-stock">
+            <p className="flex items-center gap-2 text-xs text-zinc-600 tabular-nums" data-testid="product-stock">
               <span
                 aria-hidden="true"
                 className={cn(
@@ -148,7 +148,7 @@ const ProductDetailPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="space-y-4 border-t border-[#e4e4e7] pt-5">
+          <div className="space-y-4 border-t border-hairline-light pt-5">
             <ProductShopCard sellerId={product.seller.id} shopName={product.seller.shopName} isOwner={isOwner} />
             <ProductPurchasePanel
               // Mỗi sản phẩm bắt đầu lại với số lượng 1.
@@ -173,7 +173,7 @@ const ProductDetailPage: React.FC = () => {
         </h2>
         <div
           data-testid="product-description"
-          className="rounded-2xl border border-[#e4e4e7] bg-white p-5 text-sm leading-7 text-zinc-700 sm:p-6"
+          className="rounded-2xl border border-hairline-light bg-white p-5 text-sm leading-7 text-zinc-700 sm:p-6"
         >
           {product.description.trim() ? (
             // Mô tả là văn bản thuần: giữ xuống dòng, tuyệt đối không render HTML.

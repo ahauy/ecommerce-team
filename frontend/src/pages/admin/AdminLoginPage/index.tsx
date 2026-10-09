@@ -29,10 +29,10 @@ const AdminLoginPage: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen w-full bg-[#fbfbf5] flex flex-col items-center justify-center p-4 sm:p-6"
+      className="min-h-screen w-full bg-canvas-cream flex flex-col items-center justify-center p-4 sm:p-6"
       style={{ fontFeatureSettings: '"ss03"' }}
     >
-      <div className="w-full max-w-md bg-white border border-[#e4e4e7] rounded-3xl p-8 sm:p-10 shadow-[0_8px_8px_rgba(0,0,0,0.03),0_4px_4px_rgba(0,0,0,0.02),0_2px_2px_rgba(0,0,0,0.02),0_0_0_1px_#e4e4e7] space-y-8">
+      <div className="w-full max-w-md bg-white border border-hairline-light rounded-3xl p-8 sm:p-10 shadow-card space-y-8">
         {/* Header */}
         <div className="text-center space-y-3">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-black text-white shadow-sm mb-1">

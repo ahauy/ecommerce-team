@@ -45,7 +45,7 @@ export const matchesOrderSearch = (order: SellerOrder, query: string): boolean =
 };
 
 export const PAYMENT_BADGE_CLASS: Record<OrderPaymentStatus, string> = {
-  paid: 'bg-[#c1fbd4] text-[#0f5132]',
+  paid: 'bg-aloe text-[#0f5132]',
   unpaid: 'bg-zinc-100 text-zinc-600',
   refunded: 'bg-zinc-200 text-zinc-700',
 };

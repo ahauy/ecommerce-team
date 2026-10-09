@@ -46,7 +46,7 @@ const ProductStatusBanner: React.FC<ProductStatusBannerProps> = ({ kind, viewerI
     return (
       <div
         data-testid="banner-hidden"
-        className="flex items-center gap-3 rounded-2xl border border-[#e4e4e7] bg-zinc-100 px-4 py-3"
+        className="flex items-center gap-3 rounded-2xl border border-hairline-light bg-zinc-100 px-4 py-3"
       >
         <EyeOff className="h-4 w-4 shrink-0 text-zinc-600" aria-hidden="true" />
         <p className="flex-1 text-sm font-medium text-zinc-800">
