@@ -129,7 +129,7 @@ describe('CheckoutPage', () => {
     expect(screen.getByTestId('checkout-total')).toHaveTextContent('19.080.000');
     expect(screen.getByTestId('checkout-split-note')).toHaveTextContent('tách thành 2 đơn');
     expect(screen.queryByTestId('checkout-issue-alert')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Thanh toán với VNPay/ })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /Thanh toán với PayOS/ })).toBeEnabled();
   });
 
   it('pays with recipient + productId/quantity only (no price / sellerId) and redirects to paymentUrl', () => {
@@ -138,7 +138,7 @@ describe('CheckoutPage', () => {
     );
 
     renderPage();
-    fireEvent.click(screen.getByRole('button', { name: /Thanh toán với VNPay/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Thanh toán với PayOS/ }));
 
     expect(mockMutate).toHaveBeenCalledTimes(1);
     expect(mockMutate.mock.calls[0][0]).toEqual({
@@ -157,7 +157,7 @@ describe('CheckoutPage', () => {
     renderPage();
 
     expect(screen.getByLabelText(/Số điện thoại/)).toHaveValue('');
-    expect(screen.getByRole('button', { name: /Thanh toán với VNPay/ })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Thanh toán với PayOS/ })).toBeDisabled();
     expect(screen.getByTestId('checkout-disabled-reason')).toBeInTheDocument();
 
     fireEvent.blur(screen.getByLabelText(/Số điện thoại/));
@@ -166,7 +166,7 @@ describe('CheckoutPage', () => {
     fireEvent.change(screen.getByLabelText(/Số điện thoại/), { target: { value: '0987654321' } });
     fireEvent.change(screen.getByLabelText(/Địa chỉ giao hàng/), { target: { value: '12 Lê Lợi, Quận 1, TP.HCM' } });
 
-    await waitFor(() => expect(screen.getByRole('button', { name: /Thanh toán với VNPay/ })).toBeEnabled());
+    await waitFor(() => expect(screen.getByRole('button', { name: /Thanh toán với PayOS/ })).toBeEnabled());
   });
 
   it('invalid phone number shows an error and blocks payment', async () => {
@@ -176,7 +176,7 @@ describe('CheckoutPage', () => {
     fireEvent.blur(phone);
 
     expect(await screen.findByText('Số điện thoại không hợp lệ')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Thanh toán với VNPay/ })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Thanh toán với PayOS/ })).toBeDisabled();
   });
 
   it('buyer can edit name / phone / address and the edited values are what gets sent', async () => {
@@ -187,7 +187,7 @@ describe('CheckoutPage', () => {
     fireEvent.change(screen.getByLabelText(/Số điện thoại/), { target: { value: '+84987654321' } });
     fireEvent.change(screen.getByLabelText(/Địa chỉ giao hàng/), { target: { value: 'Địa chỉ mới 99 Hai Bà Trưng' } });
 
-    const pay = screen.getByRole('button', { name: /Thanh toán với VNPay/ });
+    const pay = screen.getByRole('button', { name: /Thanh toán với PayOS/ });
     await waitFor(() => expect(pay).toBeEnabled());
     fireEvent.click(pay);
 
@@ -198,7 +198,7 @@ describe('CheckoutPage', () => {
     });
   });
 
-  it('stock issue in the cart: red alert, blocked VNPay, update-cart action, nothing is sent', () => {
+  it('stock issue in the cart: red alert, blocked PayOS, update-cart action, nothing is sent', () => {
     mockUseCart.mockReturnValue(
       cartState({
         cart: {
@@ -219,7 +219,7 @@ describe('CheckoutPage', () => {
     expect(screen.getByTestId('checkout-issue-alert')).toHaveTextContent('Một số sản phẩm không đủ hàng');
     expect(screen.getByTestId('checkout-issue-line')).toHaveTextContent('Bạn yêu cầu 2 sản phẩm, hiện chỉ còn 1 sản phẩm.');
     expect(screen.getByTestId('checkout-item-issue')).toHaveTextContent('Chỉ còn 1 sản phẩm trong kho (Bạn chọn 2)');
-    expect(screen.getByRole('button', { name: 'Thanh toán với VNPay' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Thanh toán với PayOS' })).toBeDisabled();
     expect(screen.getByRole('link', { name: 'Cập nhật lại giỏ hàng' })).toHaveAttribute('href', '/cart');
     expect(screen.getByText(/giải quyết cảnh báo tồn kho/)).toBeInTheDocument();
     expect(mockMutate).not.toHaveBeenCalled();
@@ -234,11 +234,11 @@ describe('CheckoutPage', () => {
       })
     );
     renderPage();
-    fireEvent.click(screen.getByRole('button', { name: /Thanh toán với VNPay/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Thanh toán với PayOS/ }));
 
     expect(await screen.findByTestId('checkout-issue-alert')).toBeInTheDocument();
     expect(screen.getByTestId('checkout-issue-line')).toHaveTextContent('Lam Phong Tech');
-    expect(screen.getByRole('button', { name: 'Thanh toán với VNPay' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Thanh toán với PayOS' })).toBeDisabled();
     expect(mockShowError).not.toHaveBeenCalled();
   });
 
@@ -247,7 +247,7 @@ describe('CheckoutPage', () => {
       opts.onError({ response: { data: { message: 'Bạn không thể mua sản phẩm của chính mình' } } })
     );
     renderPage();
-    fireEvent.click(screen.getByRole('button', { name: /Thanh toán với VNPay/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Thanh toán với PayOS/ }));
     expect(mockShowError).toHaveBeenCalledWith('Bạn không thể mua sản phẩm của chính mình');
     expect(screen.queryByTestId('checkout-issue-alert')).not.toBeInTheDocument();
   });
@@ -255,6 +255,6 @@ describe('CheckoutPage', () => {
   it('disables the pay button while the checkout is being created (no double submit)', () => {
     mutationState.isPending = true;
     renderPage();
-    expect(screen.getByRole('button', { name: /Đang chuyển tới VNPay/ })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Đang chuyển tới PayOS/ })).toBeDisabled();
   });
 });

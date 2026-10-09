@@ -28,7 +28,7 @@ const Footer: React.FC = () => {
                 Khám phá sản phẩm
               </Link>
               <span className="text-xs text-zinc-400">
-                Thanh toán an toàn qua VNPay
+                Thanh toán an toàn qua PayOS
               </span>
             </div>
             <div className="flex flex-col gap-2.5">
