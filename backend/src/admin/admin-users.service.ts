@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Model, QueryFilter, Types } from 'mongoose';
+import { escapeRegex } from '../common/utils/escape-regex';
 import { Product, ProductDocument } from '../products/schemas/product.schema';
 import { User, UserDocument, UserRole } from '../users/schemas/user.schema';
 import { AdminUserDto, PaginatedAdminUsersDto } from './dto/admin-user.dto';
@@ -26,9 +27,6 @@ interface UserRecord {
   shop?: { shopName?: string | null; shopSlug?: string | null } | null;
   createdAt: Date;
 }
-
-export const escapeRegex = (text: string): string =>
-  text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 @Injectable()
 export class AdminUsersService {
