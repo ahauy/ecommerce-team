@@ -17,7 +17,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
 
   // CORS — allow frontend origin
-  const rawOrigins = config.get<string>('FRONTEND_URL', 'http://localhost:5173');
+  const rawOrigins = config.get<string>('FRONTEND_URL', 'ecommerce-team.vercel.app');
   const allowedOrigins = rawOrigins
     .split(',')
     .map((url) => url.trim().replace(/\/+$/, ''))
