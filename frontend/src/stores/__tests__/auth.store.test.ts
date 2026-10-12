@@ -4,6 +4,7 @@ const user = { id: 'u1', email: 'a@b.c', fullName: 'An', role: 'customer' as con
 
 describe('auth store', () => {
   beforeEach(() => {
+    localStorage.clear();
     useAuthStore.setState({ status: 'booting', user: null, accessToken: null });
   });
 
@@ -31,9 +32,13 @@ describe('auth store', () => {
     expect(s.accessToken).toBeNull();
   });
 
-  it('never persists the access token to web storage', () => {
+  it('persists user and accessToken to localStorage on setSession and removes them on clear', () => {
     useAuthStore.getState().setSession(user, 'secret-token');
-    expect(JSON.stringify({ ...localStorage })).not.toContain('secret-token');
-    expect(JSON.stringify({ ...sessionStorage })).not.toContain('secret-token');
+    expect(localStorage.getItem('teamshop_access_token')).toBe('secret-token');
+    expect(JSON.parse(localStorage.getItem('teamshop_auth_user') || 'null')).toEqual(user);
+
+    useAuthStore.getState().clear();
+    expect(localStorage.getItem('teamshop_access_token')).toBeNull();
+    expect(localStorage.getItem('teamshop_auth_user')).toBeNull();
   });
 });

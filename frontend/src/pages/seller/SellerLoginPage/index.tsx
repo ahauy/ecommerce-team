@@ -69,7 +69,7 @@ const SellerLoginPage: React.FC = () => {
 
               if (res.data) {
                 if (res.data.user.role === 'admin') {
-                  await authService.logout().catch(() => {});
+                  await authService.logout(res.data.accessToken).catch(() => {});
                   const msg = 'Tài khoản quản trị viên vui lòng đăng nhập tại Cổng Quản Trị.';
                   setStatus(msg);
                   toast.error(msg);

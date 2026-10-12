@@ -25,6 +25,7 @@ describe('bootstrapSession', () => {
     vi.resetModules();
     refreshMock.mockReset();
     profileMock.mockReset();
+    localStorage.clear();
   });
 
   it('restores the session from the refresh cookie', async () => {
@@ -46,6 +47,20 @@ describe('bootstrapSession', () => {
     const { bootstrapSession, useAuthStore } = await load();
     await bootstrapSession();
     expect(useAuthStore.getState().user?.role).toBe('customer');
+  });
+
+  it('restores the session from persisted accessToken fallback when refresh cookie is blocked on reload', async () => {
+    localStorage.setItem('teamshop_access_token', 'persisted-admin-tok');
+    refreshMock.mockRejectedValue(new Error('401 Unauthorized'));
+    profileMock.mockResolvedValue({ id: 'admin1', email: 'admin@b.c', fullName: 'Admin', role: 'admin' });
+    const { bootstrapSession, useAuthStore } = await load();
+
+    await bootstrapSession();
+
+    const s = useAuthStore.getState();
+    expect(s.status).toBe('authed');
+    expect(s.accessToken).toBe('persisted-admin-tok');
+    expect(s.user).toEqual({ id: 'admin1', email: 'admin@b.c', fullName: 'Admin', role: 'admin' });
   });
 
   it('becomes guest when there is no valid refresh cookie', async () => {
