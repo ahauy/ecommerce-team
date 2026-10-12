@@ -9,13 +9,14 @@ import type { ProductSummary } from '@/types/product.types';
 interface ProductCardProps {
   product: ProductSummary;
   className?: string;
+  showShopName?: boolean;
 }
 
 /**
  * Thẻ sản phẩm dùng cho lưới danh sách và mục "Sản phẩm khác của gian hàng".
  * stock = 0 → phủ nhãn "Hết hàng", làm mờ giá (BR-PRD-003): vẫn bấm xem được.
  */
-const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, className, showShopName = true }) => {
   const soldOut = product.stock <= 0;
 
   return (
@@ -66,7 +67,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
           {formatVnd(product.price)}
         </p>
 
-        {product.shopName && (
+        {showShopName && product.shopName && (
           <div className="mt-3 flex items-center gap-1.5 border-t border-[#f0f0f2] pt-2.5 text-[11px] text-zinc-500">
             <Store className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             <span className="truncate">{product.shopName}</span>

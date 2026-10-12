@@ -2,32 +2,131 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import BaseUrl from '@/consts/baseUrl';
-import { Store, Calendar, Package, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Calendar, Package, ArrowLeft, AlertCircle } from 'lucide-react';
 import { usePublicShop } from '@/hooks/queries/usePublicShop';
+import { CategoryNav } from '@/components/CategoryNav';
+import ProductCard, { ProductCardSkeleton } from '@/components/ProductCard';
+import Pagination from '@/components/Pagination';
+import type { PublicShopResponseDto } from '@/types/shop.types';
+import {
+  useShopCatalog,
+  SHOP_SORT_OPTIONS,
+  SHOP_PAGE_SIZE,
+  type ShopSortOption,
+} from './hooks/useShopCatalog';
 
 const formatJoinedDate = (dateStr?: string | null): string => {
   if (!dateStr) return '';
   try {
     if (dateStr.includes('T')) {
-      const [datePart] = dateStr.split('T');
-      const [y, m, d] = datePart.split('-');
-      if (y && m && d) {
-        return `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`;
-      }
+      const [y, m, d] = dateStr.split('T')[0].split('-');
+      if (y && m && d) return `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`;
     }
     const d = new Date(dateStr);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
-    return `${day}/${month}/${year}`;
+    return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
   } catch {
     return dateStr;
   }
 };
 
+const ShopNotFoundState: React.FC = () => (
+  <div
+    data-testid="public-shop-not-found"
+    className="w-full min-h-[70vh] flex items-center justify-center bg-canvas-cream px-4 py-16"
+    style={{ fontFeatureSettings: '"ss03"' }}
+  >
+    <div className="max-w-md w-full bg-white rounded-2xl p-8 border border-hairline-light shadow-card text-center space-y-6">
+      <div className="w-16 h-16 rounded-full bg-zinc-100 flex items-center justify-center mx-auto text-zinc-400">
+        <AlertCircle className="w-8 h-8" />
+      </div>
+      <div className="space-y-2">
+        <h1 className="text-2xl font-light tracking-tight text-zinc-900">Không tìm thấy gian hàng</h1>
+        <p className="text-sm text-zinc-500 leading-relaxed">
+          Gian hàng này không tồn tại hoặc đã tạm dừng hoạt động. Vui lòng kiểm tra lại đường dẫn.
+        </p>
+      </div>
+      <Button asChild className="rounded-full bg-black text-white hover:bg-zinc-800 transition-colors h-11 px-8 text-sm">
+        <Link to={BaseUrl.Homepage} className="inline-flex items-center gap-2">
+          <ArrowLeft className="w-4 h-4" />
+          <span>Về trang chủ</span>
+        </Link>
+      </Button>
+    </div>
+  </div>
+);
+
+const ShopHeroBand: React.FC<{ shop: PublicShopResponseDto }> = ({ shop }) => {
+  const initialLetter = shop.shopName ? shop.shopName.charAt(0).toUpperCase() : 'S';
+  return (
+    <section className="w-full">
+      <div className="w-full bg-pistachio rounded-2xl p-6 sm:p-10 md:p-12 border border-hairline-light shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="flex items-center gap-6">
+          <div className="w-20 h-20 rounded-full bg-black flex items-center justify-center text-white shrink-0 shadow-md">
+            <span className="text-3xl font-light select-none">{initialLetter}</span>
+          </div>
+          <div className="flex flex-col justify-center">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-light tracking-tight text-zinc-900 leading-tight">
+                {shop.shopName}
+              </h1>
+              {shop.shopSlug && (
+                <span className="font-mono text-xs text-zinc-700 bg-white/80 border border-hairline-light px-2.5 py-0.5 rounded-full">
+                  @{shop.shopSlug}
+                </span>
+              )}
+            </div>
+            <div className="text-xs sm:text-sm text-zinc-600 mt-2 flex items-center flex-wrap gap-2">
+              <span className="inline-flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5 text-zinc-500" />
+                Tham gia từ {formatJoinedDate(shop.joinedAt)}
+              </span>
+              <span className="inline-block w-1 h-1 rounded-full bg-zinc-400" />
+              <span className="inline-flex items-center gap-1 font-medium text-zinc-800 tabular-nums">
+                <Package className="w-3.5 h-3.5 text-zinc-500" />
+                {shop.productCount} sản phẩm
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const StateCard: React.FC<{
+  testId: string;
+  icon: React.ReactNode;
+  title: string;
+  hint: string;
+  action?: { label: string; onClick: () => void };
+}> = ({ testId, icon, title, hint, action }) => (
+  <div
+    data-testid={testId}
+    className="w-full bg-white rounded-2xl p-12 text-center border border-hairline-light shadow-card space-y-4"
+  >
+    <div className="w-12 h-12 rounded-full bg-zinc-100 flex items-center justify-center mx-auto text-zinc-400">
+      {icon}
+    </div>
+    <div className="space-y-1">
+      <h2 className="text-sm font-semibold text-black">{title}</h2>
+      <p className="text-xs text-zinc-500 max-w-sm mx-auto">{hint}</p>
+    </div>
+    {action && (
+      <button
+        type="button"
+        onClick={action.onClick}
+        className="min-h-[44px] rounded-full bg-black px-6 text-xs font-semibold text-white hover:bg-zinc-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+      >
+        {action.label}
+      </button>
+    )}
+  </div>
+);
+
 const PublicShopPage: React.FC = () => {
   const { sellerId = '' } = useParams<{ sellerId: string }>();
   const { data: shop, isPending, isError } = usePublicShop(sellerId);
+  const catalog = useShopCatalog(sellerId, Boolean(shop && shop.productCount > 0));
 
   if (isPending) {
     return (
@@ -43,40 +142,12 @@ const PublicShopPage: React.FC = () => {
     );
   }
 
-  if (isError || !shop) {
-    return (
-      <div
-        data-testid="public-shop-not-found"
-        className="w-full min-h-[70vh] flex items-center justify-center bg-canvas-cream px-4 py-16"
-        style={{ fontFeatureSettings: '"ss03"' }}
-      >
-        <div className="max-w-md w-full bg-white rounded-2xl p-8 border border-hairline-light shadow-card text-center space-y-6">
-          <div className="w-16 h-16 rounded-full bg-zinc-100 flex items-center justify-center mx-auto text-zinc-400">
-            <AlertCircle className="w-8 h-8" />
-          </div>
-          <div className="space-y-2">
-            <h1 className="text-2xl font-light tracking-tight text-zinc-900">
-              Không tìm thấy gian hàng
-            </h1>
-            <p className="text-sm text-zinc-500 leading-relaxed">
-              Gian hàng này không tồn tại hoặc đã tạm dừng hoạt động. Vui lòng kiểm tra lại đường dẫn.
-            </p>
-          </div>
-          <Button
-            asChild
-            className="rounded-full bg-black text-white hover:bg-zinc-800 transition-colors h-11 px-8 text-sm"
-          >
-            <Link to={BaseUrl.Homepage} className="inline-flex items-center gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              <span>Về trang chủ</span>
-            </Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  if (isError || !shop) return <ShopNotFoundState />;
 
-  const initialLetter = shop.shopName ? shop.shopName.charAt(0).toUpperCase() : 'S';
+  const handlePageChange = (page: number) => {
+    catalog.setFilters({ page });
+    window.scrollTo?.({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div
@@ -84,8 +155,7 @@ const PublicShopPage: React.FC = () => {
       className="w-full min-h-screen bg-canvas-cream py-8 md:py-12 px-4 sm:px-6 lg:px-8"
       style={{ fontFeatureSettings: '"ss03"' }}
     >
-      <div className="w-full space-y-10">
-        {/* Back Link */}
+      <div className="w-full max-w-[1440px] mx-auto space-y-10">
         <div>
           <Link
             to={BaseUrl.Homepage}
@@ -96,84 +166,83 @@ const PublicShopPage: React.FC = () => {
           </Link>
         </div>
 
-        {/* Hero Band Gian Hang */}
-        <section className="w-full">
-          <div className="w-full bg-pistachio rounded-2xl p-6 sm:p-10 md:p-12 border border-hairline-light shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="flex items-center gap-6">
-              {/* Store Avatar */}
-              <div className="w-20 h-20 rounded-full bg-black flex items-center justify-center text-white shrink-0 shadow-md">
-                <span className="text-3xl font-light select-none">
-                  {initialLetter}
-                </span>
-              </div>
+        <ShopHeroBand shop={shop} />
 
-              {/* Store Identity */}
-              <div className="flex flex-col justify-center">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-light tracking-tight text-zinc-900 leading-tight">
-                    {shop.shopName}
-                  </h1>
-                  <span className="font-mono text-xs text-zinc-700 bg-white/80 border border-hairline-light px-2.5 py-0.5 rounded-full">
-                    @{shop.shopSlug}
-                  </span>
-                </div>
-
-                <div className="text-xs sm:text-sm text-zinc-600 mt-2 flex items-center flex-wrap gap-2">
-                  <span className="inline-flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-zinc-500" />
-                    Tham gia từ {formatJoinedDate(shop.joinedAt)}
-                  </span>
-                  <span className="inline-block w-1 h-1 rounded-full bg-zinc-400" />
-                  <span className="inline-flex items-center gap-1 font-medium text-zinc-800 tabular-nums">
-                    <Package className="w-3.5 h-3.5 text-zinc-500" />
-                    {shop.productCount} sản phẩm
-                  </span>
-                </div>
-              </div>
+        {shop.productCount === 0 ? (
+          <StateCard
+            testId="shop-products-empty"
+            icon={<Package className="w-6 h-6" />}
+            title="Gian hàng chưa có sản phẩm nào"
+            hint="Người bán hiện tại chưa đăng bán sản phẩm nào lên gian hàng. Vui lòng quay lại sau!"
+          />
+        ) : (
+          <section className="space-y-8" aria-label="Sản phẩm của gian hàng">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <CategoryNav
+                selectedSlug={catalog.filters.category}
+                onSelectCategory={(slug) => catalog.setFilters({ category: slug })}
+                className="flex-1 min-w-0"
+              />
+              <label className="flex items-center gap-2 text-xs text-zinc-500 shrink-0 self-end lg:self-auto">
+                <span>Sắp xếp:</span>
+                <select
+                  aria-label="Sắp xếp sản phẩm"
+                  data-testid="shop-sort-select"
+                  value={catalog.filters.sort}
+                  onChange={(e) => catalog.setFilters({ sort: e.target.value as ShopSortOption })}
+                  className="min-h-[44px] rounded-full border border-hairline-light bg-white px-4 text-xs font-medium text-black shadow-xs transition-colors duration-150 focus:border-black focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                >
+                  {SHOP_SORT_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
             </div>
-          </div>
-        </section>
 
-        {/* Product Catalog Section */}
-        <section className="space-y-6">
-          <div className="flex items-center justify-between border-b border-hairline-light pb-4">
-            <h2 className="text-lg font-semibold text-zinc-900 flex items-center gap-2">
-              <Store className="w-5 h-5 text-zinc-700" />
-              <span>Sản phẩm của gian hàng</span>
-            </h2>
-            <span className="text-xs text-zinc-500 tabular-nums">
-              Tổng số: {shop.productCount} sản phẩm
-            </span>
-          </div>
-
-          {shop.productCount === 0 ? (
-            <div className="w-full bg-white rounded-2xl p-12 text-center border border-hairline-light shadow-sm space-y-3">
-              <div className="w-12 h-12 rounded-full bg-zinc-100 flex items-center justify-center mx-auto text-zinc-400">
-                <Package className="w-6 h-6" />
+            {catalog.isLoading ? (
+              <ul
+                data-testid="shop-products-loading"
+                aria-busy="true"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+              >
+                {Array.from({ length: SHOP_PAGE_SIZE }, (_, i) => (
+                  <li key={i}>
+                    <ProductCardSkeleton />
+                  </li>
+                ))}
+              </ul>
+            ) : catalog.isError ? (
+              <StateCard
+                testId="shop-products-error"
+                icon={<AlertCircle className="w-6 h-6" />}
+                title="Không thể tải danh sách sản phẩm"
+                hint="Đã có lỗi khi kết nối tới máy chủ. Vui lòng thử lại."
+                action={{ label: 'Thử lại', onClick: () => catalog.refetch() }}
+              />
+            ) : catalog.items.length === 0 ? (
+              <StateCard
+                testId="shop-products-empty"
+                icon={<Package className="w-6 h-6" />}
+                title="Không tìm thấy sản phẩm phù hợp"
+                hint="Chưa có sản phẩm nào trong danh mục này của gian hàng."
+                action={{ label: 'Xem tất cả sản phẩm', onClick: () => catalog.setFilters({ category: '' }) }}
+              />
+            ) : (
+              <div className={catalog.isPlaceholderData ? 'space-y-10 opacity-60 transition-opacity' : 'space-y-10 transition-opacity'}>
+                <ul data-testid="shop-product-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {catalog.items.map((p) => (
+                    <li key={p.id}>
+                      <ProductCard product={p} showShopName={false} />
+                    </li>
+                  ))}
+                </ul>
+                <Pagination page={catalog.filters.page} totalPages={catalog.totalPages} onPageChange={handlePageChange} />
               </div>
-              <h3 className="text-base font-medium text-zinc-900">
-                Gian hàng chưa có sản phẩm nào
-              </h3>
-              <p className="text-xs text-zinc-500 max-w-sm mx-auto">
-                Người bán hiện tại chưa đăng bán sản phẩm nào lên gian hàng. Vui lòng quay lại sau!
-              </p>
-            </div>
-          ) : (
-            <div className="w-full bg-white rounded-2xl p-12 text-center border border-hairline-light shadow-sm space-y-4">
-              <div className="w-12 h-12 rounded-full bg-aloe flex items-center justify-center mx-auto text-black">
-                <Package className="w-6 h-6" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-base font-medium text-zinc-900 tabular-nums">
-                  Gian hàng có {shop.productCount} sản phẩm đang bày bán
-                </h3>
-                <p className="text-xs text-zinc-500">
-                  Danh mục sản phẩm chi tiết sẽ hiển thị tại đây khi tính năng quản lý sản phẩm hoàn thiện.
-                </p>
-              </div>
-            </div>
-          )}
-        </section>
+            )}
+          </section>
+        )}
       </div>
     </div>
   );
