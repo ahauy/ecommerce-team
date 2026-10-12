@@ -25,7 +25,7 @@ Thứ tự làm: **Atlas → Render (BE) → Vercel (FE) → cập nhật URL ch
 | Mục | Giá trị |
 | --- | --- |
 | Root Directory | `backend` |
-| Build Command | `npm install --include=dev && npm run build` |
+| Build Command | `npm install --include=dev --legacy-peer-deps && npm run build` |
 | Start Command | `npm run start:prod` |
 | Instance Type | Free |
 
