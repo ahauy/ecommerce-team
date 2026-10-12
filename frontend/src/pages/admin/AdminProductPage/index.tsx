@@ -8,7 +8,7 @@ import UnblockProductDialog from './dialogs/UnblockProductDialog';
 import { adminProductService } from './services/admin-product.service';
 import type { AdminProduct, AdminProductsParams } from './types';
 
-export const ADMIN_PRODUCTS_PAGE_SIZE = 20;
+export const ADMIN_PRODUCTS_PAGE_SIZE = 5;
 export const SEARCH_DEBOUNCE_MS = 400;
 
 type BlockFilter = 'all' | 'blocked' | 'unblocked';
