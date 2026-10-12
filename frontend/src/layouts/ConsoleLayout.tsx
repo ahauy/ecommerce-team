@@ -126,7 +126,7 @@ const SidebarBody: React.FC<SidebarBodyProps> = ({
                     active ? "text-current opacity-70" : "text-zinc-400"
                   )}
                 >
-                  Sắp có
+                  
                 </span>
               )}
             </Link>

@@ -163,6 +163,50 @@ describe('AuthService', () => {
       );
     });
 
+    it('should set refreshToken cookie with sameSite=none and secure=true when NODE_ENV is production', async () => {
+      configService.get.mockImplementation(
+        (key: string, defaultValue?: unknown) => {
+          if (key === 'JWT_ACCESS_SECRET') return 'test_access_secret';
+          if (key === 'JWT_REFRESH_SECRET') return 'test_refresh_secret';
+          if (key === 'JWT_ACCESS_EXPIRES_IN') return '15m';
+          if (key === 'JWT_REFRESH_EXPIRES_IN') return '7d';
+          if (key === 'NODE_ENV') return 'production';
+          return defaultValue;
+        },
+      );
+      mockCookie.mockClear();
+
+      const hashedPassword = await bcrypt.hash('Password123', 10);
+      usersService.findByEmail.mockResolvedValue({
+        _id: 'user_123',
+        email: 'test@example.com',
+        password: hashedPassword,
+        fullName: 'Nguyen Van A',
+        role: UserRole.CUSTOMER,
+        isActive: true,
+        shopName: null,
+      });
+      jwtService.sign
+        .mockReturnValueOnce('mock_access_token')
+        .mockReturnValueOnce('mock_refresh_token');
+
+      await authService.login(
+        { email: 'test@example.com', password: 'Password123' },
+        mockRes,
+      );
+
+      expect(mockCookie).toHaveBeenCalledWith(
+        'refreshToken',
+        'mock_refresh_token',
+        expect.objectContaining({
+          httpOnly: true,
+          secure: true,
+          sameSite: 'none',
+          path: '/api/v1/auth',
+        }),
+      );
+    });
+
     it('TC-004: should throw UnauthorizedException on wrong password', async () => {
       const hashedPassword = await bcrypt.hash('CorrectPassword', 10);
       const mockUser = {

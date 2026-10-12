@@ -32,6 +32,7 @@ describe('AuthService — US-AUTH-002 (Refresh & Logout)', () => {
   let service: AuthService;
   let usersService: jest.Mocked<UsersService>;
   let jwtService: jest.Mocked<JwtService>;
+  let configService: jest.Mocked<ConfigService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -75,6 +76,7 @@ describe('AuthService — US-AUTH-002 (Refresh & Logout)', () => {
     service = module.get<AuthService>(AuthService);
     usersService = module.get(UsersService);
     jwtService = module.get(JwtService);
+    configService = module.get(ConfigService);
   });
 
   // TC-101: Refresh with valid token → returns new accessToken
@@ -122,6 +124,27 @@ describe('AuthService — US-AUTH-002 (Refresh & Logout)', () => {
     expect(res.clearCookie).toHaveBeenCalledWith(
       'refreshToken',
       expect.objectContaining({ path: '/api/v1/auth' }),
+    );
+  });
+
+  it('logout() clears refreshToken cookie with secure=true and sameSite=none when NODE_ENV is production', async () => {
+    configService.get.mockImplementation((key: string, fallback?: string) => {
+      if (key === 'NODE_ENV') return 'production';
+      return fallback;
+    });
+    usersService.updateRefreshToken.mockResolvedValue(undefined);
+
+    const res = mockResponse();
+    await service.logout('user-id-123', res as never);
+
+    expect(res.clearCookie).toHaveBeenCalledWith(
+      'refreshToken',
+      expect.objectContaining({
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        path: '/api/v1/auth',
+      }),
     );
   });
 });
