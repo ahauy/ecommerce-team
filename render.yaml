@@ -22,7 +22,7 @@ services:
       - key: MONGODB_URI
         sync: false
       - key: FRONTEND_URL
-        sync: false
+        value: https://ecommerce-team.vercel.app
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
       - key: CLOUDINARY_API_KEY

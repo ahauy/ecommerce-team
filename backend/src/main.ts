@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { isAllowedCorsOrigin } from './common/utils/cors.util';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -17,14 +18,19 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
 
   // CORS — allow frontend origin
-  const rawOrigins = config.get<string>('FRONTEND_URL', 'ecommerce-team.vercel.app');
-  const allowedOrigins = rawOrigins
-    .split(',')
-    .map((url) => url.trim().replace(/\/+$/, ''))
-    .filter(Boolean);
+  const rawOrigins = config.get<string>('FRONTEND_URL');
   app.enableCors({
-    origin: allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins,
+    origin: (origin, callback) => {
+      callback(null, isAllowedCorsOrigin(origin, rawOrigins));
+    },
     credentials: true,
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Accept',
+      'Authorization',
+      'X-Requested-With',
+    ],
   });
 
   app.use(cookieParser());
