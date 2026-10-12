@@ -15,10 +15,10 @@ const base: ProductSummary = {
   shopName: 'Lam Phong Tech',
 };
 
-const renderCard = (p: Partial<ProductSummary> = {}) =>
+const renderCard = (p: Partial<ProductSummary> = {}, showShopName?: boolean) =>
   render(
     <MemoryRouter>
-      <ProductCard product={{ ...base, ...p }} />
+      <ProductCard product={{ ...base, ...p }} showShopName={showShopName} />
     </MemoryRouter>
   );
 
@@ -45,6 +45,11 @@ describe('ProductCard', () => {
 
   it('omits the shop row when the shop name is unknown', () => {
     renderCard({ shopName: null });
+    expect(screen.queryByText('Lam Phong Tech')).not.toBeInTheDocument();
+  });
+
+  it('omits the shop row when showShopName is false', () => {
+    renderCard({}, false);
     expect(screen.queryByText('Lam Phong Tech')).not.toBeInTheDocument();
   });
 });
