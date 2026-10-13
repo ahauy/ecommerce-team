@@ -22,13 +22,13 @@ describe('isAllowedCorsOrigin', () => {
 
   it('allows custom origins from FRONTEND_URL with quotes, trailing slashes, or missing https://', () => {
     const rawFrontendUrl =
-      'https://custom.domain.com/, \'https://second.domain.com\', bare.domain.com';
-    expect(isAllowedCorsOrigin('https://custom.domain.com', rawFrontendUrl)).toBe(
-      true,
-    );
-    expect(isAllowedCorsOrigin('https://second.domain.com', rawFrontendUrl)).toBe(
-      true,
-    );
+      "https://custom.domain.com/, 'https://second.domain.com', bare.domain.com";
+    expect(
+      isAllowedCorsOrigin('https://custom.domain.com', rawFrontendUrl),
+    ).toBe(true);
+    expect(
+      isAllowedCorsOrigin('https://second.domain.com', rawFrontendUrl),
+    ).toBe(true);
     expect(isAllowedCorsOrigin('https://bare.domain.com', rawFrontendUrl)).toBe(
       true,
     );

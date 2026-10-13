@@ -1,7 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import AdminProductPage from '../index';
+import AdminProductPage, { ADMIN_PRODUCTS_PAGE_SIZE } from '../index';
 import { showError, showSuccess } from '@/helpers/toast';
 import { SELLER_BANNED_REASON, type AdminProduct, type AdminProductsParams, type AdminProductsResult } from '../types';
 
@@ -57,7 +57,7 @@ const result = (overrides: Partial<AdminProductsResult> = {}): AdminProductsResu
   items: [selling, blocked, bannedSeller],
   total: 3,
   page: 1,
-  limit: 20,
+  limit: ADMIN_PRODUCTS_PAGE_SIZE,
   totalPages: 1,
   ...overrides,
 });
@@ -80,27 +80,27 @@ describe('AdminProductPage', () => {
     mockQuery(result());
   });
 
-  it('hiển thị tiêu đề, danh sách và khoảng bản ghi; lần đầu tải trang 1, 20 dòng', () => {
+  it('hiển thị tiêu đề, danh sách và khoảng bản ghi; lần đầu tải trang 1 với page size mặc định', () => {
     render(<AdminProductPage />);
 
     expect(screen.getByRole('heading', { name: 'Kiểm duyệt sản phẩm' })).toBeInTheDocument();
     expect(screen.getByTestId('product-row-p-1')).toBeInTheDocument();
     expect(screen.getByTestId('product-range')).toHaveTextContent('Hiển thị 1–3 trong 3 sản phẩm');
-    expect(lastParams()).toEqual({ page: 1, limit: 20 });
+    expect(lastParams()).toEqual({ page: 1, limit: ADMIN_PRODUCTS_PAGE_SIZE });
   });
 
   it('lọc trạng thái chặn gửi đúng isBlocked', async () => {
     render(<AdminProductPage />);
 
     await userEvent.click(screen.getByRole('button', { name: 'Đang bị chặn' }));
-    expect(lastParams()).toEqual({ page: 1, limit: 20, isBlocked: true });
+    expect(lastParams()).toEqual({ page: 1, limit: ADMIN_PRODUCTS_PAGE_SIZE, isBlocked: true });
     expect(screen.getByRole('button', { name: 'Đang bị chặn' })).toHaveAttribute('aria-pressed', 'true');
 
     await userEvent.click(screen.getByRole('button', { name: 'Không bị chặn' }));
-    expect(lastParams()).toEqual({ page: 1, limit: 20, isBlocked: false });
+    expect(lastParams()).toEqual({ page: 1, limit: ADMIN_PRODUCTS_PAGE_SIZE, isBlocked: false });
 
     await userEvent.click(screen.getByRole('button', { name: 'Tất cả' }));
-    expect(lastParams()).toEqual({ page: 1, limit: 20 });
+    expect(lastParams()).toEqual({ page: 1, limit: ADMIN_PRODUCTS_PAGE_SIZE });
   });
 
   it('tìm kiếm có debounce, gửi từ khóa đã trim', async () => {
@@ -109,16 +109,17 @@ describe('AdminProductPage', () => {
     await userEvent.type(screen.getByLabelText('Tìm kiếm sản phẩm'), '  áo  ');
     expect(lastParams().search).toBeUndefined();
 
-    await waitFor(() => expect(lastParams()).toEqual({ page: 1, limit: 20, search: 'áo' }), { timeout: 2000 });
+    await waitFor(() => expect(lastParams()).toEqual({ page: 1, limit: ADMIN_PRODUCTS_PAGE_SIZE, search: 'áo' }), { timeout: 2000 });
   });
 
   it('phân trang; đổi bộ lọc thì quay về trang 1', async () => {
-    mockQuery(result({ total: 41, totalPages: 3 }));
+    const total = ADMIN_PRODUCTS_PAGE_SIZE * 2 + 1;
+    mockQuery(result({ total, totalPages: 3 }));
     render(<AdminProductPage />);
 
     await userEvent.click(screen.getByRole('button', { name: 'Trang 3' }));
     expect(lastParams()).toMatchObject({ page: 3 });
-    expect(screen.getByTestId('product-range')).toHaveTextContent('Hiển thị 41–41 trong 41 sản phẩm');
+    expect(screen.getByTestId('product-range')).toHaveTextContent(`Hiển thị ${total}–${total} trong ${total} sản phẩm`);
 
     await userEvent.click(screen.getByRole('button', { name: 'Đang bị chặn' }));
     expect(lastParams()).toMatchObject({ page: 1, isBlocked: true });

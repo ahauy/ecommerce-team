@@ -23,6 +23,7 @@ const BaseUrl = {
   SellerOrders: "/seller/orders",
 
   // ── Admin (Cổng quản trị) ──────────────────────────────────────────────────
+  AdminRoot: "/admin",
   AdminLogin: "/admin/login",
   AdminProfile: "/admin/profile",
   AdminCategories: "/admin/categories",
