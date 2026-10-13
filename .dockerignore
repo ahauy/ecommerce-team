@@ -1,0 +1,17 @@
+**/node_modules
+**/dist
+**/coverage
+**/.env
+**/.env.*
+!**/.env.example
+.git
+.claude
+.specify
+.vscode
+docs
+frontend/.husky
+backend/pnpm-workspace.yaml
+backend/pnpm-lock.yaml
+backend/package-lock.json
+frontend/pnpm-lock.yaml
+**/Dockerfile

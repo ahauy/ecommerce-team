@@ -63,7 +63,6 @@ atlas-credentials.env
 
 .agents/
 .codex/
-.github/
 .kilo/
 optional-stack-skills/
 packages/

@@ -180,7 +180,7 @@ const AppRoutes = () => {
               }
             >
               <Route
-                path="/admin"
+                path={BaseUrl.AdminRoot}
                 element={<Navigate to={BaseUrl.AdminCategories} replace />}
               />
               <Route
